@@ -1,7 +1,7 @@
 package it.polimi.is24am05.is24am05.model.enums.element;
 
 /**
- * Resources of the game.
+ * Resources.
  */
 public enum Resource implements Element {
     ANIMAL,
