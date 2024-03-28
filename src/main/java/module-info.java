@@ -5,5 +5,6 @@ module it.polimi.is24am05 {
     requires org.controlsfx.controls;
 
     opens it.polimi.is24am05.is24am05 to javafx.fxml;
-    exports it.polimi.is24am05.is24am05;
+    exports it.polimi.is24am05;
+    opens it.polimi.is24am05 to javafx.fxml;
 }

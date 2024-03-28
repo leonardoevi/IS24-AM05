@@ -1,4 +1,4 @@
-package it.polimi.is24am05.is24am05;
+package it.polimi.is24am05;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
