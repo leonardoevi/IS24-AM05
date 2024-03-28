@@ -298,6 +298,14 @@ public class PlayArea {
     }
 
     /**
+     * PlayArea Getter
+     * @return attribute playArea
+     */
+    public Map<Tuple, PlacedSide> getPlayArea() {
+        return new HashMap<>(this.playArea);
+    }
+
+    /**
      * @return The PlayArea, represented as a Matrix of PlayedSides.
      */
     public PlacedSide[][] getMatrixPlayArea(){
