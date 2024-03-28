@@ -103,4 +103,9 @@ public enum StarterBackSide implements Side {
             throw new InvalidCornerException();
         return List.of(corners.get(corner));
     }
+
+    @Override
+    public Resource getSeed() {
+        return null;
+    }
 }

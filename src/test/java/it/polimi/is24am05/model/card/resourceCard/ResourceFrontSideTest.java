@@ -41,4 +41,14 @@ class ResourceFrontSideTest {
     void getInvalidCorner() {
         assertThrows(InvalidCornerException.class, () -> ResourceFrontSide.RFS_001.getCorner(Corner.SE));
     }
+    @Test
+    void getSeed(){ assertEquals(Resource.FUNGI, ResourceFrontSide.RFS_001.getSeed());
+                    assertEquals(Resource.FUNGI, ResourceFrontSide.RFS_010.getSeed());
+                    assertEquals(Resource.PLANT, ResourceFrontSide.RFS_011.getSeed());
+                    assertEquals(Resource.PLANT, ResourceFrontSide.RFS_020.getSeed());
+                    assertEquals(Resource.ANIMAL, ResourceFrontSide.RFS_021.getSeed());
+                    assertEquals(Resource.ANIMAL, ResourceFrontSide.RFS_030.getSeed());
+                    assertEquals(Resource.INSECT, ResourceFrontSide.RFS_031.getSeed());
+                    assertEquals(Resource.INSECT, ResourceFrontSide.RFS_040.getSeed());
+    }
 }

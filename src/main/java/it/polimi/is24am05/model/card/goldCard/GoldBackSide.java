@@ -94,4 +94,18 @@ public enum GoldBackSide implements Side {
             return List.of(center);
         return List.of();
     }
+
+    @Override
+    public Resource getSeed() {
+        // Looking at the last 2 digits(fifth and sixth) of each card ID
+        int id = Integer.parseInt(this.name().substring(5));
+        id -=40;
+        if(id <= 10)
+            return Resource.FUNGI;
+        if (id <=20)
+            return Resource.PLANT;
+        if (id <=30)
+            return  Resource.ANIMAL;
+        return Resource.INSECT;
+    }
 }

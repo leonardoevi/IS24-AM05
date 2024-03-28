@@ -368,4 +368,17 @@ public enum ResourceFrontSide implements Side {
     public int getPlacementPoints(PlayArea playArea) {
         return points;
     }
+
+    @Override
+    public Resource getSeed() {
+        // Looking at the last 2 digits(fifth and sixth) of each card ID
+        int id = Integer.parseInt(this.name().substring(5));
+        if(id <= 10)
+            return Resource.FUNGI;
+        if (id <=20)
+            return Resource.PLANT;
+        if (id <=30)
+            return  Resource.ANIMAL;
+        return Resource.INSECT;
+    }
 }

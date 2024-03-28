@@ -29,4 +29,14 @@ class ResourceBackSideTest {
     void getEmptyCorner() {
         assertEquals(ResourceBackSide.RBS_001.getCorner(Corner.NW), List.of());
     }
+    @Test
+    void getSeed(){ assertEquals(Resource.FUNGI, ResourceBackSide.RBS_001.getSeed());
+                    assertEquals(Resource.FUNGI, ResourceBackSide.RBS_010.getSeed());
+                    assertEquals(Resource.PLANT, ResourceBackSide.RBS_011.getSeed());
+                    assertEquals(Resource.PLANT, ResourceBackSide.RBS_020.getSeed());
+                    assertEquals(Resource.ANIMAL, ResourceBackSide.RBS_021.getSeed());
+                    assertEquals(Resource.ANIMAL, ResourceBackSide.RBS_030.getSeed());
+                    assertEquals(Resource.INSECT, ResourceBackSide.RBS_031.getSeed());
+                    assertEquals(Resource.INSECT, ResourceBackSide.RBS_040.getSeed());
+    }
 }

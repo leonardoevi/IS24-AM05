@@ -116,4 +116,9 @@ public enum StarterFrontSide implements Side {
             return new ArrayList<>(corners.get(corner).get());
         return List.of();
     }
+
+    @Override
+    public Resource getSeed() {
+        return null;
+    }
 }

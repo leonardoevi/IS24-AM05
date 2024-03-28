@@ -5,6 +5,7 @@ import java.util.*;
 import it.polimi.is24am05.model.enums.element.Element;
 import it.polimi.is24am05.model.enums.Corner;
 
+import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.exceptions.card.InvalidCornerException;
 
 import it.polimi.is24am05.model.playArea.PlayArea;
@@ -44,4 +45,6 @@ public interface Side {
     default int getPlacementPoints(PlayArea playArea) {
         return 0;
     }
+
+    Resource getSeed();
 }
