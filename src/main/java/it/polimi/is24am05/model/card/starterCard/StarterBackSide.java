@@ -22,6 +22,30 @@ public enum StarterBackSide implements Side {
             Corner.SW, Resource.INSECT
         )
     ),
+    SBS_082(
+            Map.of(
+                    Corner.NW, Resource.PLANT,
+                    Corner.NE, Resource.ANIMAL,
+                    Corner.SE, Resource.INSECT,
+                    Corner.SW, Resource.FUNGI
+            )
+    ),
+    SBS_083(
+            Map.of(
+                    Corner.NW, Resource.INSECT,
+                    Corner.NE, Resource.ANIMAL,
+                    Corner.SE, Resource.PLANT,
+                    Corner.SW, Resource.FUNGI
+            )
+    ),
+    SBS_084(
+            Map.of(
+                    Corner.NW, Resource.PLANT,
+                    Corner.NE, Resource.INSECT,
+                    Corner.SE, Resource.FUNGI,
+                    Corner.SW, Resource.ANIMAL
+            )
+    ),
     SBS_085(
         Map.of(
             Corner.NW, Resource.INSECT,
@@ -29,6 +53,14 @@ public enum StarterBackSide implements Side {
             Corner.SE, Resource.ANIMAL,
             Corner.SW, Resource.PLANT
         )
+    ),
+    SBS_086(
+            Map.of(
+                    Corner.NW, Resource.FUNGI,
+                    Corner.NE, Resource.ANIMAL,
+                    Corner.SE, Resource.INSECT,
+                    Corner.SW, Resource.PLANT
+            )
     );
 
     /**

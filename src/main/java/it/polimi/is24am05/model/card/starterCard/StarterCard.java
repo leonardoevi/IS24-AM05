@@ -8,7 +8,11 @@ import it.polimi.is24am05.model.card.Card;
  */
 public enum StarterCard implements Card {
     SC_081(StarterFrontSide.SFS_081, StarterBackSide.SBS_081),
-    SC_085(StarterFrontSide.SFS_085, StarterBackSide.SBS_085);
+    SC_082(StarterFrontSide.SFS_082, StarterBackSide.SBS_082),
+    SC_083(StarterFrontSide.SFS_083, StarterBackSide.SBS_083),
+    SC_084(StarterFrontSide.SFS_084, StarterBackSide.SBS_084),
+    SC_085(StarterFrontSide.SFS_085, StarterBackSide.SBS_085),
+    SC_086(StarterFrontSide.SFS_086, StarterBackSide.SBS_086);
 
     /**
      * Front side of this card.

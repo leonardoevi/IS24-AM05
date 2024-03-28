@@ -3,12 +3,14 @@ package it.polimi.is24am05.model.card.goldCard.goldCardMultiplier;
 import it.polimi.is24am05.model.enums.element.Item;
 
 import it.polimi.is24am05.model.playArea.PlayArea;
-
+//ITEM WILL BE USED IN COMPUTE METHOD, TO BE IMPLEMENTED
 /**
  * Gold card multipliers that count the number of occurrences of an item on the play area.
  */
 public enum ItemMultiplier implements GoldCardMultiplier {
-    QUILL(Item.QUILL);
+    QUILL(Item.QUILL),
+    INKWELL(Item.INKWELL),
+    MANUSCRIPT(Item.MANUSCRIPT);
 
     /**
      * Item to count.

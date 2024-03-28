@@ -2,10 +2,12 @@ package it.polimi.is24am05.model.card.goldCard;
 
 import java.util.*;
 
+import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.AlwaysTrueMultiplier;
 import it.polimi.is24am05.model.enums.element.Element;
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.element.Item;
 import it.polimi.is24am05.model.enums.Corner;
+
 
 import it.polimi.is24am05.model.card.side.Side;
 
@@ -33,18 +35,484 @@ public enum GoldFrontSide implements Side {
         1,
         ItemMultiplier.QUILL
     ),
+    GFS_042(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.of(Item.INKWELL),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 2,
+                    Resource.PLANT, 1
+            ),
+            1,
+            ItemMultiplier.INKWELL
+    ),
+    GFS_043(
+            Map.of(
+                    Corner.NW, Optional.of(Item.MANUSCRIPT),
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 2,
+                    Resource.INSECT, 1
+            ),
+            1,
+            ItemMultiplier.MANUSCRIPT
+    ),
+    GFS_044(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 3,
+                    Resource.ANIMAL, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_045(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 3,
+                    Resource.PLANT, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_046(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 3,
+                    Resource.INSECT, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_047(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.of(Item.INKWELL)
+            ),
+            Map.of(
+                    Resource.FUNGI, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_048(
+            Map.of(
+                    Corner.NW, Optional.of(Item.QUILL),
+                    Corner.NE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_049(
+            Map.of(
+                    Corner.NE, Optional.of(Item.MANUSCRIPT),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_050(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.FUNGI, 5
+            ),
+            5,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_051(
+            Map.of(
+                    Corner.NW, Optional.of(Item.QUILL),
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 2,
+                    Resource.INSECT, 1
+            ),
+            1,
+            ItemMultiplier.QUILL
+    ),
+    GFS_052(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.of(Item.MANUSCRIPT),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 2,
+                    Resource.FUNGI, 1
+            ),
+            1,
+            ItemMultiplier.MANUSCRIPT
+    ),
+    GFS_053(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.of(Item.INKWELL),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 2,
+                    Resource.ANIMAL, 1
+            ),
+            1,
+            ItemMultiplier.INKWELL
+    ),
     GFS_054(
-        Map.of(
-            Corner.NE, Optional.empty(),
-            Corner.SE, Optional.empty(),
-            Corner.SW, Optional.empty()
-        ),
-        Map.of(
-            Resource.PLANT, 3,
-            Resource.INSECT, 1
-        ),
-        2,
-        CornerMultiplier.CORNER
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 3,
+                    Resource.INSECT, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_055(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 3,
+                    Resource.ANIMAL, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_056(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 3,
+                    Resource.FUNGI, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_057(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.of(Item.QUILL)
+            ),
+            Map.of(
+                    Resource.PLANT, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_058(
+            Map.of(
+                    Corner.NW, Optional.of(Item.MANUSCRIPT),
+                    Corner.NE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_059(
+            Map.of(
+                    Corner.NE, Optional.of(Item.INKWELL),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_060(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.PLANT, 5
+            ),
+            5,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_061(
+            Map.of(
+                    Corner.NW, Optional.of(Item.INKWELL),
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 2,
+                    Resource.INSECT, 1
+            ),
+            1,
+            ItemMultiplier.INKWELL
+    ),
+    GFS_062(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.of(Item.MANUSCRIPT),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 2,
+                    Resource.PLANT, 1
+            ),
+            1,
+            ItemMultiplier.MANUSCRIPT
+    ),
+    GFS_063(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SE, Optional.of(Item.QUILL),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 2,
+                    Resource.FUNGI, 1
+            ),
+            1,
+            ItemMultiplier.QUILL
+    ),
+    GFS_064(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 3,
+                    Resource.INSECT, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_065(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 3,
+                    Resource.FUNGI, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_066(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 3,
+                    Resource.PLANT, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_067(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.of(Item.MANUSCRIPT)
+            ),
+            Map.of(
+                    Resource.ANIMAL, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_068(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.of(Item.INKWELL)
+            ),
+            Map.of(
+                    Resource.ANIMAL, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_069(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.of(Item.QUILL)
+            ),
+            Map.of(
+                    Resource.ANIMAL, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_070(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.ANIMAL, 5
+            ),
+            5,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_071(
+            Map.of(
+                    Corner.NE, Optional.of(Item.QUILL),
+                    Corner.NW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.INSECT, 2,
+                    Resource.PLANT, 1
+            ),
+            1,
+            ItemMultiplier.QUILL
+    ),
+    GFS_072(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SE, Optional.empty(),
+                    Corner.NE, Optional.of(Item.MANUSCRIPT)
+            ),
+            Map.of(
+                    Resource.INSECT, 2,
+                    Resource.ANIMAL, 1
+            ),
+            1,
+            ItemMultiplier.MANUSCRIPT
+    ),
+    GFS_073(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.SE, Optional.of(Item.INKWELL)
+                    ),
+            Map.of(
+                    Resource.INSECT, 2,
+                    Resource.FUNGI, 1
+            ),
+            1,
+            ItemMultiplier.INKWELL
+    ),
+    GFS_074(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.NW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.INSECT, 3,
+                    Resource.ANIMAL, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_075(
+            Map.of(
+                    Corner.NE, Optional.empty(),
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.empty()
+            ),
+            Map.of(
+                    Resource.INSECT, 3,
+                    Resource.PLANT, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_076(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.SE, Optional.empty()
+            ),
+            Map.of(
+                    Resource.INSECT, 3,
+                    Resource.FUNGI, 1
+            ),
+            2,
+            CornerMultiplier.CORNER
+    ),
+    GFS_077(
+            Map.of(
+                    Corner.NW, Optional.of(Item.INKWELL),
+                    Corner.SW, Optional.empty()
+
+            ),
+            Map.of(
+                    Resource.INSECT, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_078(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.of(Item.MANUSCRIPT)
+
+            ),
+            Map.of(
+                    Resource.INSECT, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_079(
+            Map.of(
+                    Corner.SW, Optional.of(Item.QUILL),
+                    Corner.SE, Optional.empty()
+
+            ),
+            Map.of(
+                    Resource.INSECT, 3
+            ),
+            3,
+            AlwaysTrueMultiplier.ALWAYSTRUE
+    ),
+    GFS_080(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty()
+
+            ),
+            Map.of(
+                    Resource.INSECT, 5
+            ),
+            5,
+            AlwaysTrueMultiplier.ALWAYSTRUE
     );
 
     /**

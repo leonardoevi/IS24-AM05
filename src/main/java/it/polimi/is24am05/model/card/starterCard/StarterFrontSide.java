@@ -23,16 +23,31 @@ public enum StarterFrontSide implements Side {
             Corner.CE, Optional.of(List.of(Resource.INSECT))
         )
     ),
+    SFS_082(
+            Map.of(
+                    Corner.NW, Optional.of(List.of(Resource.ANIMAL)),
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.of(List.of(Resource.FUNGI)),
+                    Corner.SW, Optional.empty(),
+                    Corner.CE, Optional.of(List.of(Resource.FUNGI))
+            )
+    ),
+    SFS_083(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty(),
+                    Corner.SE, Optional.empty(),
+                    Corner.SW, Optional.empty(),
+                    Corner.CE, Optional.of(List.of(Resource.FUNGI, Resource.PLANT))
+            )
+    ),
     SFS_084(
             Map.of(
                     Corner.NW, Optional.empty(),
                     Corner.NE, Optional.empty(),
                     Corner.SE, Optional.empty(),
                     Corner.SW, Optional.empty(),
-                    Corner.CE, Optional.of(List.of(
-                            Resource.ANIMAL,
-                            Resource.INSECT
-                    ))
+                    Corner.CE, Optional.of(List.of(Resource.ANIMAL, Resource.INSECT))
             )
     ),
     SFS_085(
@@ -45,6 +60,17 @@ public enum StarterFrontSide implements Side {
                 Resource.PLANT
             ))
         )
+    ),
+    SFS_086(
+            Map.of(
+                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty(),
+                    Corner.CE, Optional.of(List.of(
+                            Resource.ANIMAL,
+                            Resource.FUNGI,
+                            Resource.PLANT
+                    ))
+            )
     );
 
     /**
