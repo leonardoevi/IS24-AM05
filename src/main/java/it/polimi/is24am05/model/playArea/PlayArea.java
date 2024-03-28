@@ -98,7 +98,7 @@ public class PlayArea {
      * @return The four "white" coordinates diagonally adjacent to param
      * @throws InvalidCoordinatesException If param doesn't correspond to a "white" set of coordinates
      */
-    private static Tuple[] getNeighbours(Tuple coord) throws InvalidCoordinatesException {
+    public static Tuple[] getNeighbours(Tuple coord) throws InvalidCoordinatesException {
         // Check for invalid coordinates
         if(!isWhite(coord))
             throw new InvalidCoordinatesException();
