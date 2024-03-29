@@ -6,14 +6,14 @@ public enum Objective {
     /**
      * The Objective enum declares the 16 objective cards needed for the game
      */
-    O_087(2, ResourcesMultiplier.OM_087),
-    O_088(2, ResourcesMultiplier.OM_088),
-    O_089(2, ResourcesMultiplier.OM_089),
-    O_090(2, ResourcesMultiplier.OM_090),
-    O_091(3, ResourcesMultiplier.OM_091),
-    O_092(3, ResourcesMultiplier.OM_092),
-    O_093(3, ResourcesMultiplier.OM_093),
-    O_094(3, ResourcesMultiplier.OM_094),
+    O_087(2, LayoutMultiplier.OM_087),
+    O_088(2, LayoutMultiplier.OM_088),
+    O_089(2, LayoutMultiplier.OM_089),
+    O_090(2, LayoutMultiplier.OM_090),
+    O_091(3, LayoutMultiplier.OM_091),
+    O_092(3, LayoutMultiplier.OM_092),
+    O_093(3, LayoutMultiplier.OM_093),
+    O_094(3, LayoutMultiplier.OM_094),
 
     O_095(2, ItemMultiplier.IM_095),
     O_096(2, ItemMultiplier.IM_096),

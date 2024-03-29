@@ -4,7 +4,7 @@ import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.enums.element.*;
 import it.polimi.is24am05.model.playArea.PlayArea;
 
-public enum ResourcesMultiplier implements ObjectiveMultiplier{
+public enum LayoutMultiplier implements ObjectiveMultiplier{
     /**
      * The ResourceMultiplier enum declares the 8 Objective
      * multiplier which are characterized by their points
@@ -43,14 +43,14 @@ public enum ResourcesMultiplier implements ObjectiveMultiplier{
     /**
      * The resources attribute is the 3x3 matrix that describes the layout
      */
-    private final Resource[][] resources;
+    private final Resource[][] layout;
 
     /**
      * Initializes a ResourceMultiplier
-     * @param resources 3x3 matrix for Point Condition
+     * @param layout 3x3 matrix for Point Condition
      */
-    ResourcesMultiplier(Resource[][] resources) {
-        this.resources = resources;
+    LayoutMultiplier(Resource[][] layout) {
+        this.layout = layout;
     }
 
     /**
@@ -72,16 +72,16 @@ public enum ResourcesMultiplier implements ObjectiveMultiplier{
         }
         int result = 0;
 
-        for (int i = 0; i <= res.length - resources.length; i++) {
-            for (int j = 0; j <= res[0].length - resources[0].length; j++) {
+        for (int i = 0; i <= res.length - layout.length; i++) {
+            for (int j = 0; j <= res[0].length - layout[0].length; j++) {
 
-                if (matches(res, resources, i, j)){
+                if (matches(res, layout, i, j)){
                     //Once a placing condition is satisfied all the values in the bigger matrix
                     //matching with the layout are set to null to avoid duplicates
 
-                    for (int k = i; k < i + resources.length; k++) {
-                        for (int l = j; l < j + resources[0].length; l++) {
-                            if(resources[k-i][l-j]!= null) {
+                    for (int k = i; k < i + layout.length; k++) {
+                        for (int l = j; l < j + layout[0].length; l++) {
+                            if(layout[k-i][l-j]!= null) {
                                 res[k][l] = null;
                             }
                         }
