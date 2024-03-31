@@ -8,11 +8,13 @@ import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
 import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
+import it.polimi.is24am05.model.exceptions.player.*;
 import it.polimi.is24am05.model.objective.Objective;
 import it.polimi.is24am05.model.playArea.PlayArea;
 import it.polimi.is24am05.model.playArea.Tuple;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Player {
@@ -37,13 +39,18 @@ public class Player {
      */
     private int points;
 
+
+    /**
+     * This attribute keeps track of the starter card
+     */
+    private StarterCard starterCard;
     /**
      * This attribute keeps track of the cards in the player's hand
      */
     private List<Card> hand;
 
     /**
-     * each player has playArea->view class PlayArea
+     * each player has a playArea where they can place the cards
      */
     private PlayArea playArea;
 
@@ -65,34 +72,25 @@ public class Player {
         this.nickname = nickname;
         this.color = color;
         this.hand = new ArrayList<Card>();
-
         this.points = 0;
         this.playArea = new PlayArea();
         this.objectivesHand = new Objective[2];
         this.objective = null;
     }
 
-
     /**
-     * places the side of the starter card chosen by the player in his playArea
+     * initialize the starter card of the player
      *
-     * @param starterSide is the Side of the starter Card chosen by the player
-     * @throws InvalidCoordinatesException  If the specified coordinates are not "white"
-     * @throws NoAdjacentCardException      If the specified coordinates are not diagonally adjacent to any card
-     * @throws PlacementNotAllowedException If a neighbouring card doesn't allow the placement
-     *                                      since it's the first card to be placed in the playArea, and the methods force the placement in coordinates (0,0)
-     *                                      exceptions can't happne
+     * @param starterCard is the starterCard given to the player
      */
-
-    public void dealStarterCard(Side starterSide) throws PlacementNotAllowedException, InvalidCoordinatesException, NoAdjacentCardException {
-        playArea.playSide(starterSide, new Tuple(0, 0));
+    public void dealStarterCard(StarterCard starterCard) {
+        this.starterCard=starterCard;
     }
-
 
     /**
      * initialize the hand of the player
      *
-     * @param hand is the List of Card given to the player at the beginning of the game
+     * @param hand is the List of 3 Cards given to the player at the beginning of the game
      */
 
     public void dealHand(List<Card> hand) {
@@ -110,29 +108,72 @@ public class Player {
     }
 
     /**
-     * initialize the attribute obective
+     * initialize the attribute objective
      *
      * @param objective is the objective card chosen between the 2 objectives card by the player
+     * @throws ObjectiveNotAllowedException  if the player doesn't have that objective card
+     *
      */
-    public void choseObjective(Objective objective) {
+    public void choseObjective(Objective objective) throws ObjectiveNotAllowedException {
+        if(!this.objectivesHand[0].equals(objective) && !this.objectivesHand[1].equals(objective))
+            throw new ObjectiveNotAllowedException();
+
         this.objective = objective;
     }
 
     /**
-     * places the side of a card in the player's playArea at coordinates (i,j)
+     * places the side of the starter card chosen by the player in his playArea
      *
-     * @param side is the Side of the Card to be positioned in the playArea
+     * @param starterSide is the Side of the starter Card chosen by the player
+     * @throws InvalidStarterSideException  If the side is not associated with the starterCard of the player
+     *
+     */
+
+    public void playStarterCard(Side starterSide) throws InvalidStarterSideException {
+
+        if(!starterCard.getBackSide().equals(starterSide) && !starterCard.getFrontSide().equals(starterSide))
+            throw new InvalidStarterSideException();
+        try {
+            playArea.playSide(starterSide, new Tuple(0, 0));
+        }
+        catch( InvalidCoordinatesException | NoAdjacentCardException |
+               PlacementNotAllowedException ignored) {}
+    }
+
+    /**
+     * places the side of the card in the player's playArea at coordinates (i,j)
+     *
+     * @param card is the card to be played  chosen by the player
+     * @param side is the Side of the card the player wants to place
      * @param i    is the first coordinate
      * @param j    is the second coordinate
+     * @throws InvalidCardException  If the player's hand doesn't contain Card
+     * @throws InvalidSideException  If the side is not associated with the card
      * @throws InvalidCoordinatesException  If the specified coordinates are not "white"
      * @throws NoAdjacentCardException      If the specified coordinates are not diagonally adjacent to any card
      * @throws PlacementNotAllowedException If a neighbouring card doesn't allow the placement
      */
-    public void playSide(Side side, int i, int j) throws PlacementNotAllowedException, InvalidCoordinatesException, NoAdjacentCardException {
+    public void playSide(Card card, Side side, int i, int j) throws InvalidCardException, InvalidSideException, PlacementNotAllowedException, InvalidCoordinatesException, NoAdjacentCardException  {
+
+        if(!hand.contains(card))
+            throw new InvalidCardException();
+        if(!card.getFrontSide().equals(side) && !card.getBackSide().equals(side))
+            throw new InvalidSideException();
 
         points += this.playArea.playSide(side, new Tuple(i, j));
+        this.hand.remove(card);
 
     }
+    /**
+     * add the drawn card to the player's hand
+     *
+     * @param card is card drawn by the player
+     */
+    public void drawCard(Card card)
+    {
+        hand.add(card);
+    }
+
 
     /**
      * nickname Getter
@@ -207,6 +248,15 @@ public class Player {
     }
 
     /**
+     * starterCard Getter
+     *
+     * @return the attribute starterCard
+     */
+    public StarterCard getStarterCard() {
+        return this.starterCard;
+    }
+
+    /**
      * state Setter
      */
     public void setState(PlayerState state)
@@ -214,6 +264,5 @@ public class Player {
         this.state=state;
 
     }
-
 
 }
