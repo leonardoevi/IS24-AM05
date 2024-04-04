@@ -5,11 +5,11 @@ package it.polimi.is24am05.model.enums.state;
  */
 public enum PlayerState {
     /**
-     * Places a card.
+     * Player must draw a card.
      */
-    PLACE,
+    DRAW,
     /**
-     * Draws a card.
+     * Player must place a card.
      */
-    DRAW;
+    PLACE;
 }

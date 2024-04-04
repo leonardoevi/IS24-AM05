@@ -64,11 +64,18 @@ public class Player {
      */
     private Objective objective;
 
+    // Attributes used by the Game Class
+    public boolean hasPlacedStarterCard = false, hasChosenObjective = false;
+
+    public PlayerState playerState;
+
+    private int satisfiedObjectiveCards = 0;
+
     /**
      * Initializes a player with his nickname and Color of the token
      */
 
-    Player(String nickname, Color color) {
+    public Player(String nickname, Color color) {
         this.nickname = nickname;
         this.color = color;
         this.hand = new ArrayList<Card>();
@@ -114,11 +121,12 @@ public class Player {
      * @throws ObjectiveNotAllowedException  if the player doesn't have that objective card
      *
      */
-    public void choseObjective(Objective objective) throws ObjectiveNotAllowedException {
+    public void chooseObjective(Objective objective) throws ObjectiveNotAllowedException {
         if(!this.objectivesHand[0].equals(objective) && !this.objectivesHand[1].equals(objective))
             throw new ObjectiveNotAllowedException();
 
         this.objective = objective;
+        this.hasChosenObjective = true;
     }
 
     /**
@@ -138,6 +146,8 @@ public class Player {
         }
         catch( InvalidCoordinatesException | NoAdjacentCardException |
                PlacementNotAllowedException ignored) {}
+
+        this.hasPlacedStarterCard = true;
     }
 
     /**
@@ -256,6 +266,10 @@ public class Player {
         return this.starterCard;
     }
 
+    public int getSatisfiedObjectiveCards() {
+        return satisfiedObjectiveCards;
+    }
+
     /**
      * state Setter
      */
@@ -264,5 +278,15 @@ public class Player {
         this.state=state;
 
     }
+
+    /**
+     * Evaluates the objectives for the player, both private and shared.
+     * Increases the player points accordingly.
+     * Sets the number of objectiveCard that the player has satisfied.
+     */
+    public void evaluateObjectives(Objective[] sharedObjectives){
+        // TO IMPLEMENT
+        return;
+    };
 
 }
