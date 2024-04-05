@@ -18,6 +18,10 @@ public enum GameState {
      */
     GAME,
     /**
+     * The game is about to end, last few turns are being played.
+     */
+    GAME_ENDING,
+    /**
      * The game ended and winners are returned.
      */
     END;

@@ -66,9 +66,6 @@ public class Player {
 
     // Attributes used by the Game Class
     public boolean hasPlacedStarterCard = false, hasChosenObjective = false;
-
-    public PlayerState playerState;
-
     private int satisfiedObjectiveCards = 0;
 
     /**
@@ -278,6 +275,7 @@ public class Player {
         this.state=state;
 
     }
+
 
     /**
      * Evaluates the objectives for the player, both private and shared.

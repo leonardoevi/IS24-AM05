@@ -138,6 +138,23 @@ public class Game {
     }
 
     /**
+     * @param expected Expected game state
+     * @param alternative Alternative expected game state
+     * @throws MoveNotAllowedException If the current game state is different from the expected game state
+     */
+    private void checkState(GameState expected, GameState alternative) throws MoveNotAllowedException {
+        if(this.gameState != expected && this.gameState != alternative)
+            throw new MoveNotAllowedException("Current game state different from expected");
+    }
+
+    /**
+     * @return True if a player can draw a card from one of the decks
+     */
+    private boolean cardLeftToDraw(){
+        return !this.goldDeck.getVisible().isEmpty() || !this.resourceDeck.getVisible().isEmpty();
+    }
+
+    /**
      * After game initialization players have to place their starter Card
      * @param playerName Name of the player that is placing the card
      * @param side Side of the card that is facing up
@@ -242,13 +259,17 @@ public class Game {
             allHaveChosen = allHaveChosen && p.hasChosenObjective;
 
         // It is time to start playing
-        if(allHaveChosen)
+        if(allHaveChosen) {
             this.gameState = GameState.GAME;
-
+            for (Player p : players)
+                p.setState(PlayerState.PLACE);
+        }
     }
 
     /**
      * Allows a player to place a card in their play area
+     * If there is at least a card left to draw, sets its PlayerState to DRAW
+     * Sets the game state to GAME_ENDING and ends the player turn otherwise.
      * @param playerName The player that wants to play
      * @param card The card to be placed
      * @param side The side that will be visible
@@ -265,19 +286,20 @@ public class Game {
      */
     public void placeSide(String playerName, Card card, Side side, int i, int j) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, PlacementNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
         // Check if the current game state is GAME
-        checkState(GameState.GAME);     // throws MoveNotAllowedException
+        checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
         // Find the player
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
-
-        // Check if it's time for the player to place a Card
-        if(player.playerState != PlayerState.PLACE)
-            throw new MoveNotAllowedException("It is time to place a card");
 
         // Check if it's the Player turn
         if(this.players.get(turn) != player){
             throw new NotYourTurnException();
         }
+
+        // Check if it's time for the player to place a Card
+        if(player.getState() != PlayerState.PLACE)
+            throw new MoveNotAllowedException("It is time to place a card");
+
 
         // Place the card
         player.playSide(card, side, i, j);  // throws InvalidCardException
@@ -286,11 +308,16 @@ public class Game {
                                             // InvalidCoordinatesException
                                             // NoAdjacentCardException
 
-        // Time to draw a card
-        player.playerState = PlayerState.DRAW;
+        // If there is something left to draw
+        if(cardLeftToDraw())
+            // Time to draw a card
+            player.setState(PlayerState.DRAW);
+        else {
+            // The game is ending and the player must not Draw
+            this.gameState = GameState.GAME_ENDING;
+            nextTurn();
+        }
     }
-
-    // WE MIGHT WANT TO HANDLE THE CASE WHERE THERE IS NO MORE CARDS LEFT TO DRAW
 
     /**
      * Allows a player to draw a Card from a Deck
@@ -304,19 +331,19 @@ public class Game {
      */
     public void drawDeck(String playerName, boolean fromGold) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, EmptyDeckException {
         // Check if the current game state is GAME
-        checkState(GameState.GAME);     // throws MoveNotAllowedException
+        checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
         // Find the player
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
-
-        // Check if it is time for the player to draw
-        if(player.getState() != PlayerState.DRAW)
-            throw new MoveNotAllowedException("It is time to draw a Card");
 
         // Check if it's the Player turn
         if(this.players.get(turn) != player){
             throw new NotYourTurnException();
         }
+
+        // Check if it is time for the player to draw
+        if(player.getState() != PlayerState.DRAW)
+            throw new MoveNotAllowedException("It is time to draw a Card");
 
         // Select the deck
         Deck toDrawFrom;
@@ -332,7 +359,7 @@ public class Game {
         player.drawCard(drawn);
 
         // End the turn
-        player.playerState = PlayerState.PLACE;
+        player.setState(PlayerState.PLACE);
         nextTurn();
     }
 
@@ -348,7 +375,7 @@ public class Game {
      */
     public void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException {
         // Check if the current game state is GAME
-        checkState(GameState.GAME);     // throws MoveNotAllowedException
+        checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
         // Find the player
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
@@ -376,7 +403,7 @@ public class Game {
         player.drawCard(drawn);
 
         // End the turn
-        player.playerState = PlayerState.PLACE;
+        player.setState(PlayerState.PLACE);
         nextTurn();
 
     }
@@ -388,8 +415,12 @@ public class Game {
      * After everyone has played the last turn, it ends the game.
      */
     private void nextTurn(){
-        // If a Player has reached 20 points
-        if( players.stream().anyMatch(player -> player.getPoints() >= POINTS_TO_END) ){
+        // If a player has reached 20 points
+        if(players.stream().anyMatch(p -> p.getPoints() >= POINTS_TO_END))
+            this.gameState = GameState.GAME_ENDING;
+
+        // If only last turns must be played
+        if(this.gameState == GameState.GAME_ENDING){
             // Increase the index
             this.turn += 1;
         } else
@@ -431,5 +462,29 @@ public class Game {
     public List<Player> getWinners() {
         // Check if game has ended
         return new ArrayList<>(this.winners);
+    }
+
+    public List<Player> getPlayers() {
+        return new ArrayList<>(this.players);
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public Deck getResourceDeck() {
+        return resourceDeck;
+    }
+
+    public Deck getGoldDeck() {
+        return goldDeck;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public Objective[] getSharedObjectives() {
+        return sharedObjectives.clone();
     }
 }

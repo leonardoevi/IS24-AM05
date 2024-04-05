@@ -3,8 +3,8 @@ package it.polimi.is24am05.model.playArea;
 import java.util.Objects;
 
 public class Tuple {
-    protected int i;
-    protected int j;
+    public int i;
+    public int j;
 
     public Tuple(int i, int j) {
         this.i = i;
