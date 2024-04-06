@@ -3,7 +3,7 @@ package it.polimi.is24am05.model.card.goldCard.goldCardMultiplier;
 import it.polimi.is24am05.model.enums.element.Item;
 
 import it.polimi.is24am05.model.playArea.PlayArea;
-//ITEM WILL BE USED IN COMPUTE METHOD, TO BE IMPLEMENTED
+
 /**
  * Gold card multipliers that count the number of occurrences of an item on the play area.
  */
@@ -34,6 +34,6 @@ public enum ItemMultiplier implements GoldCardMultiplier {
      */
     @Override
     public int compute(PlayArea playArea) {
-        return 1;
+        return playArea.getVisibleElements().get(this.item);
     }
 }
