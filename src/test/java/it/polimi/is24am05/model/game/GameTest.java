@@ -2,6 +2,7 @@ package it.polimi.is24am05.model.game;
 
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.enums.state.PlayerState;
@@ -16,6 +17,7 @@ import it.polimi.is24am05.model.exceptions.player.InvalidSideException;
 import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.objective.Objective;
+import it.polimi.is24am05.model.playArea.AreaDisplayer;
 import it.polimi.is24am05.model.playArea.Tuple;
 import org.junit.jupiter.api.Test;
 
@@ -297,11 +299,21 @@ class GameTest {
             Card toPlace = current.getHand().getFirst();
             Tuple coord = getRandomFreePlacingSpot(current);
             try {
-                game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
+                // Try placing it facing up
+                game.placeSide(current.getNickname(), toPlace, toPlace.getFrontSide(), coord.i, coord.j);
             } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
-                     InvalidCoordinatesException | InvalidSideException | PlacementNotAllowedException |
+                     InvalidCoordinatesException | InvalidSideException |
                      NotYourTurnException | NoSuchPlayerException e) {
                 throw new RuntimeException(e);
+            } catch (PlacementNotAllowedException e){
+                try {
+                    // Place it facing down
+                    game.placeSide(current.getNickname(), toPlace, toPlace.getFrontSide(), coord.i, coord.j);
+                } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                         InvalidCoordinatesException | InvalidSideException | PlacementNotAllowedException |
+                         NotYourTurnException | NoSuchPlayerException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
             // If there is nothing to draw
@@ -369,7 +381,7 @@ class GameTest {
             assertEquals(PlayerState.PLACE, current.getState());
         }
 
-        // Announce winners
+        // Get winners
         List<Player> winners = game.getWinners();
 
         // Must have at least one winner
@@ -377,7 +389,7 @@ class GameTest {
 
         // Announce winners
         if(winners.size() == 1){
-            System.out.println("The winner is: " + winners.getFirst());
+            System.out.println("The winner is: " + winners.getFirst().getNickname());
         } else {
             String names = "";
             for(Player winner : winners){
@@ -394,7 +406,7 @@ class GameTest {
             System.out.println("Points:" + p.getPoints());
             System.out.println("Cards Played: " + p.getPlayArea().getPlayArea().keySet().size());
             System.out.println("PlayArea:");
-            System.out.println(PlayAreaToString(p.getPlayArea().getMatrixPlayArea()));
+            System.out.println(new AreaDisplayer(p.getPlayArea()));
 
 
             System.out.println();
@@ -403,20 +415,16 @@ class GameTest {
     }
 
     @Test
-    void placeSide() {
-    }
+    void multipleGames() {
+        int N = 100;
 
-    @Test
-    void drawDeck() {
-    }
-
-    @Test
-    void drawVisible() {
+        for (int i = 0; i < N; i++)
+            Game2();
     }
 
     // Used to get the player of the game that is expected to make a move.
     // Might throw exceptions if invoked when the game state is not GAME
-    private static Player getCurrentPlayer(Game game){
+    public static Player getCurrentPlayer(Game game){
         return game.getPlayers().get(game.getTurn());
     }
 
@@ -427,7 +435,7 @@ class GameTest {
                 .get();
     }
 
-    private static Tuple getRandomFreePlacingSpot(Player player){
+    public static Tuple getRandomFreePlacingSpot(Player player){
         List<Tuple> possibleCoord;
         possibleCoord = new LinkedList<>(player.getPlayArea().getFrontier().stream().toList());
         Collections.shuffle(possibleCoord);
@@ -439,11 +447,11 @@ class GameTest {
         String ret = "";
         for(PlacedSide[] row : matrix){
             for(PlacedSide placedSide : row){
-                if(placedSide == null)
-                    ret += " ------- ";
-                else {
+                // Replace this with correct implementation of toString method
+                if(placedSide instanceof EmptyPlacedSide)
+                    ret += " " + placedSide.getActualCoord().toString() + " ";
+                else
                     ret += " " + placedSide.getSide().toString() + " ";
-                }
             }
             ret += "\n";
         }

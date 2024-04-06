@@ -72,7 +72,7 @@ public enum ResourceFrontSide implements Side {
             Map.of(
                     Corner.NW, Optional.empty(),
                     Corner.NE, Optional.of(Resource.FUNGI),
-                    Corner.SE, Optional.empty()
+                    Corner.SW, Optional.empty()
 
             ), 1
     ),
@@ -170,7 +170,7 @@ public enum ResourceFrontSide implements Side {
             Map.of(
                     Corner.NE, Optional.of(Resource.ANIMAL),
                     Corner.NW, Optional.of(Resource.ANIMAL),
-                    Corner.SE, Optional.empty()
+                    Corner.SW, Optional.empty()
             ), 0
     ),
     RFS_022(
@@ -203,8 +203,8 @@ public enum ResourceFrontSide implements Side {
     ),
     RFS_026(
             Map.of(
-                    Corner.NE, Optional.of(Resource.PLANT),
-                    Corner.NW, Optional.of(Resource.ANIMAL),
+                    Corner.NW, Optional.of(Resource.PLANT),
+                    Corner.NE, Optional.of(Resource.ANIMAL),
                     Corner.SE, Optional.of(Item.MANUSCRIPT)
             ), 0
     ),

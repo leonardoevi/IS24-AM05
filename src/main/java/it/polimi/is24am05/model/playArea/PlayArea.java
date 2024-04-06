@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.playArea;
 
+import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterBackSide;
@@ -29,10 +30,14 @@ public class PlayArea {
     private final Map<Tuple, PlacedSide> playArea;
 
     /**
+     * Keeps track of the order in which sides are placed
+     */
+    private final List<PlacedSide> orderedPlacements = new ArrayList<>();
+
+    /**
      * This attribute keeps track of the number of visible elements on the PlayArea
      */
     private final Map<Element, Integer> visibleElements;
-
     /**
      * The frontier is the set of empty Coordinates that are neighbours to an existing card.
      */
@@ -54,7 +59,7 @@ public class PlayArea {
      * The following 4 attributes keep track of the boundaries of the play area.
      * They are needed to turn the Map into an actual Matrix
      */
-    private int minI, minJ, maxI, maxJ;
+    protected int minI, minJ, maxI, maxJ;
 
     /**
      * Initializes an empty Play Area
@@ -65,14 +70,14 @@ public class PlayArea {
 
         // Initialize element counter to zero
         this.visibleElements = new HashMap<>();
-        for(Resource r : Resource.values())
-            this.visibleElements.put(r,0);
-        for(Item i : Item.values())
-            this.visibleElements.put(i,0);
+        for (Resource r : Resource.values())
+            this.visibleElements.put(r, 0);
+        for (Item i : Item.values())
+            this.visibleElements.put(i, 0);
 
         // Initialize frontier
         this.frontier = new HashSet<>();
-        this.frontier.add(new Tuple(0,0));
+        this.frontier.add(new Tuple(0, 0));
 
         // Initialize set of blocked coordinates
         this.blocked = new HashSet<>();
@@ -81,7 +86,10 @@ public class PlayArea {
         this.turnCount = 0;
 
         // Initialize min max values
-        minI = 0; minJ = 0; maxI = 0; maxJ = 0;
+        minI = 0;
+        minJ = 0;
+        maxI = 0;
+        maxJ = 0;
     }
 
 
@@ -89,8 +97,8 @@ public class PlayArea {
      * @param coord Set of coordinates to check
      * @return True if the specified set of coordinates correspond to a "white" cell in the chessboard
      */
-    private static boolean isWhite(Tuple coord){
-        return Math.abs(coord.i%2) == Math.abs(coord.j%2);
+    protected static boolean isWhite(Tuple coord) {
+        return Math.abs(coord.i % 2) == Math.abs(coord.j % 2);
     }
 
     /**
@@ -100,39 +108,39 @@ public class PlayArea {
      */
     public static Tuple[] getNeighbours(Tuple coord) throws InvalidCoordinatesException {
         // Check for invalid coordinates
-        if(!isWhite(coord))
+        if (!isWhite(coord))
             throw new InvalidCoordinatesException();
 
         // Allocate array of neighbours
         Tuple[] neighbours = new Tuple[4];
 
         // Fill the array
-        neighbours[0] = new Tuple( coord.i -1, coord.j -1);
-        neighbours[1] = new Tuple( coord.i -1, coord.j +1);
-        neighbours[2] = new Tuple( coord.i +1, coord.j +1);
-        neighbours[3] = new Tuple( coord.i +1, coord.j -1);
+        neighbours[0] = new Tuple(coord.i - 1, coord.j - 1);
+        neighbours[1] = new Tuple(coord.i - 1, coord.j + 1);
+        neighbours[2] = new Tuple(coord.i + 1, coord.j + 1);
+        neighbours[3] = new Tuple(coord.i + 1, coord.j - 1);
 
         return neighbours;
     }
 
     /**
-     * @param coord starting coordinates
+     * @param coord  starting coordinates
      * @param corner direction of adjacency
      * @return Returns the coordinates diagonally adjacent in the specified direction
      */
-    private static Tuple getNeighbour(Tuple coord, Corner corner){
-        switch (corner){
+    public static Tuple getNeighbour(Tuple coord, Corner corner) {
+        switch (corner) {
             case NW -> {
-                return new Tuple(coord.i -1, coord.j -1);
+                return new Tuple(coord.i - 1, coord.j - 1);
             }
             case NE -> {
-                return new Tuple(coord.i -1, coord.j +1);
+                return new Tuple(coord.i - 1, coord.j + 1);
             }
             case SE -> {
-                return new Tuple(coord.i +1, coord.j +1);
+                return new Tuple(coord.i + 1, coord.j + 1);
             }
             case SW -> {
-                return new Tuple(coord.i +1, coord.j -1);
+                return new Tuple(coord.i + 1, coord.j - 1);
             }
             // Should never happen
             case null, default -> {
@@ -143,27 +151,29 @@ public class PlayArea {
 
     /**
      * Updates the frontier, adding the empty "white" cells adjacent to the last added card
+     *
      * @param lastAdd Coordinates of the last added Card
      * @throws InvalidCoordinatesException If the specified coordinates are not "white"
      */
     private void updateFrontier(Tuple lastAdd) throws InvalidCoordinatesException {
         // Check for invalid coordinates
-        if(!isWhite(lastAdd))
+        if (!isWhite(lastAdd))
             throw new InvalidCoordinatesException();
 
         // Check if lastAdd is in the playArea
-        if(!this.playArea.containsKey(lastAdd))
+        if (!this.playArea.containsKey(lastAdd))
             return;
 
         // Update the frontier
         frontier.remove(lastAdd);
-        for(Tuple neighbour : getNeighbours(lastAdd))
-            if(!playArea.containsKey(neighbour))
+        for (Tuple neighbour : getNeighbours(lastAdd))
+            if (!playArea.containsKey(neighbour))
                 frontier.add(neighbour);
     }
 
     /**
      * After placing the card at the specified coordinates, updates the count of visible Elements
+     *
      * @param coord Coordinates of the card that was last added
      * @throws InvalidCoordinatesException If the specified coordinates are not "white"
      */
@@ -172,9 +182,9 @@ public class PlayArea {
         Tuple[] neighbours = getNeighbours(coord);
 
         // For each neighbouring set of coordinates
-        for(Tuple neighbour : neighbours){
+        for (Tuple neighbour : neighbours) {
             // If there is a card
-            if(this.playArea.containsKey(neighbour)){
+            if (this.playArea.containsKey(neighbour)) {
                 Corner covered = getCoveredCorner(neighbour, coord);
                 try {
                     // Remove the element that the card is covering
@@ -191,10 +201,10 @@ public class PlayArea {
 
         // Add the Resources that the Side is showing
         Side lastAdd = this.playArea.get(coord).getSide();
-        for(Corner corner : Corner.values()){
+        for (Corner corner : Corner.values()) {
             try {
                 List<Element> elementsToAdd = lastAdd.getCorner(corner);
-                for(Element toAdd : elementsToAdd){
+                for (Element toAdd : elementsToAdd) {
                     int count = this.visibleElements.get(toAdd);
                     this.visibleElements.put(toAdd, count + 1);
                 }
@@ -207,20 +217,21 @@ public class PlayArea {
 
     /**
      * Returns the corner that the top card is covering
+     *
      * @param bottom Coordinates of the card that is covered
-     * @param top Coordinates of the card on top
+     * @param top    Coordinates of the card on top
      * @return The corner of the Bottom Card, that the Top card is covering
      * @throws InvalidCoordinatesException If the two Cards are not adjacent
      */
-    public static Corner getCoveredCorner(Tuple bottom, Tuple top) throws InvalidCoordinatesException{
+    public static Corner getCoveredCorner(Tuple bottom, Tuple top) throws InvalidCoordinatesException {
         // If the two coordinates are not adjacent
-        if(Arrays.stream(getNeighbours(top)).noneMatch(x -> x.equals(bottom)))
+        if (Arrays.stream(getNeighbours(top)).noneMatch(x -> x.equals(bottom)))
             throw new InvalidCoordinatesException();
 
         int deltaI = top.i - bottom.i;
         int deltaJ = top.j - bottom.j;
 
-        if(deltaI > 0) {
+        if (deltaI > 0) {
             if (deltaJ > 0)
                 return Corner.SE;
             else
@@ -235,32 +246,40 @@ public class PlayArea {
 
     /**
      * Adds the specified card to the PlayArea
-     * @param side Side of the card to play
+     *
+     * @param side  Side of the card to play
      * @param coord Coordinates of the card to play
-     * @throws InvalidCoordinatesException If the specified coordinates are not "white"
-     * @throws NoAdjacentCardException If the specified coordinates are not diagonally adjacent to any card
+     * @throws InvalidCoordinatesException  If the specified coordinates are not "white"
+     * @throws NoAdjacentCardException      If the specified coordinates are not diagonally adjacent to any card
      * @throws PlacementNotAllowedException If a neighbouring card doesn't allow the placement
      */
     public int playSide(Side side, Tuple coord) throws InvalidCoordinatesException, NoAdjacentCardException, PlacementNotAllowedException {
         // Check for invalid coordinates
-        if(!isWhite(coord))
+        if (!isWhite(coord))
             throw new InvalidCoordinatesException();
 
         // Check if coordinates are in the frontier
-        if(!this.frontier.contains(coord))
+        if (!this.frontier.contains(coord))
             throw new NoAdjacentCardException();
 
         // Check if the first card is a Starting Card
-        if(this.playArea.keySet().isEmpty() && !(side instanceof StarterFrontSide || side instanceof StarterBackSide))
+        if (this.playArea.keySet().isEmpty() && !(side instanceof StarterFrontSide || side instanceof StarterBackSide))
             throw new PlacementNotAllowedException();
 
         // Check if coordinates are blocked
-        if(this.blocked.contains(coord))
+        if (this.blocked.contains(coord))
             throw new PlacementNotAllowedException();
 
+        // Check if card Condition allow the placement
+        Map<Resource, Integer> conditions = side.getPlacementConditions();
+        for (Resource necessary : conditions.keySet())
+            if (this.getVisibleElements().get(necessary) < conditions.get(necessary))
+                throw new PlacementNotAllowedException();
+
         // Place Card
-        PlacedSide toPlace = new PlacedSide(side, this.turnCount);
+        PlacedSide toPlace = new PlacedSide(side, this.turnCount, coord);
         this.playArea.put(coord, toPlace);
+        orderedPlacements.add(toPlace);
 
         // Update min max values
         minI = Integer.min(coord.i, minI);
@@ -275,7 +294,7 @@ public class PlayArea {
         updateVisibleElements(coord);
 
         // Update blocked positions
-        for(Corner c : Corner.getEdges()) {
+        for (Corner c : Corner.getEdges()) {
             // If the card does not have a corner and the neighbouring cell is empty
             if (!side.hasCorner(c) && !this.playArea.containsKey(getNeighbour(coord, c)))
                 // No card can be placed in that cell
@@ -293,12 +312,13 @@ public class PlayArea {
      * @param coord Coordinates to check for availability
      * @return True if a Card can be placed at the specified Coordinates
      */
-    public boolean isFree(Tuple coord){
+    public boolean isFree(Tuple coord) {
         return this.frontier.contains(coord) && !this.blocked.contains(coord);
     }
 
     /**
      * PlayArea Getter
+     *
      * @return attribute playArea
      */
     public Map<Tuple, PlacedSide> getPlayArea() {
@@ -308,27 +328,39 @@ public class PlayArea {
     /**
      * @return The PlayArea, represented as a Matrix of PlayedSides.
      */
-    public PlacedSide[][] getMatrixPlayArea(){
+    public PlacedSide[][] getMatrixPlayArea() {
         // Start with a shift of zero
         int iShift = 0;
         int jShift = 0;
 
         // Calculate necessary i and j Shifts, such that no card has a negative i or j coordinate
-        // Make sure that the coordinates are "white" by increasing shifts by 2 each time
-        while(this.minI + iShift < 0)
-            iShift += 2;
+        while (this.minI + iShift < 0)
+            iShift += 1;
 
         while (this.minJ + jShift < 0)
-            jShift += 2;
+            jShift += 1;
 
         // Allocate Matrix
-        PlacedSide[][] area = new PlacedSide[this.maxI + iShift + 1][this.maxJ + jShift + 1];
+        // Leave a frame of space around (+4)
+        PlacedSide[][] area = new PlacedSide[this.maxI + iShift + 1 +4][this.maxJ + jShift + 1+4];
+
+        iShift += 2;   // Modify shifts accordingly
+        jShift += 2;
 
         // Fill up the matrix
         // For each Card in the PlayArea
-        for(Tuple coord : this.playArea.keySet()){
+        for (Tuple coord : this.playArea.keySet()) {
             // Put the Card in the matrix, shifted by the previously calculated amount
             area[coord.i + iShift][coord.j + jShift] = playArea.get(coord);
+        }
+
+        // Fill the empty slots of the PlayArea with an EmptyPlacedSide
+        // Make sure its coordinates are shifted back to mimic its presence in the original PlayArea
+        for (int row = 0; row < area.length; row++) {
+            for (int col = 0; col < area[0].length; col++) {
+                if (isFree(new Tuple(row - iShift, col - jShift)))
+                    area[row][col] = new EmptyPlacedSide(new Tuple(row - iShift, col - jShift));
+            }
         }
 
         // Return the matrix
@@ -337,6 +369,7 @@ public class PlayArea {
 
     /**
      * Visible Elements getter
+     *
      * @return attribute visibleElements
      */
     public Map<Element, Integer> getVisibleElements() {
@@ -350,5 +383,12 @@ public class PlayArea {
         Set<Tuple> retVal = new HashSet<>(frontier);
         retVal.removeAll(blocked);
         return retVal;
+    }
+
+    /**
+     * @return All PlacedSides, ordered by the time they were placed
+     */
+    public List<PlacedSide> getOrderedPlacements() {
+        return orderedPlacements;
     }
 }

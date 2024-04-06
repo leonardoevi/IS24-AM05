@@ -2,6 +2,7 @@ package it.polimi.is24am05.model.playArea;
 
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
 import it.polimi.is24am05.model.card.resourceCard.*;
+import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterFrontSide;
@@ -114,8 +115,8 @@ class PlayAreaTest {
 
         PlacedSide[][] matrix = playArea.getMatrixPlayArea();
 
-        assertEquals(1, matrix.length);
-        assertEquals(1, matrix[0].length);
+        assertEquals(5, matrix.length);
+        assertEquals(5, matrix[0].length);
 
             // Place three cards
 
@@ -124,8 +125,8 @@ class PlayAreaTest {
 
         // Verify the correctness of matrix dimensions
         matrix = playArea.getMatrixPlayArea();
-        assertEquals(1, matrix.length);
-        assertEquals(1, matrix[0].length);
+        assertEquals(5, matrix.length);
+        assertEquals(5, matrix[0].length);
 
         // Place a card in (-1, -1)
         assertEquals(0,playArea.playSide(ResourceFrontSide.RFS_003, new Tuple(-1,-1)));
@@ -138,7 +139,7 @@ class PlayAreaTest {
         Set<Side> set = new HashSet<>();
         for(PlacedSide[] row : matrix){
             for (PlacedSide p : row){
-                if(p != null)
+                if(p != null && !(p instanceof EmptyPlacedSide))
                     set.add(p.getSide());
             }
         }
@@ -167,8 +168,8 @@ class PlayAreaTest {
         matrix = playArea1.getMatrixPlayArea();
 
         // Verify the correctness of matrix dimensions
-        assertEquals(2, matrix.length);
-        assertEquals(202, matrix[0].length);
+        assertEquals(6, matrix.length);
+        assertEquals(206, matrix[0].length);
 
         // Create a new PlayaArea
         PlayArea playArea2 = new PlayArea();
@@ -185,14 +186,13 @@ class PlayAreaTest {
         // Verify all 100 cards have been placed
         long num = Arrays.stream(matrix).flatMap(Arrays::stream)
                 .filter(Objects::nonNull)
+                .filter(p ->! (p instanceof EmptyPlacedSide))
                 .count();
         assertEquals(101, num);
 
         // Verify visibility of elements in the matrix too
         for(Element element : Element.values())
             assertEquals((long) playArea2.getVisibleElements().get(element), matrixCount(matrix, element));
-
-
     }
 
     // Helpful functions
@@ -224,6 +224,7 @@ class PlayAreaTest {
     private static long matrixCount(PlacedSide[][] matrix, Element toCount){
         return Arrays.stream(matrix).flatMap(Arrays::stream)
                 .filter(Objects::nonNull)
+                .filter(p ->! (p instanceof EmptyPlacedSide))
                 .map(PlacedSide::getSide)
                 .flatMap(side -> {
                     try {

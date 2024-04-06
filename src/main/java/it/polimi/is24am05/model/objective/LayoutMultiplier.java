@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.objective;
 
+import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.enums.element.*;
 import it.polimi.is24am05.model.playArea.PlayArea;
@@ -65,9 +66,8 @@ public enum LayoutMultiplier implements ObjectiveMultiplier{
         Resource[][] res = new Resource[tmp.length][tmp[0].length];
         for (int i = 0; i < tmp.length; i++) {
             for (int j = 0; j < tmp[0].length; j++) {
-                if (tmp[i][j]!= null)
+                if (tmp[i][j] != null && !(tmp[i][j] instanceof EmptyPlacedSide))
                     res[i][j] = tmp[i][j].getSide().getSeed();
-
             }
         }
         int result = 0;

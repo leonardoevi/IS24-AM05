@@ -46,5 +46,9 @@ public interface Side {
         return 0;
     }
 
+    default Map<Resource, Integer> getPlacementConditions(){
+        return new HashMap<>();
+    }
+
     Resource getSeed();
 }

@@ -449,8 +449,9 @@ public class Game {
                                           .thenComparingInt(Player::getSatisfiedObjectiveCards))
                         .toList();
 
-        int winnerPoints = ranking.getFirst().getPoints();
-        int winnerObjectives = ranking.getFirst().getSatisfiedObjectiveCards();
+            // The player with fewer points is first in the list
+        int winnerPoints = ranking.getLast().getPoints();
+        int winnerObjectives = ranking.getLast().getSatisfiedObjectiveCards();
 
         this.winners = ranking.stream()
                         .filter(p -> p.getPoints() == winnerPoints && p.getSatisfiedObjectiveCards() == winnerObjectives)
