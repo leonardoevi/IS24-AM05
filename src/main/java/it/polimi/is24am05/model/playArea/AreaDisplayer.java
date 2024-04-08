@@ -1,8 +1,17 @@
 package it.polimi.is24am05.model.playArea;
 
 import it.polimi.is24am05.model.card.side.PlacedSide;
+import it.polimi.is24am05.model.enums.element.Element;
+import it.polimi.is24am05.model.enums.element.Item;
 
+import java.util.*;
 
+import static it.polimi.is24am05.model.playArea.SideDisplayer.RESET;
+
+// This code will probably be removed from the model and used in the view
+/**
+ * This class is needed to display the PlayArea as a String
+ */
 public class AreaDisplayer {
     private final PlayArea playArea;
 
@@ -71,11 +80,18 @@ public class AreaDisplayer {
             put(SideDisplayer.sideToString(placedSide.getSide()), stringMatrix, newCoord.i, newCoord.j);
         }
 
+        String[] visibleElementsScore = elementMapToString();
+
+        int i = 0;
         // Return the matrix as a string
         StringBuilder sb = new StringBuilder();
         for(String[] row : stringMatrix){
             for (String s : row){
                 sb.append(s);
+            }
+            if(i < visibleElementsScore.length){
+                sb.append(" " + visibleElementsScore[i]);
+                i++;
             }
             sb.append("\n");
         }
@@ -91,7 +107,7 @@ public class AreaDisplayer {
      * @param i starting i coordinate
      * @param j starting j coordinate
      */
-    private void put(String[][] top, String[][] bottom, int i, int j) {
+    public static void put(String[][] top, String[][] bottom, int i, int j) {
         int m = top.length;
         int n = top[0].length;
 
@@ -108,5 +124,55 @@ public class AreaDisplayer {
      */
     private Tuple transpose(Tuple playAreaCoordinates){
         return new Tuple((playAreaCoordinates.i + this.iShift)*2, (playAreaCoordinates.j + this.jShift)*2);
+    }
+
+    /**
+     * @return A vector of String, each containing the counter of visible elements, if any is present.
+     */
+    private String[] elementMapToString(){
+        Map<Element, Integer> visibleElements = this.playArea.getVisibleElements();
+
+        Map<String, String> elementName = Map.of(
+                "ANIMAL" , "Animal    ",
+                "INSECT" , "Insect    ",
+                "FUNGI" , "Fungi     ",
+                "PLANT" , "Plant     ",
+                "MANUSCRIPT" , "Manuscript",
+                "INKWELL" , "inKwell   ",
+                "QUILL", "Quill     "
+        );
+
+        // Remove elements that are not visible
+        for(Element element : Element.values())
+            if(visibleElements.get(element) == 0)
+                visibleElements.remove(element);
+
+        // If there are no visible elements (Unlikely)
+        if(visibleElements.isEmpty())
+            return new String[0];
+
+        // Otherwise
+        List<String> toRet = new ArrayList<>();
+
+        boolean lineAdded = false;
+        for(Element element : Element.values()){
+            // Don't display elements if none is visible
+            if(!visibleElements.containsKey(element))
+                continue;
+
+            // Add an empty line between resources and items
+            if(element instanceof Item && !lineAdded){
+                toRet.add(" "); lineAdded = true; }
+
+            // Add the element count to the array
+            StringBuilder s = new StringBuilder(SideDisplayer.getElementColor(element));
+            s.append(elementName.get(element.toString())).append("\t")
+                    .append(visibleElements.get(element))
+                    .append(RESET);
+            toRet.add(s.toString());
+        }
+
+        // Return the array
+        return toRet.toArray(String[]::new);
     }
 }

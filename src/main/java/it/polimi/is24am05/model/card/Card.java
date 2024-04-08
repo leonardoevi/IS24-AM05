@@ -19,4 +19,8 @@ public interface Card {
      * @return the back side of this card.
      */
     Side getBackSide();
+
+    default int getId(){
+        return Integer.valueOf(this.toString().substring(4,6));
+    }
 }

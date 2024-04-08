@@ -2,6 +2,8 @@ package it.polimi.is24am05.model.card.side;
 
 import java.util.*;
 
+import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.AlwaysTrueMultiplier;
+import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.GoldCardMultiplier;
 import it.polimi.is24am05.model.enums.element.Element;
 import it.polimi.is24am05.model.enums.Corner;
 
@@ -46,9 +48,19 @@ public interface Side {
         return 0;
     }
 
+    /**
+     * @return The placing condition for the specific side. An empty map if there are no conditions to satisfy.
+     */
     default Map<Resource, Integer> getPlacementConditions(){
         return new HashMap<>();
     }
 
+    default GoldCardMultiplier getMultiplier() {
+        return AlwaysTrueMultiplier.ALWAYSTRUE;
+    }
+
+    /**
+     * @return The Seed (resource) that the card is associated with. Null for StarterCard sides.
+     */
     Resource getSeed();
 }

@@ -15,6 +15,8 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
+// This code will probably be removed from the model and used in the view
 /**
  * This class implements the methods to display a card as a string
  */
@@ -32,12 +34,11 @@ public class SideDisplayer {
     /**
      * Character used to draw the card
      */
-    public static final String MISSING_CORNER = "+";
-    public static final String EMPTY_CORNER = " ";
-    public static final String HORIZONTAL_DASH = "-";
-    public static final String VERTICAL_DASH = "|";
-    public static final String HORIZONTAL_DOTTED = "·";
-    public static final String VERTICAL_DOTTED = ":";
+    public static final String MISSING_CORNER = "⤬", EMPTY_CORNER = "▫",
+    HORIZONTAL_DASH = "-", HORIZONTAL_FULL = "—", HORIZONTAL_DOTTED = "·",
+    VERTICAL_DASH = "|", VERTICAL_DOTTED = ":",
+    EMPTY_CENTER = "⊙";
+
 
 
     // ASCII colors
@@ -72,6 +73,12 @@ public class SideDisplayer {
             topBottom.append(cardColor).append(HORIZONTAL_DASH).append(RESET);
             topBottom.append(" ");
         }
+        // If it is a Starter side
+        else if(toDraw instanceof StarterFrontSide || toDraw instanceof StarterBackSide){
+            topBottom.append(" ");
+            topBottom.append(HORIZONTAL_FULL.repeat(CARD_WIDTH - 2));
+            topBottom.append(" ");
+        }
         // If it is a normal side
         else {
             topBottom.append(" ");
@@ -99,10 +106,10 @@ public class SideDisplayer {
                 cornerLetter = getElementColor(cornerElement) + getElementLetter(cornerElement) + RESET;
             } catch (InvalidCornerException e) {
                 // If the card does not have the corner
-                cornerLetter = WHITE_BOLD_BRIGHT + MISSING_CORNER + RESET;
+                cornerLetter = cardColor + MISSING_CORNER + RESET;
             } catch (NoSuchElementException e){
                 // If the corner is empty
-                cornerLetter = EMPTY_CORNER;
+                cornerLetter = cardColor + EMPTY_CORNER + RESET;
             }
 
             // Draw the corner
@@ -192,7 +199,7 @@ public class SideDisplayer {
      * @param element resource to get the color
      * @return the color corresponding to the card seed
      */
-    private static String getElementColor(Element element){
+    protected static String getElementColor(Element element){
         switch (element) {
             case Resource.PLANT -> {
                 return GREEN_BOLD;
@@ -218,7 +225,7 @@ public class SideDisplayer {
      * @param element to display
      * @return the corresponding letter (String of length 1)
      */
-    private static String getElementLetter(Element element){
+    protected static String getElementLetter(Element element){
         switch (element) {
             case Resource.PLANT -> {
                 return "P";
@@ -291,7 +298,7 @@ public class SideDisplayer {
             // If the card doesn't have any resource in the centre
             int spacing = CARD_WIDTH/2;
             s.append(" ".repeat(spacing));
-            s.append(getCardColor(side)).append(HORIZONTAL_DASH).append(RESET);
+            s.append(getCardColor(side)).append(EMPTY_CENTER).append(RESET);
             s.append(" ".repeat(spacing));
         }
         return s.toString();

@@ -49,6 +49,10 @@ class AreaDisplayerTest {
         System.out.println();
     }
 
+    @Test
+    void  testPlayAreaToString(){
+        System.out.println(new AreaDisplayer(generatePlayArea()));
+    }
 
     // Methods used by simulateGame()
     private static Player getCurrentPlayer(Game game){

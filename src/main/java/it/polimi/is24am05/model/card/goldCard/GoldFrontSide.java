@@ -599,6 +599,10 @@ public enum GoldFrontSide implements Side {
         return points * multiplier.compute(playArea);
     }
 
+    public GoldCardMultiplier goldCardMultiplier(){
+        return this.multiplier;
+    }
+
     @Override
     public Resource getSeed() {
         // Looking at the last 2 digits(fifth and sixth) of each card ID
