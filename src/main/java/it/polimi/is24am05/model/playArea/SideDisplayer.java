@@ -42,14 +42,14 @@ public class SideDisplayer {
 
 
     // ASCII colors
-    public static final String YELLOW_BOLD = "\033[1;93m";
-    public static final String BLACK_BOLD_BRIGHT = "\033[1;90m";
-    public static final String WHITE_BOLD_BRIGHT = "\033[1;97m";
-    public static final String RESET = "\u001B[0m";
-    public static final String RED_BOLD = "\033[1;31m";
-    public static final String GREEN_BOLD = "\033[1;92m";
-    public static final String PURPLE_BOLD = "\033[1;35m";
-    public static final String CYAN_BOLD = "\033[1;96m";
+    public static final String YELLOW_BOLD =        "\033[1;93m";
+    public static final String BLACK_BOLD_BRIGHT =  "\033[1;90m";
+    public static final String WHITE_BOLD_BRIGHT =  "\033[1;97m";
+    public static final String RESET =              "\u001B[0m";
+    public static final String RED_BOLD =           "\033[1;31m";
+    public static final String GREEN_BOLD =         "\033[1;92m";
+    public static final String PURPLE_BOLD =        "\033[1;35m";
+    public static final String CYAN_BOLD =          "\033[1;96m";
 
     /**
      * Allows to draw a card Side
@@ -178,7 +178,7 @@ public class SideDisplayer {
      * @param toDraw Side to get the color
      * @return the color corresponding to the card seed
      */
-    private static String getCardColor(Side toDraw){
+    public static String getCardColor(Side toDraw){
         // Return gray if the side is null
         if(toDraw == null)
             return BLACK_BOLD_BRIGHT;
@@ -225,7 +225,7 @@ public class SideDisplayer {
      * @param element to display
      * @return the corresponding letter (String of length 1)
      */
-    protected static String getElementLetter(Element element){
+    public static String getElementLetter(Element element){
         switch (element) {
             case Resource.PLANT -> {
                 return "P";

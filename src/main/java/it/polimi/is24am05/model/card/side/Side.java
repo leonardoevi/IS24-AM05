@@ -63,4 +63,8 @@ public interface Side {
      * @return The Seed (resource) that the card is associated with. Null for StarterCard sides.
      */
     Resource getSeed();
+
+    default int getPoints(){
+        return 0;
+    }
 }

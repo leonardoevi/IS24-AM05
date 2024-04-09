@@ -599,6 +599,11 @@ public enum GoldFrontSide implements Side {
         return points * multiplier.compute(playArea);
     }
 
+    @Override
+    public GoldCardMultiplier getMultiplier() {
+        return this.multiplier;
+    }
+
     public GoldCardMultiplier goldCardMultiplier(){
         return this.multiplier;
     }
@@ -616,4 +621,11 @@ public enum GoldFrontSide implements Side {
             return  Resource.ANIMAL;
         return Resource.INSECT;
     }
+
+    @Override
+    public int getPoints() {
+        return this.points;
+    }
+
+
 }

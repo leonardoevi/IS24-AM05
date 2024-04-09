@@ -36,4 +36,10 @@ public enum ItemMultiplier implements GoldCardMultiplier {
     public int compute(PlayArea playArea) {
         return 1;
     }
+
+    public Item getItem() {
+        return this.item;
+    }
+
+
 }

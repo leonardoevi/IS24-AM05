@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.card.goldCard.goldCardMultiplier;
 
+import it.polimi.is24am05.model.enums.element.Item;
 import it.polimi.is24am05.model.playArea.PlayArea;
 
 /**

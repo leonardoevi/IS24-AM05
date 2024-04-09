@@ -381,4 +381,10 @@ public enum ResourceFrontSide implements Side {
             return  Resource.ANIMAL;
         return Resource.INSECT;
     }
+
+    @Override
+    public int getPoints() {
+        return this.points;
+    }
+
 }
