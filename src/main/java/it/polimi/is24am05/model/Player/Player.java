@@ -64,8 +64,6 @@ public class Player {
      */
     private Objective objective;
 
-    // Attributes used by the Game Class
-    public boolean hasPlacedStarterCard = false, hasChosenObjective = false;
     private int satisfiedObjectiveCards = 0;
 
     /**
@@ -80,6 +78,7 @@ public class Player {
         this.playArea = new PlayArea();
         this.objectivesHand = new Objective[2];
         this.objective = null;
+        this.state = PlayerState.PLACE_STARTER_CARD;
     }
 
     /**
@@ -123,7 +122,6 @@ public class Player {
             throw new ObjectiveNotAllowedException();
 
         this.objective = objective;
-        this.hasChosenObjective = true;
     }
 
     /**
@@ -143,8 +141,6 @@ public class Player {
         }
         catch( InvalidCoordinatesException | NoAdjacentCardException |
                PlacementNotAllowedException ignored) {}
-
-        this.hasPlacedStarterCard = true;
     }
 
     /**

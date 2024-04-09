@@ -166,14 +166,22 @@ public class Game {
         // Check if the current game state is PLACE_STARTER_CARDS
         checkState(GameState.PLACE_STARTER_CARDS);
 
-        // Find the player and place the card
+        // Find the player
         Player toPlay = findPlayer(playerName);
+
+        // Check if it's time for the player to place the starter card
+        if(toPlay.getState() != PlayerState.PLACE_STARTER_CARD)
+            throw new MoveNotAllowedException("Starter card already placed");
+
+        // Place the card
         toPlay.playStarterCard(side);
 
+        // Update Player state
+        toPlay.setState(PlayerState.CHOOSE_OBJECTIVE);
+
         // If every player has placed their card
-        boolean allHavePlaced = true;
-        for(Player p : this.players)
-            allHavePlaced = allHavePlaced && p.hasPlacedStarterCard;
+        boolean allHavePlaced = this.players.stream()
+                .allMatch(p -> p.getState() == PlayerState.CHOOSE_OBJECTIVE);
 
         if(allHavePlaced) {
             // Deal the objectives
@@ -250,13 +258,19 @@ public class Game {
         // Find the player
         Player player = findPlayer(playerName);
 
+        // Check if it's time for the player to choose an objective
+        if(player.getState() != PlayerState.CHOOSE_OBJECTIVE)
+            throw new MoveNotAllowedException("It is not time to choose an objective");
+
         // Choose the objective
         player.chooseObjective(objective);
 
+        // Update player state
+        player.setState(PlayerState.DRAW);
+
         // If all players have chosen their objective
-        boolean allHaveChosen = true;
-        for(Player p : this.players)
-            allHaveChosen = allHaveChosen && p.hasChosenObjective;
+        boolean allHaveChosen = this.players.stream()
+                .allMatch(p -> p.getState() == PlayerState.DRAW);
 
         // It is time to start playing
         if(allHaveChosen) {
