@@ -2,6 +2,7 @@ package it.polimi.is24am05.model.playArea;
 
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
 import it.polimi.is24am05.model.card.goldCard.GoldFrontSide;
+import it.polimi.is24am05.model.card.resourceCard.ResourceBackSide;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterBackSide;
 import it.polimi.is24am05.model.card.starterCard.StarterFrontSide;
@@ -120,6 +121,26 @@ public class SideDisplayer {
         draw[1][1] = getCentreToString(toDraw);
 
         return draw;
+    }
+
+    /**
+     * @param resource Resource
+     * @return The generic back side of a Card of the same color of th Resource
+     */
+    public static String[][] sideToString(Resource resource, boolean isGold){
+        Side[] toSearch;
+
+        if(isGold)
+            toSearch = GoldBackSide.values();
+        else
+            toSearch = ResourceBackSide.values();
+
+        for(Side side : toSearch){
+            if(side.getSeed() == resource)
+                return sideToString(side);
+        }
+
+        return null;
     }
 
     /**

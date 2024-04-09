@@ -14,7 +14,6 @@ import it.polimi.is24am05.model.playArea.PlayArea;
 import it.polimi.is24am05.model.playArea.Tuple;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Player {
@@ -52,7 +51,7 @@ public class Player {
     /**
      * each player has a playArea where they can place the cards
      */
-    private PlayArea playArea;
+    private final PlayArea playArea;
 
     /**
      * This attribute keeps track of the two Objectives Cards in the player's hand
@@ -281,6 +280,6 @@ public class Player {
     public void evaluateObjectives(Objective[] sharedObjectives){
         // TO IMPLEMENT
         return;
-    };
+    }
 
 }

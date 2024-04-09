@@ -97,7 +97,7 @@ public class HandDisplayer {
          */
     }
 
-    private static String matrixToString(String[][] matrix){
+    public static String matrixToString(String[][] matrix){
         // Return the matrix as a string
         StringBuilder sb = new StringBuilder();
         for(String[] row : matrix){
@@ -139,7 +139,7 @@ public class HandDisplayer {
         return result;
     }
 
-    private static void editTopEdge(String[][] original, Side side){
+    public static void editTopEdge(String[][] original, Side side){
         // Ignore sides that dont assign points
         if(side instanceof GoldBackSide || side instanceof ResourceBackSide)
             return;
@@ -165,7 +165,7 @@ public class HandDisplayer {
         return;
     }
 
-    private static void editBottomEdge(String[][] original, Side side){
+    public static void editBottomEdge(String[][] original, Side side){
         // Only for gold front sides
         if(!( side instanceof GoldFrontSide)) return;
 
@@ -228,7 +228,7 @@ public class HandDisplayer {
         return idx;
     }
 
-    private static void editCentre(String[][] original, Side side){
+    public static void editCentre(String[][] original, Side side){
         if(!(side instanceof GoldFrontSide))
             return;
 
