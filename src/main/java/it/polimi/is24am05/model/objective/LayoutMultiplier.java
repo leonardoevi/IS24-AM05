@@ -116,4 +116,8 @@ public enum LayoutMultiplier implements ObjectiveMultiplier{
         }
         return true;
     }
+
+    public Resource[][] getLayout() {
+        return layout;
+    }
 }

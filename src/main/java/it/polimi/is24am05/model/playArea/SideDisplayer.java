@@ -192,6 +192,22 @@ public class SideDisplayer {
         return draw;
     }
 
+    public static String[][] blankToString(String borderChar) {
+        String[][] draw = new String[iSize][jSize];
+
+        String sizeOne = borderChar, sizeWidth = borderChar.repeat(CARD_WIDTH);
+
+        for(int i=0; i < iSize; i++){
+            draw[i][0] = sizeOne;
+            draw[i][1] = sizeWidth;
+            draw[i][2] = sizeOne;
+        }
+
+        draw[1][1] = " ".repeat(CARD_WIDTH);
+
+        return draw;
+    }
+
 
     // Useful functions
 

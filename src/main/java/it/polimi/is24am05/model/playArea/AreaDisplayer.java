@@ -48,37 +48,7 @@ public class AreaDisplayer {
      */
     @Override
     public String toString() {
-        // Allocate the String matrix that will contain the sides.
-        // Each side is represented as a 3 x 3 matrix.
-        // However, each side overlaps with others neighbouring sides.
-        // * — * — *
-        // | X | Y |
-        // * — * — *
-
-        // A matrix 4 times as large is needed (length and height double and are increased by 1)
-        String[][] stringMatrix = new String[iLength *2 + 1][jLength*2 + 1];
-
-        // Fill matrix with empty Strings of the correct size
-        String[][] blankMatrix = SideDisplayer.blankToString();
-        for (int i = 0; i < stringMatrix.length - 2; i += 2) {
-            for (int j = 0; j < stringMatrix[0].length - 2; j += 2) {
-                put(blankMatrix, stringMatrix, i, j);
-            }
-        }
-
-        // Put cards in the matrix
-
-        // Start with the Empty Slots
-        for(Tuple coord : playArea.getFrontier()){
-            Tuple newCoord = transpose(coord);
-            put(SideDisplayer.emptySideToString(coord), stringMatrix, newCoord.i, newCoord.j);
-        }
-
-        // Draw Cards in the order they were played
-        for(PlacedSide placedSide : this.playArea.getOrderedPlacements()){
-            Tuple newCoord = transpose(placedSide.getActualCoord());
-            put(SideDisplayer.sideToString(placedSide.getSide()), stringMatrix, newCoord.i, newCoord.j);
-        }
+        String[][] stringMatrix = areaToMatrix();
 
         String[] visibleElementsScore = elementMapToString();
 
@@ -113,7 +83,8 @@ public class AreaDisplayer {
 
         for (int row = 0; row < m; row++) {
             for (int col = 0; col < n; col++) {
-                bottom[i + row][j + col] = top[row][col];
+                if(top[row][col] != null)
+                    bottom[i + row][j + col] = top[row][col];
             }
         }
     }
@@ -174,5 +145,41 @@ public class AreaDisplayer {
 
         // Return the array
         return toRet.toArray(String[]::new);
+    }
+
+    public String[][] areaToMatrix(){
+        // Allocate the String matrix that will contain the sides.
+        // Each side is represented as a 3 x 3 matrix.
+        // However, each side overlaps with others neighbouring sides.
+        // * — * — *
+        // | X | Y |
+        // * — * — *
+
+        // A matrix 4 times as large is needed (length and height double and are increased by 1)
+        String[][] stringMatrix = new String[iLength *2 + 1][jLength*2 + 1];
+
+        // Fill matrix with empty Strings of the correct size
+        String[][] blankMatrix = SideDisplayer.blankToString();
+        for (int i = 0; i < stringMatrix.length - 2; i += 2) {
+            for (int j = 0; j < stringMatrix[0].length - 2; j += 2) {
+                put(blankMatrix, stringMatrix, i, j);
+            }
+        }
+
+        // Put cards in the matrix
+
+        // Start with the Empty Slots
+        for(Tuple coord : playArea.getFrontier()){
+            Tuple newCoord = transpose(coord);
+            put(SideDisplayer.emptySideToString(coord), stringMatrix, newCoord.i, newCoord.j);
+        }
+
+        // Draw Cards in the order they were played
+        for(PlacedSide placedSide : this.playArea.getOrderedPlacements()){
+            Tuple newCoord = transpose(placedSide.getActualCoord());
+            put(SideDisplayer.sideToString(placedSide.getSide()), stringMatrix, newCoord.i, newCoord.j);
+        }
+
+        return stringMatrix;
     }
 }

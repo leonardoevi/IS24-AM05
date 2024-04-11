@@ -52,4 +52,12 @@ public enum Objective {
     public int evaluate(PlayArea playArea){
         return points * multiplier.compute(playArea);
     }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public ObjectiveMultiplier getMultiplier() {
+        return multiplier;
+    }
 }
