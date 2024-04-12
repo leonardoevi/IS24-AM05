@@ -8,8 +8,11 @@ import it.polimi.is24am05.model.playArea.AreaDisplayer;
 import it.polimi.is24am05.model.playArea.SideDisplayer;
 import it.polimi.is24am05.model.playArea.Tuple;
 
+import java.util.List;
 import java.util.Set;
 
+import static it.polimi.is24am05.model.Player.HandDisplayer.matrixToString;
+import static it.polimi.is24am05.model.Player.HandDisplayer.sideToSide;
 import static it.polimi.is24am05.model.playArea.SideDisplayer.BLACK_BOLD_BRIGHT;
 import static it.polimi.is24am05.model.playArea.SideDisplayer.RESET;
 
@@ -45,9 +48,11 @@ public class DeckDisplayer {
             k++;
 
             side = SideDisplayer.sideToString(visible.getFrontSide());
+            /*
             HandDisplayer.editTopEdge(side, visible.getFrontSide());
             HandDisplayer.editBottomEdge(side, visible.getFrontSide());
             HandDisplayer.editCentre(side, visible.getFrontSide());
+             */
 
             AreaDisplayer.put(side, toReturn, k, 0);
 
@@ -55,6 +60,14 @@ public class DeckDisplayer {
         }
 
         return toReturn;
+    }
+
+    public static String deckToString(Deck deck, boolean isGold){
+        return matrixToString(deckToMatrix(deck, isGold));
+    }
+
+    public static String deckToString(Deck deck1, boolean isGold1, Deck deck2, boolean isGold2){
+        return matrixToString(sideToSide(List.of(deckToMatrix(deck1, isGold1), deckToMatrix(deck2, isGold2) )));
     }
 
     private static String[][] emptyDeckTopSide(){

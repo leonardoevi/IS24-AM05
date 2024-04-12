@@ -26,6 +26,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import static it.polimi.is24am05.model.Player.HandDisplayer.*;
+import static it.polimi.is24am05.model.deck.DeckDisplayer.deckToMatrix;
+import static it.polimi.is24am05.model.playArea.AreaDisplayer.put;
+import static java.lang.Integer.max;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AreaDisplayerTest {
@@ -102,8 +106,13 @@ class AreaDisplayerTest {
             game = new Game(players);
         } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) { throw new RuntimeException(e); }
 
+        // Player to display
+        Player toPrint = game.getPlayers().getFirst();
+
         // Game state should be PLACE_STARTER_CARDS
         assertEquals(GameState.PLACE_STARTER_CARDS, game.getGameState());
+
+        //printPlayerState(game, toPrint);
 
         // No moves except for placeStarterSide() should be allowed
         // The exception is thrown regardless of the parameters
@@ -124,6 +133,8 @@ class AreaDisplayerTest {
                 game.placeStarterSide(name, starterCard.getBackSide());
             } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
         }
+
+        printPlayerState(game, toPrint);
 
         // Game state should be CHOOSE_OBJECTIVE
         assertEquals(GameState.CHOOSE_OBJECTIVE, game.getGameState());
@@ -212,6 +223,9 @@ class AreaDisplayerTest {
                 assertThrows(NotYourTurnException.class, () -> game.placeSide(other.getNickname(), null, null, 0, 0));
             }
 
+            if(current == toPrint)
+                printPlayerState(game, toPrint);
+
             // Current Player Draws a card
             int randomDecision = new Random().nextInt(4);
 
@@ -262,10 +276,38 @@ class AreaDisplayerTest {
                 }
             }
 
+            if(current == toPrint)
+                printPlayerState(game, toPrint);
+
             // Current player State should be PLACE
             assertEquals(PlayerState.PLACE, current.getState());
         }
 
         return game;
+    }
+
+    private static void printPlayerState(Game game, Player toPrint) {
+        System.out.println("Points: " + toPrint.getPoints());
+        System.out.println("PlayArea:");
+        System.out.println(new AreaDisplayer(toPrint.getPlayArea()).toString());
+
+        String[][] res = deckToMatrix(game.getResourceDeck(), false);
+        String[][] gol = deckToMatrix(game.getGoldDeck(), true);
+
+        String[][] decks = new String[max(res.length, gol.length)][res[0].length + gol[0].length + 2];
+        for (int i = 0; i < decks.length; i++) {
+            for (int j = 0; j < decks[0].length; j++) {
+                decks[i][j] = " ";
+            }
+        }
+
+        put(res, decks, 0,0);
+        put(gol, decks,0, res[0].length +2);
+
+        System.out.println(matrixToString(decks));
+
+        System.out.println(handToString(toPrint.getHand()));
+
+        System.out.println("========");
     }
 }

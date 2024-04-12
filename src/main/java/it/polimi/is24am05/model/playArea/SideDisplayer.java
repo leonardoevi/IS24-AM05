@@ -16,6 +16,8 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static it.polimi.is24am05.model.Player.HandDisplayer.*;
+
 
 // This code will probably be removed from the model and used in the view
 /**
@@ -35,7 +37,7 @@ public class SideDisplayer {
     /**
      * Character used to draw the card
      */
-    public static final String MISSING_CORNER = "⤬", EMPTY_CORNER = "▫",
+    public static final String MISSING_CORNER = "x", EMPTY_CORNER = "▫",
     HORIZONTAL_DASH = "-", HORIZONTAL_FULL = "—", HORIZONTAL_DOTTED = "·",
     VERTICAL_DASH = "|", VERTICAL_DOTTED = ":",
     EMPTY_CENTER = "⊙";
@@ -119,6 +121,11 @@ public class SideDisplayer {
 
         // Draw center
         draw[1][1] = getCentreToString(toDraw);
+
+        // Add additional information
+        editTopEdge(draw, toDraw);
+        editCentre(draw, toDraw);
+        editBottomEdge(draw, toDraw);
 
         return draw;
     }

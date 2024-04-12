@@ -373,7 +373,7 @@ public class PlayArea {
      * @return attribute visibleElements
      */
     public Map<Element, Integer> getVisibleElements() {
-        return visibleElements;
+        return new HashMap<>(this.visibleElements);
     }
 
     /**

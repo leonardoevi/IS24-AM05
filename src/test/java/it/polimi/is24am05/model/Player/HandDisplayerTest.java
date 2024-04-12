@@ -30,6 +30,14 @@ class HandDisplayerTest {
     }
 
     @Test
+    void handToStringTestBugged(){
+        List<Card> hand = new ArrayList<>();
+        hand.addAll(List.of(values()));
+
+        System.out.println(HandDisplayer.handToString(hand));
+    }
+
+    @Test
     void titleID(){
         for(Card c : ResourceCard.values())
             System.out.println(String.format("%02d", c.getId()));

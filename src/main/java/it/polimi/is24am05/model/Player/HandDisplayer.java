@@ -40,10 +40,12 @@ public class HandDisplayer {
         String[][] frontSide = SideDisplayer.sideToString(card.getFrontSide());
         String[][] backSide = SideDisplayer.sideToString(card.getBackSide());
 
-        // Edit sides to display useful information
-        editTopEdge(frontSide, card.getFrontSide());
-        editBottomEdge(frontSide, card.getFrontSide());
-        editCentre(frontSide, card.getFrontSide());
+        /*
+         Edit sides to display useful information
+         editTopEdge(frontSide, card.getFrontSide());
+         editBottomEdge(frontSide, card.getFrontSide());
+         editCentre(frontSide, card.getFrontSide());
+        */
 
         String[][] result = new String[5][frontSide[0].length * 2 + 3];
         fillMatrix(result);
@@ -121,7 +123,7 @@ public class HandDisplayer {
 
     }
 
-    private static String[][] sideToSide(List<String[][]> matrices){
+    public static String[][] sideToSide(List<String[][]> matrices){
         int rows = matrices.getFirst().length;
         int columns = matrices.stream()
                     .mapToInt(x -> x[0].length)
