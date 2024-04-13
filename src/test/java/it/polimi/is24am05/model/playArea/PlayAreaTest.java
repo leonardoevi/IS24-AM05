@@ -1,10 +1,12 @@
 package it.polimi.is24am05.model.playArea;
 
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
+import it.polimi.is24am05.model.card.goldCard.GoldFrontSide;
 import it.polimi.is24am05.model.card.resourceCard.*;
 import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.starterCard.StarterBackSide;
 import it.polimi.is24am05.model.card.starterCard.StarterFrontSide;
 import it.polimi.is24am05.model.enums.Corner;
 import it.polimi.is24am05.model.enums.element.*;
@@ -78,6 +80,29 @@ class PlayAreaTest {
 
         // Place a card in (0, -2)
         assertEquals(1,playArea.playSide(ResourceFrontSide.RFS_028, new Tuple(0,-2)));
+
+    }
+
+    @Test
+    void playSideSpecific() throws PlacementNotAllowedException, InvalidCoordinatesException, NoAdjacentCardException {
+        PlayArea playArea = new PlayArea();
+
+        // Place Starter card 82, facing down
+        playArea.playSide(StarterBackSide.SBS_082, new Tuple(0,0));
+        System.out.println(new AreaDisplayer(playArea));
+
+        // Place Resource card 7, facing up
+        playArea.playSide(ResourceFrontSide.RFS_007, new Tuple(1,1));
+        System.out.println(new AreaDisplayer(playArea));
+
+        // Place Resource card 23, facing up
+        playArea.playSide(ResourceFrontSide.RFS_023, new Tuple(2,0));
+        System.out.println(new AreaDisplayer(playArea));
+
+        // Place Gold card 56, facing up
+        assertThrows(PlacementNotAllowedException.class, () -> playArea.playSide(GoldFrontSide.GFS_056, new Tuple(1,-1)));
+        System.out.println(new AreaDisplayer(playArea));
+
 
     }
 

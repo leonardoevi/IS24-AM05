@@ -6,9 +6,10 @@ import it.polimi.is24am05.model.enums.element.*;
 import it.polimi.is24am05.model.exceptions.card.InvalidCornerException;
 import it.polimi.is24am05.model.exceptions.deck.*;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Deck {
+public class Deck implements Serializable {
     private final List<Card> deck;
     private final Set<Card> visible;
 

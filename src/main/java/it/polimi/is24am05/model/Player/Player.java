@@ -13,10 +13,11 @@ import it.polimi.is24am05.model.objective.Objective;
 import it.polimi.is24am05.model.playArea.PlayArea;
 import it.polimi.is24am05.model.playArea.Tuple;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public class Player implements Serializable {
 
     /**
      * nickname chosen by the player, it can't change during the game
@@ -277,9 +278,24 @@ public class Player {
      * Increases the player points accordingly.
      * Sets the number of objectiveCard that the player has satisfied.
      */
-    public void evaluateObjectives(Objective[] sharedObjectives){
-        // TO IMPLEMENT
-        return;
+    public void evaluateObjectives(Objective[] sharedObjectives) {
+        int objectivePoints = 0;
+        // Evaluate shared objectives
+        for (Objective o : sharedObjectives) {
+            objectivePoints = o.evaluate(this.getPlayArea());
+            if (objectivePoints > 0) {
+                this.satisfiedObjectiveCards += 1;
+                this.points += objectivePoints;
+                objectivePoints = 0;
+            }
+        }
+
+        // Evaluate player objective
+        objectivePoints = this.objective.evaluate(this.getPlayArea());
+        if (objectivePoints > 0) {
+            this.satisfiedObjectiveCards += 1;
+            this.points += objectivePoints;
+        }
     }
 
 }

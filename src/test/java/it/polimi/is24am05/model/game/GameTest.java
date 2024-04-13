@@ -2,6 +2,12 @@ package it.polimi.is24am05.model.game;
 
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
+import it.polimi.is24am05.model.card.goldCard.GoldCard;
+import it.polimi.is24am05.model.card.goldCard.GoldFrontSide;
+import it.polimi.is24am05.model.card.resourceCard.ResourceBackSide;
+import it.polimi.is24am05.model.card.resourceCard.ResourceCard;
+import it.polimi.is24am05.model.card.resourceCard.ResourceFrontSide;
 import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.enums.state.GameState;
@@ -21,11 +27,16 @@ import it.polimi.is24am05.model.playArea.AreaDisplayer;
 import it.polimi.is24am05.model.playArea.Tuple;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.*;
 
+import static it.polimi.is24am05.model.Player.HandDisplayer.handToString;
+import static it.polimi.is24am05.model.Player.HandDisplayer.matrixToString;
+import static it.polimi.is24am05.model.deck.DeckDisplayer.deckToString;
+import static it.polimi.is24am05.model.playArea.SideDisplayer.sideToString;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
@@ -308,7 +319,7 @@ class GameTest {
             } catch (PlacementNotAllowedException e){
                 try {
                     // Place it facing down
-                    game.placeSide(current.getNickname(), toPlace, toPlace.getFrontSide(), coord.i, coord.j);
+                    game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
                 } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
                          InvalidCoordinatesException | InvalidSideException | PlacementNotAllowedException |
                          NotYourTurnException | NoSuchPlayerException ex) {
@@ -422,6 +433,217 @@ class GameTest {
             Game2();
     }
 
+    @Test
+    void serializeManualGame() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException, PlacementNotAllowedException, NotYourTurnException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException, InvalidVisibleCardException, EmptyDeckException {
+        String path = "/Users/leonardo/IdeaProjects/IS24-AM05/src/test/java/it/polimi/is24am05/model/game/";
+        String filename = "game_save.sv";
+        String A = "Andre", L = "Leo";
+        Game game;// = new Game(List.of("Leo", "Andre"));
+
+        /*
+        game = load(path + filename);
+
+        printGameState(game);
+
+        // Players Play starter cards
+        game.placeStarterSide(A, StarterFrontSide.SFS_083);
+        game.placeStarterSide(L, StarterBackSide.SBS_085);
+
+        save(game, path + filename);
+        printGameState(game);
+
+
+        game = load(path + filename);
+
+        // Players choose objective
+        game.chooseObjective(L, Objective.O_101);
+        game.chooseObjective(A, Objective.O_097);
+
+        printGameState(game);
+
+        save(game, path + filename);
+
+
+        game = load(path + filename);
+        printGameState(game);
+
+        // Leo's turn
+        game.placeSide(L, ResourceCard.RC_009, ResourceBackSide.RBS_009, -1,1);
+        game.drawVisible(L, ResourceCard.RC_018);
+
+        // Andre's turn
+        game.placeSide(A, ResourceCard.RC_020, ResourceFrontSide.RFS_020, 1,1);
+        game.drawVisible(A, ResourceCard.RC_030);
+
+        printGameState(game);
+
+        save(game, path + filename);
+        */
+
+        // Load a game after deck initialization, objective choices and first 2 card placements
+
+        game = load(path + filename);
+
+        // Leo's turn
+        game.placeSide(L, ResourceCard.RC_018, ResourceBackSide.RBS_018, 1,-1);
+        game.drawVisible(L, GoldCard.GC_053);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_030, ResourceBackSide.RBS_030, 1,-1);
+        game.drawDeck(A, false);
+
+        // Leo
+        game.placeSide(L, ResourceCard.RC_032, ResourceBackSide.RBS_032, -1,-1);
+        game.drawVisible(L, GoldCard.GC_077);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_003, ResourceFrontSide.RFS_003, 2,0);
+        game.drawDeck(A, true);
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_075, GoldBackSide.GBS_075,-2,-2);
+        game.drawDeck(L, false);
+
+        // Andre
+        game.placeSide(A, GoldCard.GC_061, GoldBackSide.GBS_061, 2,-2);
+        game.drawVisible(A, ResourceCard.RC_002);
+
+        // Leo
+
+        // Placing this card on the front lets Leo win
+        // Placing it on the back lets Andre win (same points but more objectives)
+
+        game.placeSide(L, ResourceCard.RC_039, ResourceFrontSide.RFS_039, -3,-1);
+        //game.placeSide(L, ResourceCard.RC_039, ResourceBackSide.RBS_039, -3,-1);
+        game.drawDeck(L, false);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_002, ResourceFrontSide.RFS_002, -1,1);
+        game.drawVisible(A, GoldCard.GC_046);
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_053, GoldBackSide.GBS_053, 2,0);
+        game.drawDeck(L, true);
+
+        // Andre
+        game.placeSide(A, GoldCard.GC_042, GoldFrontSide.GFS_042, -2,2);
+        game.drawVisible(A, GoldCard.GC_044);
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_077, GoldFrontSide.GFS_077, 0,-2);
+        game.drawDeck(L, true);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_038, ResourceFrontSide.RFS_038, -1,3);
+        game.drawDeck(A, true);
+
+        // Leo
+        game.placeSide(L, ResourceCard.RC_027, ResourceBackSide.RBS_027, 0,2);
+        game.drawDeck(L, true);
+
+        // Andre
+        game.placeSide(A, GoldCard.GC_067, GoldBackSide.GBS_067, 3,-3);
+        game.drawVisible(A, ResourceCard.RC_005);
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_063, GoldBackSide.GBS_063, -1,3);
+        game.drawVisible(L, ResourceCard.RC_036);
+
+        // Andre
+        game.placeSide(A, GoldCard.GC_044, GoldFrontSide.GFS_044, 0,2);
+        game.drawVisible(A, ResourceCard.RC_025);
+
+        // Leo
+        game.placeSide(L, ResourceCard.RC_036, ResourceFrontSide.RFS_036, -4,0);
+        game.drawVisible(L, GoldCard.GC_076);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_025, ResourceBackSide.RBS_025, 3,1);
+        game.drawDeck(A, false);
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_065, GoldFrontSide.GFS_065, -2,4);
+        game.drawVisible(L, ResourceCard.RC_034);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_023, ResourceFrontSide.RFS_023, 4,0);
+        game.drawDeck(A, false);
+
+        // Leo
+        game.placeSide(L, ResourceCard.RC_034, ResourceBackSide.RBS_034, -3,1);
+        game.drawDeck(L, false);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_019, ResourceFrontSide.RFS_019, 2,2);
+        game.drawDeck(A, false);
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_076, GoldFrontSide.GFS_076, -2,0);
+        game.drawVisible(L, GoldCard.GC_080);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_028, ResourceBackSide.RBS_028, 5,-1);
+        game.drawDeck(A, false);
+
+        // Leo
+        game.placeSide(L, ResourceCard.RC_026, ResourceBackSide.RBS_026, -3,3);
+        game.drawDeck(L, true);
+
+        // Andre
+        game.placeSide(A, ResourceCard.RC_013, ResourceFrontSide.RFS_013, 3,3);
+        game.drawDeck(A, true);
+
+        // Last moves
+
+        // Leo
+        game.placeSide(L, GoldCard.GC_066, GoldFrontSide.GFS_066, -2,2);
+        game.drawDeck(L ,false);
+
+        // Andre
+        game.placeSide(A, GoldCard.GC_059, GoldFrontSide.GFS_059, 4,4);
+        game.drawDeck(A,true);
+
+        printGameState(game);
+
+        assertEquals(GameState.END, game.getGameState());
+        assertEquals(1, game.getWinners().size());
+        assertEquals(L,game.getWinners().getFirst().getNickname());
+    }
+
+    private void save(Game game, String fileName) {
+        try {
+            // Create FileOutputStream to write data to a file
+            FileOutputStream fileOut = new FileOutputStream(fileName);
+            // Create ObjectOutputStream to serialize object
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            // Write object to file
+            objectOut.writeObject(game);
+            // Close streams
+            objectOut.close();
+            fileOut.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private Game load(String fileName){
+        try {
+            // Create FileInputStream to read data from the file
+            FileInputStream fileIn = new FileInputStream(fileName);
+            // Create ObjectInputStream to deserialize object
+            ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+            // Read object from file
+            Game game = (Game) objectIn.readObject();
+            // Close streams
+            objectIn.close();
+            fileIn.close();
+            return game;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
     // Used to get the player of the game that is expected to make a move.
     // Might throw exceptions if invoked when the game state is not GAME
     public static Player getCurrentPlayer(Game game){
@@ -456,5 +678,29 @@ class GameTest {
             ret += "\n";
         }
         return ret;
+    }
+
+    private void printGameState(Game game){
+        System.out.println("\n".repeat(10));
+        for(Player p : game.getPlayers()){
+            System.out.println("Player: " + p.getNickname());
+            System.out.println("Points: " + p.getPoints());
+
+            System.out.println("Play area: ");
+            System.out.println(new AreaDisplayer(p.getPlayArea()));
+
+            if(p.getState() == PlayerState.PLACE_STARTER_CARD) {
+                System.out.println("Hand: ");
+                System.out.println(handToString(List.of(p.getStarterCard())));
+            }
+
+            if(p.getHand() != null && !p.getHand().isEmpty()) {
+                System.out.println("Hand: ");
+                System.out.println(handToString(p.getHand()));
+            }
+        }
+
+        System.out.println("Decks: ");
+        System.out.println(deckToString(game.getResourceDeck(), false, game.getGoldDeck(), true));
     }
 }

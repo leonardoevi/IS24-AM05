@@ -1,6 +1,5 @@
 package it.polimi.is24am05.model.deck;
 
-import it.polimi.is24am05.model.Player.HandDisplayer;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
@@ -29,7 +28,7 @@ public class DeckDisplayer {
         Set<Card> visibleCards = deck.getVisible();
 
         // Allocate the matrix to return
-        String[][] toReturn = new String[rows + visibleCards.size()*(rows + 1)][cols];
+        String[][] toReturn = new String[3*rows +2][cols];
         String[][] spacer = {{" ", "       ", " "}};
         for(int i=0; i< toReturn.length; i++)
             AreaDisplayer.put(spacer, toReturn, i, 0);

@@ -550,15 +550,6 @@ public enum GoldFrontSide implements Side {
     }
 
     /**
-     * Gets the conditions.
-     *
-     * @return the conditions.
-     */
-    public Map<Resource, Integer> getConditions() {
-        return conditions;
-    }
-
-    /**
      * Checks if a corner is present on this side, i.e. a card can cover the corner.
      *
      * @param corner the corner to check.
@@ -597,6 +588,16 @@ public enum GoldFrontSide implements Side {
     @Override
     public int getPlacementPoints(PlayArea playArea) {
         return points * multiplier.compute(playArea);
+    }
+
+    /**
+     * Gets the conditions.
+     *
+     * @return the conditions.
+     */
+    @Override
+    public Map<Resource, Integer> getPlacementConditions() {
+        return this.conditions;
     }
 
     @Override

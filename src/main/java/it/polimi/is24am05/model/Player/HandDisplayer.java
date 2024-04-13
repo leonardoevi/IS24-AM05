@@ -171,7 +171,7 @@ public class HandDisplayer {
         // Only for gold front sides
         if(!( side instanceof GoldFrontSide)) return;
 
-        Map<Resource, Integer> condition = new HashMap<>(((GoldFrontSide) side).getConditions());
+        Map<Resource, Integer> condition = new HashMap<>(side.getPlacementConditions());
 
         int conditionCount = 0;
         for(Resource resource : condition.keySet())

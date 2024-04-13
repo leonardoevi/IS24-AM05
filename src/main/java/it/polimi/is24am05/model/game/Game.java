@@ -22,9 +22,10 @@ import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.objective.Objective;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Game {
+public class Game implements Serializable {
     /**
      * List of winners of the game, updated after game is ended.
      */

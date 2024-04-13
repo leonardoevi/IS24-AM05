@@ -2,10 +2,12 @@ package it.polimi.is24am05.model.card.side;
 
 import it.polimi.is24am05.model.playArea.Tuple;
 
+import java.io.Serializable;
+
 /**
  * Wrapper of a placed Side.
  */
-public class PlacedSide {
+public class PlacedSide implements Serializable {
     /**
      * Placed side.
      */

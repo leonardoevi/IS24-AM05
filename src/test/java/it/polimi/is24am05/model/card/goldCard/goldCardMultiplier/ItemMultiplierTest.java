@@ -21,8 +21,10 @@ class ItemMultiplierTest {
 
         playArea.playSide(StarterFrontSide.SFS_081, new Tuple(0,0));
         playArea.playSide(ResourceFrontSide.RFS_005, new Tuple(-1,1));
+        playArea.playSide(ResourceFrontSide.RFS_001, new Tuple(-1,-1));
+        playArea.playSide(ResourceFrontSide.RFS_021, new Tuple(1,-1));
+        //System.out.println(new AreaDisplayer(playArea));
         playArea.playSide(GoldFrontSide.GFS_041, new Tuple(1,1));
-
         assertEquals(ItemMultiplier.QUILL.compute(playArea), 2);
     }
 }

@@ -14,6 +14,7 @@ import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
 import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -21,7 +22,7 @@ import java.util.*;
  * Cards cannot be placed next to one another.
  * If we imagine the PlayArea as a chessboard, Cards can only be placed on "white" cells.
  */
-public class PlayArea {
+public class PlayArea implements Serializable {
     /**
      * The PlayArea is represented as a Map.
      * It maps Coordinates (i, j) to the Corresponding PlayedSide

@@ -43,7 +43,7 @@ class AreaDisplayerTest {
 
         // Old Way
         // Print statistics
-        System.out.println(winner.getNickname() + ":");
+        System.out.println("The winner is: " + winner.getNickname());
         System.out.println("Points:" + winner.getPoints());
         System.out.println("Cards Played: " + winner.getPlayArea().getPlayArea().keySet().size());
 
@@ -108,6 +108,7 @@ class AreaDisplayerTest {
 
         // Player to display
         Player toPrint = game.getPlayers().getFirst();
+        System.out.println("Printing moves for player: " + toPrint.getNickname());
 
         // Game state should be PLACE_STARTER_CARDS
         assertEquals(GameState.PLACE_STARTER_CARDS, game.getGameState());
@@ -198,7 +199,7 @@ class AreaDisplayerTest {
             } catch (PlacementNotAllowedException e){
                 try {
                     // Place it facing down
-                    game.placeSide(current.getNickname(), toPlace, toPlace.getFrontSide(), coord.i, coord.j);
+                    game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
                 } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
                          InvalidCoordinatesException | InvalidSideException | PlacementNotAllowedException |
                          NotYourTurnException | NoSuchPlayerException ex) {

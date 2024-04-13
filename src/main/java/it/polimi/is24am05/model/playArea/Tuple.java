@@ -1,8 +1,9 @@
 package it.polimi.is24am05.model.playArea;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Tuple {
+public class Tuple implements Serializable {
     public int i;
     public int j;
 
