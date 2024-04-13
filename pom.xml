@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>it.polimi.is24-am05</groupId>
+  <groupId>it.polimi</groupId>
   <artifactId>IS24-AM05</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>IS24-AM05</name>
@@ -18,11 +18,6 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>5.10.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -72,7 +67,7 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>it.polimi.is24am05.is24am05/it.polimi.is24am05.HelloApplication</mainClass>
+              <mainClass>it.polimi.is24am05/it.polimi.is24am05.HelloApplication</mainClass>
               <launcher>app</launcher>
               <jlinkZipName>app</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>

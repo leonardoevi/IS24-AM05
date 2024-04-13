@@ -309,11 +309,19 @@ public class PlayArea {
     }
 
     /**
-     * @param coord Coordinates to check for availability
+     * @param coord Coordinates to check
      * @return True if a Card can be placed at the specified Coordinates
      */
     public boolean isFree(Tuple coord) {
         return this.frontier.contains(coord) && !this.blocked.contains(coord);
+    }
+
+    /**
+     * @param coord Coordinates to check
+     * @return True if a Card occupies the specified Coordinates
+     */
+    public boolean isOccupied(Tuple coord){
+        return this.playArea.containsKey(coord);
     }
 
     /**
