@@ -161,7 +161,7 @@ public enum GoldFrontSide implements Side {
             Map.of(
                     Corner.NW, Optional.empty(),
                     Corner.NE, Optional.of(Item.MANUSCRIPT),
-                    Corner.SW, Optional.empty()
+                    Corner.SE, Optional.empty()
             ),
             Map.of(
                     Resource.PLANT, 2,
@@ -211,7 +211,7 @@ public enum GoldFrontSide implements Side {
     ),
     GFS_056(
             Map.of(
-                    Corner.NE, Optional.empty(),
+                    Corner.NW, Optional.empty(),
                     Corner.SE, Optional.empty(),
                     Corner.SW, Optional.empty()
             ),
@@ -295,8 +295,8 @@ public enum GoldFrontSide implements Side {
     GFS_063(
             Map.of(
                     Corner.NW, Optional.empty(),
-                    Corner.SE, Optional.of(Item.QUILL),
-                    Corner.SW, Optional.empty()
+                    Corner.SW, Optional.of(Item.QUILL),
+                    Corner.SE, Optional.empty()
             ),
             Map.of(
                     Resource.ANIMAL, 2,
@@ -405,7 +405,7 @@ public enum GoldFrontSide implements Side {
             Map.of(
                     Corner.NW, Optional.empty(),
                     Corner.SE, Optional.empty(),
-                    Corner.NE, Optional.of(Item.MANUSCRIPT)
+                    Corner.SW, Optional.of(Item.MANUSCRIPT)
             ),
             Map.of(
                     Resource.INSECT, 2,
