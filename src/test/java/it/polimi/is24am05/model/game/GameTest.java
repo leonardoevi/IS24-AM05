@@ -726,6 +726,21 @@ class GameTest {
             GameWithDisconnections(disconnections, connections);
         }
 
+        disconnections=new HashMap<>();
+        connections=new HashMap<>();
+        disconnections.put(1, List.of("Ale"));
+        disconnections.put(4, List.of("Chad"));
+        disconnections.put(7, List.of("Acoustic"));
+        connections.put(20, List.of("Ale"));
+        connections.put(6, List.of("Chad"));
+        connections.put(9, List.of("Acoustic"));
+
+
+        for (int i = 0; i < N; i++)
+        {
+            GameWithDisconnections(disconnections, connections);
+        }
+
 
 
     }

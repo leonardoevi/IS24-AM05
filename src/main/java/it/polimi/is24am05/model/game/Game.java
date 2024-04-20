@@ -458,6 +458,10 @@ public class Game implements Serializable {
      * After everyone has played the last turn, it ends the game.
      */
     private void nextTurn(){
+
+        if(this.gameState==GameState.PAUSE)
+             return;
+
         // If a player has reached 20 points
         if(players.stream().anyMatch(p -> p.getPoints() >= POINTS_TO_END))
             this.gameState = GameState.GAME_ENDING;
