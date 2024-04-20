@@ -465,8 +465,11 @@ public class Game implements Serializable {
 
         // If only last turns must be played
         if(this.gameState == GameState.GAME_ENDING){
-            // Increase the index
+
+            // Increase the index and finds the first player connected
+
             this.turn += 1;
+
             while(this.turn<this.players.size() && !isPlayerConnected(this.players.get(this.turn)))
              {
                  this.turn+=1;
@@ -531,7 +534,7 @@ public class Game implements Serializable {
             this.gameState=GameState.PAUSE;
         }
 
-        //if there are enough players to play and if the disconnected player was supposed to play, next turn
+        //if there are is at least 1 player connected and if the disconnected player was supposed to play, next turn
         if(this.players.get(turn).equals(toDisconnect) && this.connected.size()>=1)
         {
             nextTurn();
