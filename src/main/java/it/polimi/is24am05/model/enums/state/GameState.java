@@ -24,5 +24,12 @@ public enum GameState {
     /**
      * The game ended and winners are returned.
      */
-    END;
+    END,
+
+    /**
+     * The game is paused because there are too few players
+     */
+    PAUSE;
+
+
 }

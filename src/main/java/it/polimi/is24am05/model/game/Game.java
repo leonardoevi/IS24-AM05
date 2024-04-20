@@ -35,9 +35,17 @@ public class Game implements Serializable {
      */
     private final List<Player> players;
 
+
+    /**
+     * Players connected in the game, I assume that no player can disconnect before playing the initial card an choosing the objective card
+     */
+
+    private final Set<Player> connected;
+
     /**
      * Keeps track of the player that is expected to play i.e. players.get(turn)
      */
+
     private int turn;
 
     /**
@@ -49,6 +57,12 @@ public class Game implements Serializable {
      * State of the game, used to know what move is expected
      */
     private GameState gameState;
+
+
+    /**
+     * Used to track che state of the game, i.e gameState, before the game is paused
+     */
+    private GameState lastGameState;
 
     /**
      * Objectives that every player can see
@@ -92,7 +106,11 @@ public class Game implements Serializable {
             colors.remove(color);
         }
 
-            // Randomly decide the order in which players are going to take turns
+        // Fill up the set of connected players, i.e all the players
+        this.connected=new HashSet<>(nicknames.size());
+        connected.addAll(this.players);
+
+        // Randomly decide the order in which players are going to take turns
         Collections.shuffle(this.players);
         this.turn = 0;
 
@@ -127,6 +145,15 @@ public class Game implements Serializable {
      */
     private Player findPlayer(String nickname) throws NoSuchPlayerException {
         return players.stream().filter(p -> p.getNickname().equals(nickname)).findFirst().orElseThrow(NoSuchPlayerException::new);
+    }
+
+    /**
+     * @param player is the Player
+     * @return true if player is connected
+     */
+    private boolean isPlayerConnected(Player player)
+    {
+        return this.connected.contains(player);
     }
 
     /**
@@ -307,7 +334,7 @@ public class Game implements Serializable {
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
 
         // Check if it's the Player turn
-        if(this.players.get(turn) != player){
+        if(this.players.get(turn) != player || !isPlayerConnected(player)){
             throw new NotYourTurnException();
         }
 
@@ -352,7 +379,7 @@ public class Game implements Serializable {
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
 
         // Check if it's the Player turn
-        if(this.players.get(turn) != player){
+        if(this.players.get(turn) != player || !isPlayerConnected(player)){
             throw new NotYourTurnException();
         }
 
@@ -388,15 +415,16 @@ public class Game implements Serializable {
      * @throws NotYourTurnException If it is not the Player's turn
      * @throws InvalidVisibleCardException propagated
      */
-    public void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException {
+    public void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException{
         // Check if the current game state is GAME
         checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
         // Find the player
-        Player player = findPlayer(playerName);     // throws NoSuchPlayerException
+        Player player = findPlayer(playerName);
+
 
         // Check if it's the Player turn
-        if(this.players.get(turn) != player){
+        if(this.players.get(turn) != player || !isPlayerConnected(player)){
             throw new NotYourTurnException();
         }
 
@@ -438,9 +466,20 @@ public class Game implements Serializable {
         if(this.gameState == GameState.GAME_ENDING){
             // Increase the index
             this.turn += 1;
+            while(this.turn<this.players.size() && !isPlayerConnected(this.players.get(this.turn)))
+             {
+                 this.turn+=1;
+             }
         } else
+        {
             // Increase the index, keeping it inside the boundary
             this.turn = (this.turn + 1) % players.size();
+
+          while(!isPlayerConnected(this.players.get(this.turn)))
+            {
+                 this.turn = (this.turn + 1) % players.size();
+            }
+        }
 
         // If the index is out of bound, the game has ended
         if(this.turn >= players.size()) {
@@ -473,6 +512,89 @@ public class Game implements Serializable {
                         .toList();
     }
 
+    /**
+     * handles the disconnection of a player
+     * @param nickname is the nickname of the player to disconnect
+     * @throws NoSuchPlayerException propagated
+     */
+
+    public void disconnect(String nickname) throws NoSuchPlayerException {
+        Player toDisconnect=findPlayer(nickname);
+        this.connected.remove(toDisconnect);
+
+        //if there are too few players the game is paused
+        if(connected.size()<MIN_PLAYERS)
+        {
+            this.lastGameState =this.gameState;
+            this.gameState=GameState.PAUSE;
+        }
+
+        //if there are enough players to play and if the disconnected player was supposed to play, next turn
+        else if(this.players.get(turn).equals(toDisconnect))
+        {
+            nextTurn();
+        }
+
+    }
+
+    /**
+     * handles the connection f a player previously disconnected
+     * @param nickname is the nickname of the player to reconnect
+     * @throws NoSuchPlayerException propagated
+     */
+
+    public void reconnect(String nickname) throws NoSuchPlayerException{
+        Player toConnect=findPlayer(nickname);
+        this.connected.add(toConnect);
+
+        //if the player was disconnected before drawing a card and there is card left to draw, he is assigned a random card
+        if(toConnect.getState()==PlayerState.DRAW)
+        {
+            if(cardLeftToDraw())
+            {
+               if(!this.resourceDeck.isEmpty()) {
+                   try {
+                       toConnect.drawCard(this.resourceDeck.drawTop());
+                   } catch (EmptyDeckException ignored){}
+               }
+
+               else if(!this.goldDeck.isEmpty()) {
+                   try {
+                       toConnect.drawCard(this.goldDeck.drawTop());
+                   } catch (EmptyDeckException ignored) {}
+                  }
+
+                else  if(!this.resourceDeck.getVisible().isEmpty()) {
+
+                       Card[] t = (Card[]) resourceDeck.getVisible().toArray();
+                       Random rand = new Random();
+                       int index = rand.nextInt(t.length);
+                   try {
+                       toConnect.drawCard(this.resourceDeck.drawVisible(t[index]));
+                   } catch (InvalidVisibleCardException ignored) {}
+
+               }
+                else {
+                   Card[] t = (Card[]) goldDeck.getVisible().toArray();
+                   Random rand = new Random();
+                   int index = rand.nextInt(t.length);
+                   try {
+                       toConnect.drawCard(this.goldDeck.drawVisible(t[index]));
+                   } catch (InvalidVisibleCardException ignored) {}
+               }
+
+               }
+
+            }
+       //if the game was in pause and now there are enough players to play, the game goes on
+        if(this.gameState==GameState.PAUSE && this.connected.size()>=MIN_PLAYERS)
+        {
+            this.gameState=this.lastGameState;
+        }
+
+    }
+
+
     // Getters and Setters
 
     public List<Player> getWinners() {
@@ -482,6 +604,9 @@ public class Game implements Serializable {
 
     public List<Player> getPlayers() {
         return new ArrayList<>(this.players);
+    }
+    public Set<Player> getConnectedPlayers() {
+        return new HashSet<>(this.connected);
     }
 
     public int getTurn() {

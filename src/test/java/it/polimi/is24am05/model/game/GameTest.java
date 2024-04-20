@@ -230,6 +230,7 @@ class GameTest {
         assertThrows(TooManyPlayersException.class, () -> new Game(List.of("Acoustic", "Andrea", "Chad", "Ale", "Intern")));
 
         assertDoesNotThrow(() -> new Game(List.of("Acoustic", "Andrea", "Chad", "Ale")));
+
         try {
             game = new Game(players);
         } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) { throw new RuntimeException(e); }
@@ -425,6 +426,249 @@ class GameTest {
 
     }
 
+
+
+
+    void GameWithDisconnections( Map<Integer, List<String>> disconnections, Map<Integer, List<String>> connections ) {
+        // Set up the same game as before
+
+
+        // Simulate a game being played
+        // Verify only the correct methods can be invoked
+        // Verify the correct evolution of the game model
+
+        Game game;
+        List<String> players = List.of("Acoustic", "Andrea", "Chad", "Ale");
+
+        // Test constructor
+        assertThrows(PlayerNamesMustBeDifferentException.class, () -> new Game(List.of("Acoustic", "Acoustic")));
+        assertThrows(TooFewPlayersException.class, () -> new Game(List.of("Acoustic")));
+        assertThrows(TooManyPlayersException.class, () -> new Game(List.of("Acoustic", "Andrea", "Chad", "Ale", "Intern")));
+
+        assertDoesNotThrow(() -> new Game(List.of("Acoustic", "Andrea", "Chad", "Ale")));
+
+        try {
+            game = new Game(players);
+        } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) { throw new RuntimeException(e); }
+
+        // Game state should be PLACE_STARTER_CARDS
+        assertEquals(GameState.PLACE_STARTER_CARDS, game.getGameState());
+
+        // No moves except for placeStarterSide() should be allowed
+        // The exception is thrown regardless of the parameters
+        assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective(players.getFirst(), Objective.O_088));
+        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null,0,0));
+        assertThrows(MoveNotAllowedException.class, () -> game.drawDeck("pippo", true));
+        assertThrows(MoveNotAllowedException.class, () -> game.drawVisible("pippo", null));
+
+        // Make sure each player places their card
+        for(String name : players){
+            Card starterCard = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getStarterCard();
+
+            try {
+                game.placeStarterSide(name, starterCard.getBackSide());
+            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+        }
+
+        // Game state should be CHOOSE_OBJECTIVE
+        assertEquals(GameState.CHOOSE_OBJECTIVE, game.getGameState());
+
+        // No moves except for chooseObjective() should be allowed
+        // The exception is thrown regardless of the parameters
+        assertThrows(MoveNotAllowedException.class, () -> game.placeStarterSide("pippo", null));
+        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null,0,0));
+        assertThrows(MoveNotAllowedException.class, () -> game.drawDeck("pippo", true));
+        assertThrows(MoveNotAllowedException.class, () -> game.drawVisible("pippo", null));
+
+        // Each player chooses an objective
+        for(String name : players){
+            Objective[] toChooseFrom = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getObjectivesHand();
+
+            Objective choice = toChooseFrom[new Random().nextInt(toChooseFrom.length)];
+
+            try {
+                game.chooseObjective(name, choice);
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+        }
+
+        // Game state should be GAME
+        assertEquals(GameState.GAME, game.getGameState());
+
+        // No moves except for placeSide(), drawDeck() and drawVisible() should be allowed
+        // The exception is thrown regardless of the parameters
+        assertThrows(MoveNotAllowedException.class, () -> game.placeStarterSide("pippo", null));
+        assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective("pippo", null));
+
+        int round=0;
+        while(game.getGameState() != GameState.END) {
+            round++;
+            if(disconnections.containsKey(round))
+            {
+                for(String s: disconnections.get(round)) {
+                    try {
+                        game.disconnect(s);
+                    } catch (NoSuchPlayerException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+             if(connections.containsKey(round))
+            {
+                for(String s: connections.get(round)) {
+                    try {
+                        game.reconnect(s);
+                    } catch (NoSuchPlayerException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+           if(game.getConnectedPlayers().size()<2)
+           {
+               assertEquals(GameState.PAUSE, game.getGameState());
+               continue;
+           }
+
+            Player current = getCurrentPlayer(game);
+
+            // Current player State should be PLACE
+            assertEquals(PlayerState.PLACE, current.getState());
+
+            // Others players may not make any move
+            for (Player other : game.getPlayers()) {
+                if (other.getNickname().equals(current.getNickname())) continue;
+
+                assertThrows(NotYourTurnException.class, () -> game.drawDeck(other.getNickname(), false));
+                assertThrows(NotYourTurnException.class, () -> game.drawVisible(other.getNickname(), null));
+                assertThrows(NotYourTurnException.class, () -> game.placeSide(other.getNickname(), null, null, 0, 0));
+            }
+
+            // Current player plays a card
+            Card toPlace = current.getHand().getFirst();
+            Tuple coord = getRandomFreePlacingSpot(current);
+            try {
+                // Try placing it facing up
+                game.placeSide(current.getNickname(), toPlace, toPlace.getFrontSide(), coord.i, coord.j);
+            } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                     InvalidCoordinatesException | InvalidSideException |
+                     NotYourTurnException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            } catch (PlacementNotAllowedException e){
+                try {
+                    // Place it facing down
+                    game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
+                } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                         InvalidCoordinatesException | InvalidSideException | PlacementNotAllowedException |
+                         NotYourTurnException | NoSuchPlayerException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            // If there is nothing to draw
+            if( game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()){
+                continue;
+            }
+
+            // Current player State should be DRAW
+            assertEquals(PlayerState.DRAW, current.getState());
+
+            // Others players may not make any move
+            for (Player other : game.getPlayers()) {
+                if (other.getNickname().equals(current.getNickname())) continue;
+
+                assertThrows(NotYourTurnException.class, () -> game.drawDeck(other.getNickname(), false));
+                assertThrows(NotYourTurnException.class, () -> game.drawVisible(other.getNickname(), null));
+                assertThrows(NotYourTurnException.class, () -> game.placeSide(other.getNickname(), null, null, 0, 0));
+            }
+
+            // Current Player Draws a card
+            int randomDecision = new Random().nextInt(4);
+
+            // Draw from ResourceDeck
+            if(randomDecision == 0){
+                try {
+                    game.drawDeck(current.getNickname(), false);
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (EmptyDeckException e) {
+                    randomDecision += 1;
+                }
+            }
+            // Draw from GoldDeck
+            if(randomDecision == 1){
+                try {
+                    game.drawDeck(current.getNickname(), false);
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (EmptyDeckException e) {
+                    randomDecision += 1;
+                }
+            }
+            // Draw a Visible Resource Card
+            if(randomDecision == 2){
+                try {
+                    game.drawVisible(current.getNickname(), game.getResourceDeck().getVisible().stream().findAny().orElse(null));
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (InvalidVisibleCardException e) {
+                    randomDecision += 1;
+                }
+            }
+            // Draw a Visible Gold Card
+            if(randomDecision == 3){
+                try {
+                    game.drawVisible(current.getNickname(), game.getGoldDeck().getVisible().stream().findAny().orElse(null));
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (InvalidVisibleCardException e) {
+                    randomDecision = 0;
+                }
+            }
+
+            // Current player State should be PLACE
+            assertEquals(PlayerState.PLACE, current.getState());
+        }
+
+        // Get winners
+        List<Player> winners = game.getWinners();
+
+        // Must have at least one winner
+        assertFalse(winners.isEmpty());
+
+        // Announce winners
+        if(winners.size() == 1){
+            System.out.println("The winner is: " + winners.getFirst().getNickname());
+        } else {
+            String names = "";
+            for(Player winner : winners){
+                names = names + winner.getNickname() + " ";
+            }
+            System.out.println("The winners are " + names);
+        }
+        System.out.println();
+
+        // Print statistics
+        for(String name : players){
+            Player p = getPlayer(game, name);
+            System.out.println(name + ":");
+            System.out.println("Points:" + p.getPoints());
+            System.out.println("Cards Played: " + p.getPlayArea().getPlayArea().keySet().size());
+            System.out.println("PlayArea:");
+            System.out.println(new AreaDisplayer(p.getPlayArea()));
+
+
+            System.out.println();
+        }
+
+    }
+
     @Test
     void multipleGames() {
         int N = 100;
@@ -432,6 +676,60 @@ class GameTest {
         for (int i = 0; i < N; i++)
             Game2();
     }
+
+
+    @Test
+    void multipleGameswithDisconnection() {
+        Map<Integer, List<String>> disconnections=new HashMap<>();
+        Map<Integer, List<String>> connections=new HashMap<>();
+        disconnections.put(2, List.of("Ale"));
+        disconnections.put(4, List.of("Chad"));
+        disconnections.put(7, List.of("Acoustic"));
+        connections.put(5, List.of("Ale"));
+        connections.put(6, List.of("Chad"));
+        connections.put(11, List.of("Acoustic"));
+
+        int N = 100;
+
+        for (int i = 0; i < N; i++)
+        {
+            GameWithDisconnections(disconnections, connections);
+        }
+
+         disconnections=new HashMap<>();
+         connections=new HashMap<>();
+        disconnections.put(1, List.of("Ale"));
+        disconnections.put(2, List.of("Chad"));
+        disconnections.put(3, List.of("Acoustic"));
+        connections.put(5, List.of("Ale"));
+        connections.put(4, List.of("Chad"));
+        connections.put(4, List.of("Acoustic"));
+
+
+        for (int i = 0; i < N; i++)
+        {
+            GameWithDisconnections(disconnections, connections);
+        }
+
+        disconnections=new HashMap<>();
+        connections=new HashMap<>();
+        disconnections.put(1, List.of("Ale"));
+        disconnections.put(4, List.of("Chad"));
+        disconnections.put(10, List.of("Acoustic"));
+        connections.put(3, List.of("Ale"));
+        connections.put(11, List.of("Chad"));
+        connections.put(12, List.of("Acoustic"));
+
+
+        for (int i = 0; i < N; i++)
+        {
+            GameWithDisconnections(disconnections, connections);
+        }
+
+
+
+    }
+
 
     @Test
     void serializeManualGame() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException, PlacementNotAllowedException, NotYourTurnException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException, InvalidVisibleCardException, EmptyDeckException {
