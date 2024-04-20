@@ -702,8 +702,8 @@ class GameTest {
         disconnections.put(2, List.of("Chad"));
         disconnections.put(3, List.of("Acoustic"));
         connections.put(5, List.of("Ale"));
-        connections.put(4, List.of("Chad"));
-        connections.put(4, List.of("Acoustic"));
+        connections.put(4, List.of("Chad", "Acoustic"));
+
 
 
         for (int i = 0; i < N; i++)
@@ -733,7 +733,7 @@ class GameTest {
 
     @Test
     void serializeManualGame() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException, PlacementNotAllowedException, NotYourTurnException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException, InvalidVisibleCardException, EmptyDeckException {
-        String path = "/Users/leonardo/IdeaProjects/IS24-AM05/src/test/java/it/polimi/is24am05/model/game/";
+        String path = "/Users/mcurnis/Desktop/School/IS24-AM05/src/test/java/it/polimi/is24am05/model/game/";
         String filename = "game_save.sv";
         String A = "Andre", L = "Leo";
         Game game;// = new Game(List.of("Leo", "Andre"));
