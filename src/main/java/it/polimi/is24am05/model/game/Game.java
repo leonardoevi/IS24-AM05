@@ -459,9 +459,6 @@ public class Game implements Serializable {
      */
     private void nextTurn(){
 
-        if(this.gameState==GameState.PAUSE)
-             return;
-
         // If a player has reached 20 points
         if(players.stream().anyMatch(p -> p.getPoints() >= POINTS_TO_END))
             this.gameState = GameState.GAME_ENDING;
@@ -529,6 +526,10 @@ public class Game implements Serializable {
         //if there are too few players the game is paused
         if(connected.size()<MIN_PLAYERS)
         {
+            if(connected.size()==1)
+            {
+                nextTurn();
+            }
             this.lastGameState =this.gameState;
             this.gameState=GameState.PAUSE;
         }
