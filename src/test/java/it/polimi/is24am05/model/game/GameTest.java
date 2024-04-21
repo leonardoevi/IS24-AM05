@@ -34,7 +34,6 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 
 import static it.polimi.is24am05.model.Player.HandDisplayer.handToString;
-import static it.polimi.is24am05.model.Player.HandDisplayer.matrixToString;
 import static it.polimi.is24am05.model.deck.DeckDisplayer.deckToString;
 import static it.polimi.is24am05.model.playArea.SideDisplayer.sideToString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -427,7 +426,7 @@ class GameTest {
     }
 
 
-
+    // TODO: test disconnections during early stages of the game
 
     void GameWithDisconnections( Map<Integer, List<String>> disconnections, Map<Integer, List<String>> connections ) {
         // Set up the same game as before
@@ -678,6 +677,506 @@ class GameTest {
     }
 
 
+    // A game played deterministically starting from a save file
+    // Useful to manually verify game state evolution
+    @Test
+    void gameWithDisconnections() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException {
+        String path = "src/test/java/it/polimi/is24am05/model/game/";
+        String filename = "game_disconnections_save.sv";
+        String A = "Andre", L = "Leo", M = "Manu";
+        Game game;
+
+        /*
+        game = new Game(List.of("Andre", "Leo", "Manu"));
+
+        save(game, path + filename);
+
+
+        game = load(path + filename);
+
+        game.placeStarterSide(A, StarterFrontSide.SFS_084);
+        game.placeStarterSide(M, StarterFrontSide.SFS_085);
+        game.placeStarterSide(L, StarterFrontSide.SFS_082);
+
+        save(game, path + filename);
+
+        game = load(path + filename);
+
+        game.chooseObjective(A, Objective.O_102);
+        game.chooseObjective(M, Objective.O_099);
+        game.chooseObjective(L, Objective.O_095);
+
+        save(game, path + filename);
+        */
+
+        game = load(path + filename);
+
+        // turns: A -> M -> L
+
+        // Without disconnections A wins in 20 turns (playing deterministically)
+
+        // Round 1
+        assertEquals(A, getCurrentPlayer(game).getNickname());
+        game.disconnect(A);
+        assertEquals(M, getCurrentPlayer(game).getNickname());
+        //deterministicallyPlay(game, A);
+        //deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        game.reconnect(A);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 2
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // TODO: fix this?
+        game.disconnect(A); // now its M turn
+        game.disconnect(M); // game paused
+        game.disconnect(L);
+
+        game.reconnect(M); game.reconnect(A); // game resumed, still M turn
+        game.reconnect(L);
+
+        assertEquals(GameState.GAME, game.getGameState());
+        //assertEquals(M, getCurrentPlayer(game).getNickname());
+
+        // Round 3
+        //deterministicallyPlay(game, A);
+        //deterministicallyDraw(game, A);
+
+        //deterministicallyPlay(game, M);
+        //deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 4
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 5
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 6
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 7
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 8
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 9
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 10
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 11
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 12
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 13
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 14
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 15
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 16
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 17
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 18
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 19
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 20
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        System.out.println(game.getGameState());
+        printGameState(game);
+    }
+
+    // Same test as previous without any disconnections (useful as reference)
+    @Test
+    void gameWith_OUT_Disconnections() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException {
+        String path = "src/test/java/it/polimi/is24am05/model/game/";
+        String filename = "game_disconnections_save.sv";
+        String A = "Andre", L = "Leo", M = "Manu";
+        Game game;
+
+        /*
+        game = new Game(List.of("Andre", "Leo", "Manu"));
+
+        save(game, path + filename);
+
+
+        game = load(path + filename);
+
+        game.placeStarterSide(A, StarterFrontSide.SFS_084);
+        game.placeStarterSide(M, StarterFrontSide.SFS_085);
+        game.placeStarterSide(L, StarterFrontSide.SFS_082);
+
+        save(game, path + filename);
+
+        game = load(path + filename);
+
+        game.chooseObjective(A, Objective.O_102);
+        game.chooseObjective(M, Objective.O_099);
+        game.chooseObjective(L, Objective.O_095);
+
+        save(game, path + filename);
+        */
+
+        game = load(path + filename);
+
+        // turns: A -> M -> L
+
+        // Without disconnections A wins in 20 turns (playing deterministically)
+
+        // Round 1
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 2
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 3
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 4
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 5
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 6
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 7
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 8
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 9
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 10
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 11
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 12
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 13
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 14
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 15
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 16
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 17
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 18
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 19
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        // Round 20
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
+
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        System.out.println(game.getGameState());
+        printGameState(game);
+    }
+
+
     @Test
     void multipleGameswithDisconnection() {
         Map<Integer, List<String>> disconnections=new HashMap<>();
@@ -748,7 +1247,7 @@ class GameTest {
 
     @Test
     void serializeManualGame() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException, PlacementNotAllowedException, NotYourTurnException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException, InvalidVisibleCardException, EmptyDeckException {
-        String path = "/Users/mcurnis/Desktop/School/IS24-AM05/src/test/java/it/polimi/is24am05/model/game/";
+        String path = "src/test/java/it/polimi/is24am05/model/game/";
         String filename = "game_save.sv";
         String A = "Andre", L = "Leo";
         Game game;// = new Game(List.of("Leo", "Andre"));
@@ -978,6 +1477,14 @@ class GameTest {
         return possibleCoord.getFirst();
     }
 
+    public static Tuple getDeterministicFreePlacingSpot(Player player){
+        List<Tuple> possibleCoord;
+        possibleCoord = new LinkedList<>(player.getPlayArea().getFrontier().stream().toList());
+        return possibleCoord.stream().sorted((t1, t2) -> t1.hashCode() < t2.hashCode() ? 1 : -1 )
+                .findFirst()
+                .orElse(null);
+    }
+
     private static String PlayAreaToString(PlacedSide[][] matrix){
         String ret = "";
         for(PlacedSide[] row : matrix){
@@ -994,7 +1501,7 @@ class GameTest {
     }
 
     private void printGameState(Game game){
-        System.out.println("\n".repeat(10));
+        System.out.println("\n".repeat(1));
         for(Player p : game.getPlayers()){
             System.out.println("Player: " + p.getNickname());
             System.out.println("Points: " + p.getPoints());
@@ -1015,5 +1522,65 @@ class GameTest {
 
         System.out.println("Decks: ");
         System.out.println(deckToString(game.getResourceDeck(), false, game.getGoldDeck(), true));
+    }
+
+    private void deterministicallyPlay(Game game, String nickname){
+        Player player = getPlayer(game, nickname);
+        List<Card> hand = player.getHand();
+        Card toPlay = hand.getFirst();
+        Tuple spot = getDeterministicFreePlacingSpot(player);
+
+        try {
+            game.placeSide(nickname, toPlay, toPlay.getFrontSide(), spot.i, spot.j);
+            return;
+        } catch (PlacementNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                 InvalidCoordinatesException | InvalidSideException | MoveNotAllowedException | NotYourTurnException |
+                 NoSuchPlayerException ignored) {}
+
+        try {
+            game.placeSide(nickname, toPlay, toPlay.getBackSide(), spot.i, spot.j);
+        } catch (PlacementNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                 InvalidCoordinatesException | InvalidSideException | MoveNotAllowedException | NotYourTurnException |
+                 NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void deterministicallyDraw(Game game, String nickname){
+        Player player = getPlayer(game, nickname);
+
+        for(Card card : ResourceCard.values()) {
+            try {
+                game.drawVisible(nickname, card);
+                return;
+            } catch (MoveNotAllowedException | NotYourTurnException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidVisibleCardException e) {
+                continue;
+            }
+        }
+        for(Card card : GoldCard.values()) {
+            try {
+                game.drawVisible(nickname, card);
+                return;
+            } catch (MoveNotAllowedException | NotYourTurnException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidVisibleCardException e) {
+                continue;
+            }
+        }
+        try {
+            game.drawDeck(nickname, false);
+            return;
+        } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+            throw new RuntimeException(e);
+        } catch (EmptyDeckException ignored) {}
+
+        try {
+            game.drawDeck(nickname, true);
+        } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException |EmptyDeckException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
