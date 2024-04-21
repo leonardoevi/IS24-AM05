@@ -24,6 +24,7 @@ import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Game implements Serializable {
     /**
@@ -59,8 +60,8 @@ public class Game implements Serializable {
     private final static int NUMBER_OF_SHARED_OBJECTIVES = 2;
     private final static int NUMBER_OF_OBJECTIVES_TO_DEAL = 2;
     private final static int POINTS_TO_END = 20;
-    private final static int MAX_PLAYERS = Color.values().length;
-    private final static int MIN_PLAYERS = 2;
+    public final static int MAX_PLAYERS = Color.values().length;
+    public final static int MIN_PLAYERS = 2;
 
     /**
      * Game constructor. Initializes Players with a starting card only. Initializes Decks.
@@ -339,7 +340,7 @@ public class Game implements Serializable {
      * Ends the player turn
      * @param playerName Player name
      * @param fromGold true if the player wants to draw from the Gold Cards Deck
-     * @throws MoveNotAllowedException If the current game state is not CHOOSE_OBJECTIVE
+     * @throws MoveNotAllowedException If the current game state is not GAME or GAME_ENDING
      * @throws NoSuchPlayerException If such a player is not in the game
      * @throws NotYourTurnException If it is not the Player's turn
      * @throws EmptyDeckException propagated
@@ -383,7 +384,7 @@ public class Game implements Serializable {
      * Ends the player turn
      * @param playerName Player name
      * @param visible the card to Draw
-     * @throws MoveNotAllowedException If the current game state is not CHOOSE_OBJECTIVE
+     * @throws MoveNotAllowedException If the current game state is not GAME or GAME_ENDING
      * @throws NoSuchPlayerException If such a player is not in the game
      * @throws NotYourTurnException If it is not the Player's turn
      * @throws InvalidVisibleCardException propagated
@@ -473,6 +474,10 @@ public class Game implements Serializable {
                         .toList();
     }
 
+    public void reConnect(String playerNickname){}
+
+    public void disconnect(String playerNickname){}
+
     // Getters and Setters
 
     public List<Player> getWinners() {
@@ -502,5 +507,11 @@ public class Game implements Serializable {
 
     public Objective[] getSharedObjectives() {
         return sharedObjectives.clone();
+    }
+
+    public Set<String> getDisconnected(){return null;}
+
+    public Set<String> getNicknames(){
+        return this.players.stream().map(Player::getNickname).collect(Collectors.toSet());
     }
 }
