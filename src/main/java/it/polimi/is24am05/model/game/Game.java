@@ -526,8 +526,8 @@ public class Game implements Serializable {
         Player toDisconnect=findPlayer(nickname);
         this.connected.remove(toDisconnect);
 
-        //if there are too few players the game is paused
-        if(connected.size()<MIN_PLAYERS)
+        //if there are too few players and the game is not already in pause,  the game is paused
+        if(connected.size()<MIN_PLAYERS && this.gameState!=GameState.PAUSE)
         {
 
             this.lastGameState =this.gameState;
@@ -535,7 +535,7 @@ public class Game implements Serializable {
         }
 
         //if there are is at least 1 player connected and if the disconnected player was supposed to play, next turn
-        if(this.players.get(turn).equals(toDisconnect) && this.connected.size()>=1)
+        if(this.players.get(turn).equals(toDisconnect) && this.gameState!=GameState.PAUSE)
         {
             nextTurn();
         }
