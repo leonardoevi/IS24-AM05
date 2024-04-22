@@ -737,7 +737,6 @@ class GameTest {
         deterministicallyPlay(game, L);
         deterministicallyDraw(game, L);
 
-        // TODO: fix this?
         game.disconnect(A); // now its M turn
         game.disconnect(M); // game paused
         game.disconnect(L);
@@ -758,48 +757,96 @@ class GameTest {
         deterministicallyPlay(game, L);
         deterministicallyDraw(game, L);
 
+
+        // now M disconnects mid-turn, after placing a card
         // Round 4
         deterministicallyPlay(game, A);
         deterministicallyDraw(game, A);
 
         deterministicallyPlay(game, M);
-        deterministicallyDraw(game, M);
+        game.disconnect(M);
+        //deterministicallyDraw(game, M);
+        game.reconnect(M);
 
         deterministicallyPlay(game, L);
         deterministicallyDraw(game, L);
 
-        // Round 5
+
+        // A disconnects after playing, L disconnects mid-turn
+        // L turn is automatically concluded
+        // It then M turn
         deterministicallyPlay(game, A);
         deterministicallyDraw(game, A);
+        game.disconnect(A);
 
         deterministicallyPlay(game, M);
         deterministicallyDraw(game, M);
 
         deterministicallyPlay(game, L);
-        deterministicallyDraw(game, L);
+        game.disconnect(L);
+        //deterministicallyDraw(game, L);
 
+        game.reconnect(A);
+        game.reconnect(L);
+
+        assertEquals(M, getCurrentPlayer(game).getNickname());
+
+        // Its M turn
+        // A disconnects
+        // M disconnects, game paused, still M turn
+        // A connects, game resumed, L turn
         // Round 6
-        deterministicallyPlay(game, A);
-        deterministicallyDraw(game, A);
+        // deterministicallyPlay(game, A);
+        // deterministicallyDraw(game, A);
 
-        deterministicallyPlay(game, M);
-        deterministicallyDraw(game, M);
+        game.disconnect(A);
+        game.disconnect(M);
+
+        assertEquals(M, getCurrentPlayer(game).getNickname());
+
+        game.reconnect(A);
+
+        assertEquals(L, getCurrentPlayer(game).getNickname());
+
+        //deterministicallyPlay(game, M);
+        //deterministicallyDraw(game, M);
 
         deterministicallyPlay(game, L);
         deterministicallyDraw(game, L);
+
+        game.reconnect(M);
 
         // Round 7
         deterministicallyPlay(game, A);
         deterministicallyDraw(game, A);
 
+        // Its M turn
+        // A disconnects
+        // M disconnects, game paused, still M turn
+        // L disconnects
+        // M reconnects
+        // A connects, game resumed, A turn
+
+        game.disconnect(A);
+        game.disconnect(M);
+        game.disconnect(L);
+
+        game.reconnect(M);
+        game.reconnect(A);
+
         deterministicallyPlay(game, M);
         deterministicallyDraw(game, M);
 
-        deterministicallyPlay(game, L);
-        deterministicallyDraw(game, L);
+        assertEquals(A, getCurrentPlayer(game).getNickname());
+
+        //deterministicallyPlay(game, L);
+        //deterministicallyDraw(game, L);
 
         // Round 8
         deterministicallyPlay(game, A);
+
+        game.reconnect(L);
+
         deterministicallyDraw(game, A);
 
         deterministicallyPlay(game, M);
@@ -808,15 +855,30 @@ class GameTest {
         deterministicallyPlay(game, L);
         deterministicallyDraw(game, L);
 
+
+        // A turn
+        // Everyone disconnects in the playing order
+        // The player disconnected second to last is expected to play
         // Round 9
-        deterministicallyPlay(game, A);
-        deterministicallyDraw(game, A);
+        game.disconnect(A);
+        game.disconnect(M);
+        game.disconnect(L);
 
-        deterministicallyPlay(game, M);
-        deterministicallyDraw(game, M);
+        assertEquals(M, getCurrentPlayer(game).getNickname());
 
-        deterministicallyPlay(game, L);
-        deterministicallyDraw(game, L);
+        // All except for M reconnect
+        game.reconnect(L);
+        game.reconnect(A);
+
+        assertEquals(L, getCurrentPlayer(game).getNickname());
+
+        game.disconnect(L);
+        game.reconnect(M);
+
+        assertEquals(A, getCurrentPlayer(game).getNickname());
+
+        game.reconnect(M); // Redundant, M is already connected
+        game.reconnect(L);
 
         // Round 10
         deterministicallyPlay(game, A);

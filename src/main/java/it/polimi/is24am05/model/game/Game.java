@@ -456,6 +456,8 @@ public class Game implements Serializable {
      * If a player has reached POINTS_TO_END points it allows each player left to play,
      * such that everyone will have played the same number of turns.
      * After everyone has played the last turn, it ends the game.
+     * <p>
+     * If the following player is disconnected, immediately ends its turn too
      */
     private void nextTurn(){
         // If a player has reached 20 points
@@ -509,11 +511,16 @@ public class Game implements Serializable {
 
     /**
      * handles the disconnection of a player
+     * If a player is disconnected after placing a card but before drawing, a random card is drawn to end its turn correctly
      * @param nickname is the nickname of the player to disconnect
      * @throws NoSuchPlayerException propagated
      */
 
     public void disconnect(String nickname) throws NoSuchPlayerException {
+        // If the player is already disconnected do nothing
+        if(!this.connected.contains(findPlayer(nickname)))
+            return;
+
         // If the player is mid-turn make them draw a random card
         if(this.players.get(this.turn).getNickname().equals(nickname) && findPlayer(nickname).getState() == PlayerState.DRAW)
             this.drawSomething(nickname);
@@ -540,6 +547,10 @@ public class Game implements Serializable {
      */
 
     public void reconnect(String nickname) throws NoSuchPlayerException{
+        // If the player is already connected do nothing
+        if(this.connected.contains(findPlayer(nickname)))
+            return;
+
         this.connected.add(findPlayer(nickname));
 
         // If there are enough players to play
