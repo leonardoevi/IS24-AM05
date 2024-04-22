@@ -27,10 +27,7 @@ import it.polimi.is24am05.model.playArea.AreaDisplayer;
 import it.polimi.is24am05.model.playArea.Tuple;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.*;
 
 import static it.polimi.is24am05.model.Player.HandDisplayer.handToString;
@@ -749,14 +746,14 @@ class GameTest {
         game.reconnect(L);
 
         assertEquals(GameState.GAME, game.getGameState());
-        //assertEquals(M, getCurrentPlayer(game).getNickname());
+        assertEquals(M, getCurrentPlayer(game).getNickname());
 
         // Round 3
         //deterministicallyPlay(game, A);
         //deterministicallyDraw(game, A);
 
-        //deterministicallyPlay(game, M);
-        //deterministicallyDraw(game, M);
+        deterministicallyPlay(game, M);
+        deterministicallyDraw(game, M);
 
         deterministicallyPlay(game, L);
         deterministicallyDraw(game, L);
@@ -1293,7 +1290,6 @@ class GameTest {
         */
 
         // Load a game after deck initialization, objective choices and first 2 card placements
-
         game = load(path + filename);
 
         // Leo's turn
@@ -1452,6 +1448,7 @@ class GameTest {
             return game;
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.err.println("Unable to load save file");
         }
         return null;
     }

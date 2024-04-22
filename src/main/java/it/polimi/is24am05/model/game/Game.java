@@ -458,37 +458,28 @@ public class Game implements Serializable {
      * After everyone has played the last turn, it ends the game.
      */
     private void nextTurn(){
-
         // If a player has reached 20 points
         if(players.stream().anyMatch(p -> p.getPoints() >= POINTS_TO_END))
             this.gameState = GameState.GAME_ENDING;
 
         // If only last turns must be played
         if(this.gameState == GameState.GAME_ENDING){
-
-            // Increase the index and finds the first player connected
-
+            // Increase the index
             this.turn += 1;
-
-            while(this.turn<this.players.size() && !isPlayerConnected(this.players.get(this.turn)))
-             {
-                 this.turn+=1;
-             }
         } else
-        {
             // Increase the index, keeping it inside the boundary
             this.turn = (this.turn + 1) % players.size();
-
-          while(!isPlayerConnected(this.players.get(this.turn)))
-            {
-                 this.turn = (this.turn + 1) % players.size();
-            }
-        }
 
         // If the index is out of bound, the game has ended
         if(this.turn >= players.size()) {
             this.gameState = GameState.END;
             endGame();
+            return;
+        }
+
+        // If the player that is expected to play now is disconnected, skip its turn
+        if(!this.connected.contains(this.players.get(this.turn))){
+            nextTurn();
         }
     }
 
@@ -523,23 +514,23 @@ public class Game implements Serializable {
      */
 
     public void disconnect(String nickname) throws NoSuchPlayerException {
-        Player toDisconnect=findPlayer(nickname);
-        this.connected.remove(toDisconnect);
+        // If the player is mid-turn make them draw a random card
+        if(this.players.get(this.turn).getNickname().equals(nickname) && findPlayer(nickname).getState() == PlayerState.DRAW)
+            this.drawSomething(nickname);
 
-        //if there are too few players the game is paused
-        if(connected.size()<MIN_PLAYERS)
-        {
+        // Remove the player from connected players
+        this.connected.remove(findPlayer(nickname));
 
-            this.lastGameState =this.gameState;
-            this.gameState=GameState.PAUSE;
+        // If exactly one player remains in the game after this disconnection
+        if(this.connected.size() == 1){
+            this.lastGameState = this.gameState;
+            this.gameState = GameState.PAUSE;
         }
 
-        //if there are is at least 1 player connected and if the disconnected player was supposed to play, next turn
-        if(this.players.get(turn).equals(toDisconnect) && this.connected.size()>=1)
-        {
+        // If the player disconnecting was expected to play and there are enough players to keep playing
+        if(this.players.get(this.turn).getNickname().equals(nickname) && this.connected.size() >= 2){
             nextTurn();
         }
-
     }
 
     /**
@@ -549,56 +540,32 @@ public class Game implements Serializable {
      */
 
     public void reconnect(String nickname) throws NoSuchPlayerException{
-        Player toConnect=findPlayer(nickname);
-        this.connected.add(toConnect);
+        this.connected.add(findPlayer(nickname));
 
-        //if the player was disconnected before drawing a card and there is card left to draw, he is assigned a random card
-        if(toConnect.getState()==PlayerState.DRAW)
-        {
-            if(cardLeftToDraw())
-            {
-               if(!this.resourceDeck.isEmpty()) {
-                   try {
-                       toConnect.drawCard(this.resourceDeck.drawTop());
-                   } catch (EmptyDeckException ignored){}
-               }
+        // If there are enough players to play
+        if(this.connected.size() == 2){
+            this.gameState = this.lastGameState;
+            this.lastGameState = null;
 
-               else if(!this.goldDeck.isEmpty()) {
-                   try {
-                       toConnect.drawCard(this.goldDeck.drawTop());
-                   } catch (EmptyDeckException ignored) {}
-                  }
-
-                else  if(!this.resourceDeck.getVisible().isEmpty()) {
-
-                       Card[] t = (Card[]) resourceDeck.getVisible().toArray();
-                       Random rand = new Random();
-                       int index = rand.nextInt(t.length);
-                   try {
-                       toConnect.drawCard(this.resourceDeck.drawVisible(t[index]));
-                   } catch (InvalidVisibleCardException ignored) {}
-
-               }
-                else {
-                   Card[] t = (Card[]) goldDeck.getVisible().toArray();
-                   Random rand = new Random();
-                   int index = rand.nextInt(t.length);
-                   try {
-                       toConnect.drawCard(this.goldDeck.drawVisible(t[index]));
-                   } catch (InvalidVisibleCardException ignored) {}
-               }
-
-               }
-
-            }
-       //if the game was in pause and now there are enough players to play, the game goes on
-        if(this.gameState==GameState.PAUSE && this.connected.size()>=MIN_PLAYERS)
-        {
-            this.gameState=this.lastGameState;
+            // If the player that is expected to play is still not connected
+            if(!this.connected.contains(this.players.get(this.turn)))
+                nextTurn();
         }
-
     }
 
+    private void drawSomething(String nickname){
+        Card toDraw = this.getResourceDeck().getVisible().stream().findAny().orElse(null);
+        if(toDraw == null)
+            toDraw = this.getGoldDeck().getVisible().stream().findAny().orElse(null);
+
+        // If the player was expected to draw a card, something to draw must be left in one of the decks
+        assert toDraw != null;
+
+        try {
+            this.drawVisible(nickname, toDraw);
+        } catch (MoveNotAllowedException | InvalidVisibleCardException | NotYourTurnException |
+                 NoSuchPlayerException ignored) {}
+    }
 
     // Getters and Setters
 
