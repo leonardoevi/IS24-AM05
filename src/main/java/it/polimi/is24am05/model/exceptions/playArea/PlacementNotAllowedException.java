@@ -6,4 +6,8 @@ package it.polimi.is24am05.model.exceptions.playArea;
  * - the specified coordinates are blocked
  */
 public class PlacementNotAllowedException extends Exception {
+    @Override
+    public String getMessage() {
+        return "Placement not allowed";
+    }
 }
