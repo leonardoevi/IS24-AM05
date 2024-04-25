@@ -36,6 +36,13 @@ public class Game implements Serializable {
      */
     private final List<Player> players;
 
+
+    /**
+     * Players connected in the game, I assume that no player can disconnect before playing the initial card an choosing the objective card
+     */
+
+    private final Set<Player> connected;
+
     /**
      * Keeps track of the player that is expected to play i.e. players.get(turn)
      */
@@ -50,6 +57,12 @@ public class Game implements Serializable {
      * State of the game, used to know what move is expected
      */
     private GameState gameState;
+
+
+    /**
+     * Used to track che state of the game, i.e gameState, before the game is paused
+     */
+    private GameState lastGameState;
 
     /**
      * Objectives that every player can see
@@ -93,7 +106,11 @@ public class Game implements Serializable {
             colors.remove(color);
         }
 
-            // Randomly decide the order in which players are going to take turns
+        // Fill up the set of connected players, i.e all the players
+        this.connected=new HashSet<>(nicknames.size());
+        connected.addAll(this.players);
+
+        // Randomly decide the order in which players are going to take turns
         Collections.shuffle(this.players);
         this.turn = 0;
 
@@ -128,6 +145,15 @@ public class Game implements Serializable {
      */
     private Player findPlayer(String nickname) throws NoSuchPlayerException {
         return players.stream().filter(p -> p.getNickname().equals(nickname)).findFirst().orElseThrow(NoSuchPlayerException::new);
+    }
+
+    /**
+     * @param player is the Player
+     * @return true if player is connected
+     */
+    private boolean isPlayerConnected(Player player)
+    {
+        return this.connected.contains(player);
     }
 
     /**
@@ -308,7 +334,7 @@ public class Game implements Serializable {
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
 
         // Check if it's the Player turn
-        if(this.players.get(turn) != player){
+        if(this.players.get(turn) != player || !isPlayerConnected(player)){
             throw new NotYourTurnException();
         }
 
@@ -353,7 +379,7 @@ public class Game implements Serializable {
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
 
         // Check if it's the Player turn
-        if(this.players.get(turn) != player){
+        if(this.players.get(turn) != player || !isPlayerConnected(player)){
             throw new NotYourTurnException();
         }
 
@@ -389,7 +415,7 @@ public class Game implements Serializable {
      * @throws NotYourTurnException If it is not the Player's turn
      * @throws InvalidVisibleCardException propagated
      */
-    public void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException {
+    public void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException{
         // Check if the current game state is GAME
         checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
@@ -397,7 +423,7 @@ public class Game implements Serializable {
         Player player = findPlayer(playerName);     // throws NoSuchPlayerException
 
         // Check if it's the Player turn
-        if(this.players.get(turn) != player){
+        if(this.players.get(turn) != player || !isPlayerConnected(player)){
             throw new NotYourTurnException();
         }
 
@@ -429,6 +455,8 @@ public class Game implements Serializable {
      * If a player has reached POINTS_TO_END points it allows each player left to play,
      * such that everyone will have played the same number of turns.
      * After everyone has played the last turn, it ends the game.
+     * <p>
+     * If the following player is disconnected, immediately ends its turn too
      */
     private void nextTurn(){
         // If a player has reached 20 points
@@ -447,6 +475,12 @@ public class Game implements Serializable {
         if(this.turn >= players.size()) {
             this.gameState = GameState.END;
             endGame();
+            return;
+        }
+
+        // If the player that is expected to play now is disconnected, skip its turn
+        if(!this.connected.contains(this.players.get(this.turn))){
+            nextTurn();
         }
     }
 
@@ -474,10 +508,72 @@ public class Game implements Serializable {
                         .toList();
     }
 
-    // TODO merge connectivity in here
-    public void reConnect(String playerNickname){}
+    /**
+     * handles the disconnection of a player
+     * If a player is disconnected after placing a card but before drawing, a random card is drawn to end its turn correctly
+     * @param nickname is the nickname of the player to disconnect
+     * @throws NoSuchPlayerException propagated
+     */
+    public void disconnect(String nickname) throws NoSuchPlayerException {
+        // If the player is already disconnected do nothing
+        if(!this.connected.contains(findPlayer(nickname)))
+            return;
 
-    public void disconnect(String playerNickname){}
+        // If the player is mid-turn make them draw a random card
+        if(this.players.get(this.turn).getNickname().equals(nickname) && findPlayer(nickname).getState() == PlayerState.DRAW)
+            this.drawSomething(nickname);
+
+        // Remove the player from connected players
+        this.connected.remove(findPlayer(nickname));
+
+        // If exactly one player remains in the game after this disconnection
+        if(this.connected.size() == 1){
+            this.lastGameState = this.gameState;
+            this.gameState = GameState.PAUSE;
+        }
+
+        // If the player disconnecting was expected to play and there are enough players to keep playing
+        if(this.players.get(this.turn).getNickname().equals(nickname) && this.connected.size() >= 2){
+            nextTurn();
+        }
+    }
+
+    /**
+     * handles the connection f a player previously disconnected
+     * @param nickname is the nickname of the player to reconnect
+     * @throws NoSuchPlayerException propagated
+     */
+    public void reconnect(String nickname) throws NoSuchPlayerException{
+        // If the player is already connected do nothing
+        if(this.connected.contains(findPlayer(nickname)))
+            return;
+
+        this.connected.add(findPlayer(nickname));
+
+        // If there are enough players to play
+        if(this.connected.size() == 2){
+            this.gameState = this.lastGameState;
+            this.lastGameState = null;
+
+            // If the player that is expected to play is still not connected
+            if(!this.connected.contains(this.players.get(this.turn)))
+                nextTurn();
+        }
+    }
+
+    private void drawSomething(String nickname){
+        Card toDraw = this.getResourceDeck().getVisible().stream().findAny().orElse(null);
+        if(toDraw == null)
+            toDraw = this.getGoldDeck().getVisible().stream().findAny().orElse(null);
+
+        // If the player was expected to draw a card, something to draw must be left in one of the decks
+        assert toDraw != null;
+
+        try {
+            this.drawVisible(nickname, toDraw);
+        } catch (MoveNotAllowedException | InvalidVisibleCardException | NotYourTurnException |
+                 NoSuchPlayerException ignored) {}
+    }
 
     // Getters and Setters
 
@@ -488,6 +584,9 @@ public class Game implements Serializable {
 
     public List<Player> getPlayers() {
         return new ArrayList<>(this.players);
+    }
+    public Set<Player> getConnectedPlayers() {
+        return new HashSet<>(this.connected);
     }
 
     public int getTurn() {

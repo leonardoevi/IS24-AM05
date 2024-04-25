@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AreaDisplayerTest {
     @Test
-    void testGeneratedGameToString() {
+    void testGeneratedGameToString()  {
         Game game = simulateGame();
 
         // Print winner PlayArea
@@ -88,7 +88,7 @@ class AreaDisplayerTest {
         return playArea;
     }
 
-    private static Game simulateGame() {
+    private static Game simulateGame()  {
         // Simulate a game being played
         // Verify only the correct methods can be invoked
         // Verify the correct evolution of the game model
