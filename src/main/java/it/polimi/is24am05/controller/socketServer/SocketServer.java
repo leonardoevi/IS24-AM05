@@ -37,7 +37,7 @@ public class SocketServer {
             try {
                 final Socket socket = serverSocket.accept();
 
-                System.out.println("New client connected: " + socket.getRemoteSocketAddress());;
+                System.out.println("New client connected: " + socket.getRemoteSocketAddress());
 
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketServerClientHandler(socket, this));
@@ -59,6 +59,7 @@ public class SocketServer {
         synchronized (clientSockets) {
             clientSockets.remove(toRemove);
         }
+        System.out.println("Client disconnected: " + toRemove.getRemoteSocketAddress());
     }
 
     /**
@@ -105,7 +106,10 @@ public class SocketServer {
 
                 try {
                     new PrintWriter(socket.getOutputStream(), true).println(message);
-                } catch (IOException ignored) {}
+                } catch (IOException e) {
+                    // If there is some errors remove the socket form the list
+                    removeClient(socket);
+                }
             }
         }
 

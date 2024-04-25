@@ -32,16 +32,25 @@ public class SocketClient {
     }
 
     public void startClient() throws IOException {
+        // Connect to server
         final Socket socket = new Socket(ip, port);
         System.out.println("Connection to server established");
+
+        // Create i/o to server
         final PrintWriter socketOut = new PrintWriter(socket.getOutputStream(), true);
-        new Thread(new ClientInReader(socket)).start();
         final Scanner stdin = new Scanner(System.in);
+
+        // Start process to read input from server asynchronously
+        new Thread(new ClientInReader(socket)).start();
+
         try {
+            // Read stdin
             while (true) {
                 final String inputLine = stdin.nextLine();
-                if (inputLine.equals("exit"))
+                if (inputLine.equals("quit")) {
+                    socketOut.println(inputLine);
                     break;
+                }
 
                 socketOut.println(inputLine);
             }
@@ -78,10 +87,7 @@ public class SocketClient {
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            } catch (NoSuchElementException | IllegalStateException e) {
-                if(socket.isClosed())
-                    return;
-                else throw new RuntimeException(e);
+            } catch (NoSuchElementException | IllegalStateException ignored) {
             }
         }
     }
