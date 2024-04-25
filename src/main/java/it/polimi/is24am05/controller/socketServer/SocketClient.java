@@ -23,7 +23,8 @@ public class SocketClient {
     }
 
     public static void main(String[] args) {
-        final SocketClient client = new SocketClient("127.0.0.1", 6969);
+        //final SocketClient client = new SocketClient("192.168.1.5", 6969);
+        final SocketClient client = new SocketClient("localhost", 6969);
         try {
             client.startClient();
         } catch (final IOException e) {
@@ -64,7 +65,7 @@ public class SocketClient {
     }
 
     /**
-     * Runnable used to read messages from the Socket asynchronously
+     * Runnable used to read messages from the Client's Socket input channel asynchronously
      */
     public static class ClientInReader implements Runnable {
         /**
@@ -82,13 +83,17 @@ public class SocketClient {
             try {
                 socketIn = new Scanner(socket.getInputStream());
                 while (true) {
-                    // Prints to the console the contents of the Socket Input
-                    System.out.println(socketIn.nextLine());
+                    handleServerInput(socketIn.nextLine());
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchElementException | IllegalStateException ignored) {
             }
+        }
+
+        private void handleServerInput(String inputLine) {
+            // TODO: fill this function according to the protocol
+            System.out.println(inputLine);
         }
     }
 }
