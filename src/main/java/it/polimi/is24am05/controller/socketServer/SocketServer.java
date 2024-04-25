@@ -42,6 +42,7 @@ public class SocketServer {
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketServerClientHandler(socket, this));
 
+                // TODO: maybe delay this step after the connection has been approved by the controller
                 // Add the client to the list of output stream for broadcast
                 synchronized (clientSockets) {
                     clientSockets.add(socket);
@@ -55,6 +56,10 @@ public class SocketServer {
         return;
     }
 
+    /**
+     * Removes a Client from the broadcast list
+     * @param toRemove client socket to remove
+     */
     public void removeClient(Socket toRemove){
         synchronized (clientSockets) {
             clientSockets.remove(toRemove);
