@@ -1,5 +1,7 @@
 package it.polimi.is24am05.controller.socketServer;
 
+import it.polimi.is24am05.controller.Controller;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -13,8 +15,14 @@ import java.util.concurrent.Executors;
  * Server using sockets protocol
  */
 public class SocketServer {
+    protected final Controller controller;
+
     // Observer pattern?
     private final List<Socket> clientSockets = new ArrayList<>();
+
+    public SocketServer(Controller controller) {
+        this.controller = controller;
+    }
 
     public void start() {
         ServerSocket serverSocket = null;
@@ -120,7 +128,10 @@ public class SocketServer {
 
     }
 
+    /*
     public static void main(String[] args) {
-        new SocketServer().start();
+        new SocketServer(null).start();
     }
+
+     */
 }

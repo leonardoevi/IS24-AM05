@@ -9,4 +9,9 @@ public class FirstConnectionException extends Exception{
     public FirstConnectionException(String reason) {
         this.reason = reason;
     }
+
+    @Override
+    public String getMessage() {
+        return reason;
+    }
 }

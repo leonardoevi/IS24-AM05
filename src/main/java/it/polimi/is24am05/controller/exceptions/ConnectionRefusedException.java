@@ -6,4 +6,9 @@ public class ConnectionRefusedException extends Exception{
     public ConnectionRefusedException(String reason) {
         this.reason = reason;
     }
+
+    @Override
+    public String getMessage() {
+        return reason;
+    }
 }

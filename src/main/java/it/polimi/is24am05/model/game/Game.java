@@ -474,6 +474,7 @@ public class Game implements Serializable {
                         .toList();
     }
 
+    // TODO merge connectivity in here
     public void reConnect(String playerNickname){}
 
     public void disconnect(String playerNickname){}

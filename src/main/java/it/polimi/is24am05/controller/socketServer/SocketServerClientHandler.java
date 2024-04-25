@@ -1,5 +1,9 @@
 package it.polimi.is24am05.controller.socketServer;
 
+import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
+import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
+import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -68,13 +72,58 @@ public class SocketServerClientHandler implements Runnable {
         // TODO: fill this function according to the protocol
 
         // Used only for debug
-        System.out.println("Received: " + inputLine + " from: " + socket.getRemoteSocketAddress());
+        //System.out.println("Received: " + inputLine + " from: " + socket.getRemoteSocketAddress());
 
+        /*
         // Sending messages must be sync to avoid interference with Server sendBroadcast()
         synchronized (this.socket) {
             out.println("Received: " + inputLine + " from you <3");
         }
 
         parent.sendBroadcast("Received: " + inputLine + " from " + socket.getRemoteSocketAddress(), this.socket);
+         */
+
+        Scanner scanner = new Scanner(inputLine);
+        scanner.useDelimiter(",");
+
+        String answer = null;
+
+        if(!scanner.hasNext())
+            synchronized (this.socket) {
+                out.println("Empty Input");
+            }
+
+        switch (scanner.next()) {
+            case "newConnection":
+                if(!scanner.hasNext()){
+                    answer = "Invalid input";
+                    break;
+                }
+
+                String name = scanner.next();
+                if(scanner.hasNext()) {
+                    try {
+                        parent.controller.newConnection(name, Integer.parseInt(scanner.next()));
+                    } catch (FirstConnectionException | InvalidNumUsersException e) {
+                        answer = e.getMessage();
+                    }
+                } else {
+                    try {
+                        parent.controller.newConnection(name);
+                    } catch (ConnectionRefusedException | FirstConnectionException e) {
+                        answer = e.getMessage();
+                    }
+                }
+                break;
+
+            default:
+                answer = "Invalid input";
+        }
+
+        if(answer != null)
+            synchronized (this.socket) {
+                out.println(answer);
+            }
+
     }
 }

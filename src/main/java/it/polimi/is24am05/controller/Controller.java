@@ -3,6 +3,7 @@ package it.polimi.is24am05.controller;
 import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
+import it.polimi.is24am05.controller.socketServer.SocketServer;
 import it.polimi.is24am05.model.exceptions.game.PlayerNamesMustBeDifferentException;
 import it.polimi.is24am05.model.exceptions.game.TooFewPlayersException;
 import it.polimi.is24am05.model.exceptions.game.TooManyPlayersException;
@@ -23,7 +24,7 @@ public class Controller {
     /**
      * List of connected clients, identified by name
      */
-    private List<String> users;
+    private List<String> users = new LinkedList<>();
     private LobbyState lobbyState;
     private Game game;
 
@@ -33,7 +34,6 @@ public class Controller {
      */
     public Controller(Game game) {
         this.game = game;
-        this.users = new LinkedList<>();
         this.numUsers = game.getNicknames().size();
         this.lobbyState = LobbyState.OLD;
     }
@@ -70,7 +70,7 @@ public class Controller {
                 this.lobbyState = LobbyState.STARTED;
             }
 
-            this.game.reConnect(playerNickname); // TODO: REMOVE THIS LINE?
+            //this.game.reConnect(playerNickname); // TODO: REMOVE THIS LINE?
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
             if(this.numUsers == 0)
@@ -145,6 +145,8 @@ public class Controller {
         }
 
         // Start threads for Socket and RMI servers, pass the controller.
+        Controller finalController = controller;
+        new Thread(() -> new SocketServer(finalController).start()).start();
     }
 
 
