@@ -681,7 +681,35 @@ class GameTest {
         String path = "src/test/java/it/polimi/is24am05/model/game/";
         String filename = "game_disconnections_save.sv";
         String A = "Andre", L = "Leo", M = "Manu";
-        Game game;
+        Game game = new Game(List.of(A, L ,M));
+
+        // Make sure each player places their card
+        for(String name : List.of(A, L ,M)){
+            Card starterCard = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getStarterCard();
+
+            try {
+                game.placeStarterSide(name, starterCard.getBackSide());
+            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+        }
+
+        // Each player chooses an objective
+        for(String name : List.of(A, L ,M)){
+            Objective[] toChooseFrom = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getObjectivesHand();
+
+            Objective choice = toChooseFrom[new Random().nextInt(toChooseFrom.length)];
+
+            try {
+                game.chooseObjective(name, choice);
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+        }
 
         /*
         game = new Game(List.of("Andre", "Leo", "Manu"));
@@ -706,9 +734,13 @@ class GameTest {
         save(game, path + filename);
         */
 
-        game = load(path + filename);
+        //game = load(path + filename);
 
         // turns: A -> M -> L
+        // Make sure letter are in the right order
+        A = game.getPlayers().get(0).getNickname();
+        M = game.getPlayers().get(1).getNickname();
+        L = game.getPlayers().get(2).getNickname();
 
         // Without disconnections A wins in 20 turns (playing deterministically)
 
