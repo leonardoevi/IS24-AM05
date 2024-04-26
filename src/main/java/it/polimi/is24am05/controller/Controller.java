@@ -6,6 +6,7 @@ import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
 import it.polimi.is24am05.controller.socketServer.SocketServer;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.exceptions.game.*;
 import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
@@ -52,6 +53,8 @@ public class Controller {
     public Controller(){
         this.lobbyState = LobbyState.NEW;
     }
+
+    // TODO: add rest of game methods, synchronize them!!
 
     /**
      * Handles a new connection from the network
@@ -161,12 +164,12 @@ public class Controller {
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
     }
 
-    public void chooseObjective(String playerNickname, String objectiveName) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
+    public void chooseObjective(String playerNickname, Objective objective) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
 
-        game.chooseObjective(playerNickname, Objective.valueOf(objectiveName));
+        game.chooseObjective(playerNickname, objective);
     }
 
     public void placeSide(String playerNickname, Card card, Boolean frontVisible, int i, int j) throws PlacementNotAllowedException, NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
@@ -181,6 +184,14 @@ public class Controller {
             toPlay = card.getBackSide();
 
         game.placeSide(playerNickname, card, toPlay, i, j);
+    }
+
+    public void drawDeck(String playerNickname, Boolean fromGold) throws NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, EmptyDeckException {
+        // A game must be loaded
+        if(this.game == null || this.lobbyState != LobbyState.STARTED)
+            throw new RuntimeException("Game not started yet");
+
+        game.drawDeck(playerNickname, fromGold);
     }
 
     /**
