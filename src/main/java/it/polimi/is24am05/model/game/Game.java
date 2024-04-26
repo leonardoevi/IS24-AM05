@@ -21,10 +21,14 @@ import it.polimi.is24am05.model.exceptions.player.InvalidSideException;
 import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.objective.Objective;
+import it.polimi.is24am05.model.playArea.AreaDisplayer;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static it.polimi.is24am05.model.Player.HandDisplayer.handToString;
+import static it.polimi.is24am05.model.deck.DeckDisplayer.deckToString;
 
 public class Game implements Serializable {
     /**
@@ -575,6 +579,36 @@ public class Game implements Serializable {
                  NoSuchPlayerException ignored) {}
     }
 
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Player p : this.getPlayers()){
+            stringBuilder.append("Player: ").append(p.getNickname()).append("\n");
+            stringBuilder.append("Points: ").append(p.getPoints()).append("\n");
+
+            stringBuilder.append("Play area: ").append("\n");
+            stringBuilder.append(new AreaDisplayer(p.getPlayArea())).append("\n");
+
+            if(p.getState() == PlayerState.PLACE_STARTER_CARD) {
+                stringBuilder.append("Hand: ").append("\n");
+                stringBuilder.append(handToString(List.of(p.getStarterCard()))).append("\n");
+            }
+
+            if(p.getHand() != null && !p.getHand().isEmpty()) {
+                stringBuilder.append("Hand: ").append("\n");
+                stringBuilder.append(handToString(p.getHand())).append("\n");
+            }
+
+            if(this.gameState == GameState.CHOOSE_OBJECTIVE)
+                stringBuilder.append(p.getObjectivesHand()[0]).append(p.getObjectivesHand()[1]).append("\n");
+        }
+
+        stringBuilder.append("Decks: ").append("\n");
+        stringBuilder.append(deckToString(this.getResourceDeck(), false, this.getGoldDeck(), true)).append("\n");
+
+        return stringBuilder.toString();
+    }
+
     // Getters and Setters
 
     public List<Player> getWinners() {
@@ -609,9 +643,25 @@ public class Game implements Serializable {
         return sharedObjectives.clone();
     }
 
-    public Set<String> getDisconnected(){return null;}
+    public Set<String> getDisconnected(){
+        return this.players.stream()
+                    .filter(p -> !this.connected.contains(p))
+                    .map(Player::getNickname)
+                    .collect(Collectors.toSet());
+    }
 
     public Set<String> getNicknames(){
         return this.players.stream().map(Player::getNickname).collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns the starter card of a player
+     * @param playerNickname player nickname
+     * @return Its starter card
+     * @throws NoSuchPlayerException if the player is not in the game
+     */
+    public Card getStarterCard(String playerNickname) throws NoSuchPlayerException {
+        Player player = findPlayer(playerNickname);
+        return player.getStarterCard();
     }
 }
