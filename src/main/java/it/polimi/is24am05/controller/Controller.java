@@ -4,10 +4,18 @@ import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
 import it.polimi.is24am05.controller.socketServer.SocketServer;
-import it.polimi.is24am05.model.exceptions.game.PlayerNamesMustBeDifferentException;
-import it.polimi.is24am05.model.exceptions.game.TooFewPlayersException;
-import it.polimi.is24am05.model.exceptions.game.TooManyPlayersException;
+import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.exceptions.game.*;
+import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
+import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
+import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
+import it.polimi.is24am05.model.exceptions.player.InvalidCardException;
+import it.polimi.is24am05.model.exceptions.player.InvalidSideException;
+import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
+import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.game.Game;
+import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,7 +34,7 @@ public class Controller {
      */
     private List<String> users = new LinkedList<>();
     private LobbyState lobbyState;
-    private Game game;
+    public Game game;
 
     /**
      * Controller for a loaded game
@@ -64,13 +72,15 @@ public class Controller {
 
             // If all have reconnected restart the game
             if(this.users.size() == this.numUsers) {
-                for (String nickname : this.users)
-                    game.reConnect(nickname);
+                for (String nickname : this.users) {
+                    try {
+                        game.reconnect(nickname);
+                    } catch (NoSuchPlayerException ignored) {}
+                }
 
                 this.lobbyState = LobbyState.STARTED;
             }
 
-            //this.game.reConnect(playerNickname); // TODO: REMOVE THIS LINE?
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
             if(this.numUsers == 0)
@@ -86,6 +96,7 @@ public class Controller {
             if(this.users.size() == this.numUsers) {
                 try {
                     this.game = new Game(this.users);
+                    System.out.println("New game started with players: " + this.game.getNicknames());
                     this.lobbyState = LobbyState.STARTED;
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
@@ -101,7 +112,9 @@ public class Controller {
             if(!game.getDisconnected().contains(playerNickname))
                 throw new ConnectionRefusedException("User already connected");
 
-            this.game.reConnect(playerNickname);
+            try {
+                this.game.reconnect(playerNickname);
+            } catch (NoSuchPlayerException ignored) {}
         }
     }
 
@@ -125,6 +138,49 @@ public class Controller {
         try {
             newConnection(playerNickname);
         } catch (ConnectionRefusedException ignored) {}
+    }
+
+    /**
+     * Allows a player to place its starter Card
+     * @param playerNickname player nickname
+     * @param frontVisible true if the card will be facing up (showing the front side)
+     * @throws NoSuchPlayerException propagated
+     * @throws MoveNotAllowedException propagated
+     * @throws InvalidStarterSideException propagated
+     */
+    public void playStarterCard(String playerNickname, Boolean frontVisible) throws NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException {
+        // A game must be loaded
+        if(this.game == null || this.lobbyState != LobbyState.STARTED)
+            throw new RuntimeException("Game not started yet");
+
+        Card toPlay = game.getStarterCard(playerNickname);
+
+        if(frontVisible)
+            game.placeStarterSide(playerNickname, toPlay.getFrontSide());
+        else
+            game.placeStarterSide(playerNickname, toPlay.getBackSide());
+    }
+
+    public void chooseObjective(String playerNickname, String objectiveName) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
+        // A game must be loaded
+        if(this.game == null || this.lobbyState != LobbyState.STARTED)
+            throw new RuntimeException("Game not started yet");
+
+        game.chooseObjective(playerNickname, Objective.valueOf(objectiveName));
+    }
+
+    public void placeSide(String playerNickname, Card card, Boolean frontVisible, int i, int j) throws PlacementNotAllowedException, NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
+        // A game must be loaded
+        if(this.game == null || this.lobbyState != LobbyState.STARTED)
+            throw new RuntimeException("Game not started yet");
+
+        Side toPlay;
+        if(frontVisible)
+            toPlay = card.getFrontSide();
+        else
+            toPlay = card.getBackSide();
+
+        game.placeSide(playerNickname, card, toPlay, i, j);
     }
 
     /**
@@ -168,14 +224,20 @@ public class Controller {
         fileIn.close();
 
         // Set all players to disconnected
-        for(String nickname : game.getNicknames())
-            game.disconnect(nickname);
+        for(String nickname : game.getNicknames()) {
+            try {
+                game.disconnect(nickname);
+            } catch (NoSuchPlayerException ignored) {}
+        }
 
         return game;
     }
 
-    public void disconnect(String nickname) {
-        // TODO: gestire eccezione ??
+    /**
+     * Records a players as disconnected
+     * @param nickname of the player disconnected
+     */
+    public void disconnect(String nickname) throws NoSuchPlayerException {
         users.remove(nickname);
         game.disconnect(nickname);
     }

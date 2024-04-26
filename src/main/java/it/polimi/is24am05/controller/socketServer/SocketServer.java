@@ -3,7 +3,6 @@ package it.polimi.is24am05.controller.socketServer;
 import it.polimi.is24am05.controller.Controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public class SocketServer {
     protected final Controller controller;
 
     // Observer pattern?
-    private final List<Socket> clientSockets = new ArrayList<>();
+    private final List<SocketServerClientHandler> clients = new ArrayList<>();
 
     public SocketServer(Controller controller) {
         this.controller = controller;
@@ -45,16 +44,8 @@ public class SocketServer {
             try {
                 final Socket socket = serverSocket.accept();
 
-                System.out.println("New client connected: " + socket.getRemoteSocketAddress());
-
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketServerClientHandler(socket, this));
-
-                // TODO: maybe delay this step after the connection has been approved by the controller
-                // Add the client to the list of output stream for broadcast
-                synchronized (clientSockets) {
-                    clientSockets.add(socket);
-                }
 
             } catch (final IOException e) {
                 break;
@@ -66,13 +57,24 @@ public class SocketServer {
 
     /**
      * Removes a Client from the broadcast list
-     * @param toRemove client socket to remove
+     * @param toRemove client Handler handler to remove
      */
-    public void removeClient(Socket toRemove){
-        synchronized (clientSockets) {
-            clientSockets.remove(toRemove);
+    public void removeClient(SocketServerClientHandler toRemove){
+        synchronized (clients) {
+            clients.remove(toRemove);
         }
-        System.out.println("Client disconnected: " + toRemove.getRemoteSocketAddress());
+        System.out.println("Client disconnected: " + toRemove.getClientNickname());
+    }
+
+    /**
+     * Adds a Client to the broadcast list
+     * @param toAdd client Handler to add
+     */
+    public void addClient(SocketServerClientHandler toAdd){
+        synchronized (clients) {
+            clients.add(toAdd);
+        }
+        System.out.println("Client connected: " + toAdd.getClientNickname());
     }
 
     /**
@@ -81,21 +83,14 @@ public class SocketServer {
      */
     public void sendBroadcast(String message){
         // Create a copy of the socket list
-        List<Socket> socketsListCopy;
-        synchronized (clientSockets) {
-            socketsListCopy = new ArrayList<>(clientSockets);
+        List<SocketServerClientHandler> clientsListCopy;
+        synchronized (this.clients) {
+            clientsListCopy = new ArrayList<>(this.clients);
         }
 
-        for (Socket socket : socketsListCopy) {
-            // Send the message to each client
-            // Sending messages must be sync to avoid interference with ClientHandler
-            synchronized (socket){
-                try {
-                    new PrintWriter(socket.getOutputStream(), true).println(message);
-                } catch (IOException ignored) {}
-            }
+        for (SocketServerClientHandler client : clientsListCopy) {
+            client.send(message);
         }
-
     }
 
     /**
@@ -103,29 +98,18 @@ public class SocketServer {
      * @param message to send
      * @param toAvoid client not to send the message to
      */
-    public void sendBroadcast(String message, Socket toAvoid){
+    public void sendBroadcast(String message, SocketServerClientHandler toAvoid){
         // Create a copy of the socket list
-        List<Socket> socketsListCopy;
-        synchronized (clientSockets) {
-            socketsListCopy = new ArrayList<>(clientSockets);
+        List<SocketServerClientHandler> clientsListCopy;
+        synchronized (this.clients) {
+            clientsListCopy = new ArrayList<>(this.clients);
         }
 
-        for (Socket socket : socketsListCopy) {
-            // Send the message to each client
-            // Sending messages must be sync to avoid interference with ClientHandler
-            synchronized (socket){
-                if(socket.equals(toAvoid))
-                    continue;
+        clientsListCopy.remove(toAvoid);
 
-                try {
-                    new PrintWriter(socket.getOutputStream(), true).println(message);
-                } catch (IOException e) {
-                    // If there is some errors remove the socket form the list
-                    removeClient(socket);
-                }
-            }
+        for (SocketServerClientHandler client : clientsListCopy) {
+            client.send(message);
         }
-
     }
 
     /*
