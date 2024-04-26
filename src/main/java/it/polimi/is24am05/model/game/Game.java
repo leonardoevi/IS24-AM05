@@ -64,7 +64,7 @@ public class Game implements Serializable {
 
 
     /**
-     * Used to track che state of the game, i.e gameState, before the game is paused
+     * Used to track che state of the game, i.e. gameState, before the game is paused
      */
     private GameState lastGameState;
 
@@ -581,9 +581,9 @@ public class Game implements Serializable {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder("\n=============================");
         for(Player p : this.getPlayers()){
-            stringBuilder.append("Player: ").append(p.getNickname()).append("\n");
+            stringBuilder.append("\nPlayer: ").append(p.getNickname()).append("\n");
             stringBuilder.append("Points: ").append(p.getPoints()).append("\n");
 
             stringBuilder.append("Play area: ").append("\n");
@@ -600,11 +600,17 @@ public class Game implements Serializable {
             }
 
             if(this.gameState == GameState.CHOOSE_OBJECTIVE)
-                stringBuilder.append(p.getObjectivesHand()[0]).append(p.getObjectivesHand()[1]).append("\n");
+                stringBuilder.append("\n")
+                        .append(p.getObjectivesHand()[0])
+                        .append("  ")
+                        .append(p.getObjectivesHand()[1])
+                        .append("\n");
         }
 
-        stringBuilder.append("Decks: ").append("\n");
-        stringBuilder.append(deckToString(this.getResourceDeck(), false, this.getGoldDeck(), true)).append("\n");
+        if(this.gameState == GameState.GAME || this.gameState == GameState.GAME_ENDING) {
+            stringBuilder.append("Decks: ").append("\n");
+            stringBuilder.append(deckToString(this.getResourceDeck(), false, this.getGoldDeck(), true)).append("\n");
+        }
 
         return stringBuilder.toString();
     }

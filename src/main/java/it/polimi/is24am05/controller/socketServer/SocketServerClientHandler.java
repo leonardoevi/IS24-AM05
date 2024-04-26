@@ -3,14 +3,17 @@ package it.polimi.is24am05.controller.socketServer;
 import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
+import it.polimi.is24am05.controller.exceptions.KoException;
+import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
+import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
+
+import static it.polimi.is24am05.controller.socketServer.MessageDecoder.*;
 
 /**
  * Handles the connection with one client via the socket it is provided
@@ -91,219 +94,47 @@ public class SocketServerClientHandler implements Runnable {
             return;
         }
 
-        parent.sendBroadcast(getClientNickname() + " wrote: " + inputLine, this);
+        // If the message comes from a client that is logged in
+        List<Object> message;
+        try {
+            message = decode(inputLine);
+        } catch (KoException e) {
+            send(e.getMessage());
+            return;
+        }
 
+        try {
+            switch ((String) message.getFirst()) {
+                case PLAY_STARTER_CARD:
+                    this.parent.controller.playStarterCard(this.getClientNickname(), (Boolean) message.get(1));
+                    break;
 
-        /*
-        final String    NEW_CONNECTION = "nc",
-                        PLAY_STARTER_CARD = "psc",
-                        CHOOSE_OBJECTIVE = "co",
-                        PLAY_CARD = "pc",
-                        DRAW_CARD = "dc",
-                        DRAW_DECK = "dd";
+                case CHOOSE_OBJECTIVE:
+                    this.parent.controller.chooseObjective(this.getClientNickname(), (Objective) message.get(1));
+                    break;
 
+                case PLACE_CARD:
+                    this.parent.controller.placeSide(this.getClientNickname(), (Card) message.get(1), (Boolean) message.get(2), (Integer) message.get(3), (Integer) message.get(4));
+                    break;
 
-        // Initialize input string parser
-        Scanner scanner = new Scanner(inputLine);
-        scanner.useDelimiter(",");
-
-        String answer = null;
-
-        // Skip empty inputs
-        if(!scanner.hasNext())
-            synchronized (this.socket) {
-                out.println("Empty Input");
-                return;
+                case DRAW_DECK:
+                    this.parent.controller.drawDeck(this.getClientNickname(), (Boolean) message.get(1));
             }
-
-        String playerNickname;
-        // Decode input string
-        switch (scanner.next()) {
-            case NEW_CONNECTION:
-                // Second parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                String name = scanner.next();
-                // Commands differ depending on the presence of a third parameter
-                if(scanner.hasNext()) {
-                    try {
-                        parent.controller.newConnection(name, Integer.parseInt(scanner.next()));
-                        answer = "ok";
-                    } catch (FirstConnectionException | InvalidNumUsersException e) {
-                        answer = "ko," + e.getMessage();
-                    }
-                } else {
-                    try {
-                        parent.controller.newConnection(name);
-                        answer = "ok";
-                    } catch (ConnectionRefusedException | FirstConnectionException e) {
-                        answer = "ko," + e.getMessage();
-                    }
-                }
-                break;
-
-            case PLAY_STARTER_CARD:
-                // Second parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                playerNickname = scanner.next();
-
-                // Third parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-                
-                String sideChoice = scanner.next();
-                
-                try {
-                    this.parent.controller.playStarterCard(playerNickname, Boolean.parseBoolean(sideChoice));
-                    answer = "ok";
-                } catch (NoSuchPlayerException | MoveNotAllowedException | InvalidStarterSideException | RuntimeException e) {
-                    answer = "ko," + e.getMessage();
-                }
-
-                break;
-
-            case CHOOSE_OBJECTIVE:
-                // Second parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                playerNickname = scanner.next();
-
-                // Third parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                String objectiveChoice = scanner.next();
-
-                // Validate choice
-                try {
-                    Objective.valueOf(objectiveChoice);
-                } catch (IllegalArgumentException e) {
-                    answer = "Invalid input";
-                    break;
-                }
-
-                try {
-                    this.parent.controller.chooseObjective(playerNickname, objectiveChoice);
-                    answer = "ok";
-                } catch (NoSuchPlayerException | ObjectiveNotAllowedException | MoveNotAllowedException e) {
-                    answer = "ko," + e.getMessage();
-                }
-
-                break;
-
-            case PLAY_CARD:
-                // Second parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                playerNickname = scanner.next();
-
-                // Third parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                String cardChoice = scanner.next();
-                Card card;
-                // Validate choice
-                try {
-                    card = ResourceCard.valueOf(cardChoice);
-                } catch (IllegalArgumentException e) {
-                    try {
-                        card = GoldCard.valueOf(cardChoice);
-                    } catch (IllegalArgumentException e2) {
-                        answer = "Invalid input";
-                        break;
-                    }
-                }
-
-                // Fourth parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                boolean frontVisible;
-                try {
-                    frontVisible = Boolean.parseBoolean(scanner.next());
-                } catch (NumberFormatException | InputMismatchException e) {
-                    answer = "Invalid input";
-                    break;
-                }
-
-                // Fifth parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                int i;
-                try {
-                    i = scanner.nextInt();
-                } catch (NumberFormatException | InputMismatchException e) {
-                    answer = "Invalid input";
-                    break;
-                }
-
-                // Sixth parameter expected
-                if(!scanner.hasNext()){
-                    answer = "Invalid input";
-                    break;
-                }
-
-                int j;
-                try {
-                    j = scanner.nextInt();
-                } catch (NumberFormatException | InputMismatchException e) {
-                    answer = "Invalid input";
-                    break;
-                }
-
-                try {
-                    this.parent.controller.placeSide(playerNickname, card, frontVisible, i, j);
-                    answer = "ok";
-                } catch (PlacementNotAllowedException | NoAdjacentCardException | InvalidCardException |
-                         InvalidCoordinatesException | InvalidSideException | MoveNotAllowedException |
-                         NotYourTurnException | NoSuchPlayerException e) {
-                    answer = "ko" + e.getMessage();
-                }
-
-                break;
-            default:
-                answer = "Invalid input";
+        } catch (Exception e) {
+            send("ko," + e.getMessage());
+            return;
         }
 
-        synchronized (this.socket) {
-            out.println(answer);
+        send("ok");
+        if(this.parent.controller.game != null){
+            parent.sendBroadcast(this.parent.controller.game.toString());
         }
-
-        if(answer.equals("ok") && parent.controller.game != null)
-                parent.sendBroadcast(parent.controller.game.toString());
-
-        */
 
     }
 
     /**
      * This function is called every time a message is received from a client that is not logged in (has no name).
-     * It checks whether the message is a login formatted message.
+     * It checks whether the message is a login formatted message, according to the protocol.
      * Tries to log the player in, and stores its name.
      * If it fails, it lets the client know why.
      * @param inputLine message received
