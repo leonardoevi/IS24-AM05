@@ -62,7 +62,7 @@ public class Controller {
      * @throws ConnectionRefusedException if the connection may not be established
      * @throws FirstConnectionException if this is the first connection, a different method must be invoked
      */
-    public void newConnection(String playerNickname) throws ConnectionRefusedException, FirstConnectionException {
+    public synchronized void newConnection(String playerNickname) throws ConnectionRefusedException, FirstConnectionException {
         if(this.lobbyState == LobbyState.OLD){
             // If the user was not part of the old game
             if(!game.getNicknames().contains(playerNickname))
@@ -128,7 +128,7 @@ public class Controller {
      * @throws FirstConnectionException if this is NOT the first connection, a different method must be invoked
      * @throws InvalidNumUsersException if the number of players is not valid
      */
-    public void newConnection(String playerNickname, int numUsers) throws FirstConnectionException, InvalidNumUsersException {
+    public synchronized void newConnection(String playerNickname, int numUsers) throws FirstConnectionException, InvalidNumUsersException {
         if(this.lobbyState != LobbyState.NEW)
             throw new FirstConnectionException("Wrong method invocation");
         if(this.numUsers != 0)
@@ -151,7 +151,7 @@ public class Controller {
      * @throws MoveNotAllowedException propagated
      * @throws InvalidStarterSideException propagated
      */
-    public void playStarterCard(String playerNickname, Boolean frontVisible) throws NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException {
+    public synchronized void playStarterCard(String playerNickname, Boolean frontVisible) throws NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
@@ -164,7 +164,7 @@ public class Controller {
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
     }
 
-    public void chooseObjective(String playerNickname, Objective objective) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
+    public synchronized void chooseObjective(String playerNickname, Objective objective) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
@@ -172,7 +172,7 @@ public class Controller {
         game.chooseObjective(playerNickname, objective);
     }
 
-    public void placeSide(String playerNickname, Card card, Boolean frontVisible, int i, int j) throws PlacementNotAllowedException, NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
+    public synchronized void placeSide(String playerNickname, Card card, Boolean frontVisible, int i, int j) throws PlacementNotAllowedException, NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
@@ -186,7 +186,7 @@ public class Controller {
         game.placeSide(playerNickname, card, toPlay, i, j);
     }
 
-    public void drawDeck(String playerNickname, Boolean fromGold) throws NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, EmptyDeckException {
+    public synchronized void drawDeck(String playerNickname, Boolean fromGold) throws NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, EmptyDeckException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
@@ -248,7 +248,7 @@ public class Controller {
      * Records a player as disconnected
      * @param nickname of the player disconnected
      */
-    public void disconnect(String nickname) throws NoSuchPlayerException {
+    public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
         users.remove(nickname);
         game.disconnect(nickname);
         System.out.println(nickname + " disconnected in-game");

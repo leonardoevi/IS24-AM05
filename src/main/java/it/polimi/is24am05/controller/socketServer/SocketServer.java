@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-// TODO, add a demon keeping track of actually connected clients
 
 /**
  * Server using sockets protocol
@@ -52,6 +51,8 @@ public class SocketServer {
                 break;
             }
         }
+
+        System.out.println("Shutting down thread pool");
         threadPool.shutdown();
     }
 
@@ -61,6 +62,9 @@ public class SocketServer {
      */
     public void removeClient(SocketServerClientHandler toRemove){
         synchronized (clients) {
+            if (!clients.contains(toRemove))
+                return;
+
             clients.remove(toRemove);
         }
 
