@@ -12,6 +12,9 @@ public class SocketClient {
     // Server port
     private final int port;
 
+    //Out
+    private PrintWriter socketOut;
+
     /**
      * Constructor
      * @param ip Server IP in string format "255.255.255.255"
@@ -38,22 +41,22 @@ public class SocketClient {
         System.out.println("Connection to server established");
 
         // Create i/o to server
-        final PrintWriter socketOut = new PrintWriter(socket.getOutputStream(), true);
+        this.socketOut = new PrintWriter(socket.getOutputStream(), true);
         final Scanner stdin = new Scanner(System.in);
 
         // Start process to read input from server asynchronously
-        new Thread(new ClientInReader(socket)).start();
+        new Thread(new ClientInReader(socket, this)).start();
 
         try {
             // Read stdin
             while (true) {
                 final String inputLine = stdin.nextLine();
                 if (inputLine.equals("quit")) {
-                    socketOut.println(inputLine);
+                    send(inputLine);
                     break;
                 }
 
-                socketOut.println(inputLine);
+                send(inputLine);
             }
         } catch (final NoSuchElementException e) {
             System.out.println("Connection closed");
@@ -64,17 +67,24 @@ public class SocketClient {
         }
     }
 
+    public synchronized void send(String line){
+        socketOut.println(line);
+    }
+
     /**
      * Runnable used to read messages from the Client's Socket input channel asynchronously
      */
-    public static class ClientInReader implements Runnable {
+    public class ClientInReader implements Runnable {
         /**
          * Socket to read input from
          */
         private final Socket socket;
 
-        public ClientInReader(Socket socket) {
+        private final SocketClient socketClient;
+
+        public ClientInReader(Socket socket, SocketClient socketClient) {
             this.socket = socket;
+            this.socketClient = socketClient;
         }
 
         @Override
@@ -93,7 +103,12 @@ public class SocketClient {
 
         private void handleServerInput(String inputLine) {
             // TODO: fill this function according to the protocol
-            System.out.println(inputLine);
+            if (inputLine.startsWith("ping,")) {
+                String code = inputLine.substring(5);
+                socketClient.send("pong," + code);
+            } else {
+                System.out.println(inputLine);
+            }
         }
     }
 }

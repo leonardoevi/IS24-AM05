@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+// TODO, add a demon keeping track of actually connected clients
 
 /**
  * Server using sockets protocol
@@ -52,7 +53,6 @@ public class SocketServer {
             }
         }
         threadPool.shutdown();
-        return;
     }
 
     /**
@@ -63,6 +63,7 @@ public class SocketServer {
         synchronized (clients) {
             clients.remove(toRemove);
         }
+
         System.out.println("Client disconnected: " + toRemove.getClientNickname());
     }
 
@@ -113,9 +114,28 @@ public class SocketServer {
     }
 
     /*
-    public static void main(String[] args) {
-        new SocketServer(null).start();
-    }
+    private class ConnectionsChecker implements Runnable {
+        private final SocketServer parent;
 
+        private ConnectionsChecker(SocketServer parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public void run() {
+            System.out.println("Checking connections routine...");
+            List<SocketServerClientHandler> clientsListCopy;
+            synchronized (parent.clients) {
+                clientsListCopy = new ArrayList<>(parent.clients);
+            }
+
+            for (SocketServerClientHandler client : clientsListCopy) {
+                if(!client.isConnected()){
+                    System.out.println("Connection checker noticed that " +client.getClientNickname()+ " is not connected");
+                    parent.removeClient(client);
+                }
+            }
+        }
+    }
      */
 }

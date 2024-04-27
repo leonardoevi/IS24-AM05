@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static it.polimi.is24am05.controller.socketServer.MessageDecoder.*;
 
@@ -22,7 +25,7 @@ public class SocketServerClientHandler implements Runnable {
     /**
      * Socket connected to the client
      */
-    private final Socket socket;
+    protected final Socket socket;
 
     /**
      * Client in game Nickname
@@ -40,6 +43,13 @@ public class SocketServerClientHandler implements Runnable {
       */
     private PrintWriter out;
 
+    /**
+     * Used to check if connection is still up
+     */
+    private String lastKeepAliveSent = "empty", lastKeepAliveReceived = "empty";
+    protected final ScheduledExecutorService connectionCheckerDemon = Executors.newSingleThreadScheduledExecutor();
+
+
     public SocketServerClientHandler(Socket socket, SocketServer parent) {
         this.socket = socket;
         this.parent = parent;
@@ -52,6 +62,9 @@ public class SocketServerClientHandler implements Runnable {
             final Scanner in = new Scanner(socket.getInputStream());
             this.out = new PrintWriter(socket.getOutputStream(), true );
 
+            // Start a demon thread to check connection status with clients each 5 seconds
+            connectionCheckerDemon.scheduleAtFixedRate(new ConnectionChecker(this), 0, 5, TimeUnit.SECONDS);
+
             // Handle communication with client
             while (true) {
                 // Read next line
@@ -60,23 +73,22 @@ public class SocketServerClientHandler implements Runnable {
                 // Check if the client wants to close the connection
                 if (line.equals("quit")) {
                     break;
+                } else if (line.startsWith("pong,")) {
+                    setLastKeepAliveReceived(line.substring(5));
                 } else {
-                    handleClientInput(line);
+                    //handleClientInput(line);
+                    handleClientInputDebug(line);
                 }
             }
+
             in.close();
             out.close();
-
-            // Unsubscribing from broadcast list
-            parent.removeClient(this);
-            // Set disconnected status in game
-            parent.controller.disconnect(this.getClientNickname());
-
             socket.close();
+
+            clientDisconnected();
+            connectionCheckerDemon.shutdown();
         } catch (final IOException e) {
             System.err.println(e.getMessage());
-        } catch (NoSuchPlayerException e) {
-            System.out.println("Player not found, this exception should not be thrown");;
         }
     }
 
@@ -89,7 +101,7 @@ public class SocketServerClientHandler implements Runnable {
         // TODO: fill this function according to the protocol
 
         // If the client is not logged in
-        if(clientNickname.isEmpty()){
+        if(!isLoggedIn()){
             handleLogin(inputLine);
             return;
         }
@@ -132,10 +144,21 @@ public class SocketServerClientHandler implements Runnable {
 
     }
 
+    // Used to make the server a chatServer
+    private void handleClientInputDebug(String inputLine){
+        // If the client is not logged in
+        if(clientNickname.isEmpty()){
+            handleLogin(inputLine);
+            return;
+        }
+
+        parent.sendBroadcast(getClientNickname() + " said: " + inputLine);
+    }
+
     /**
      * This function is called every time a message is received from a client that is not logged in (has no name).
      * It checks whether the message is a login formatted message, according to the protocol.
-     * Tries to log the player in, and stores its name.
+     * Tries to log the player in (meaning it can join a game), and stores its name.
      * If it fails, it lets the client know why.
      * @param inputLine message received
      */
@@ -178,9 +201,86 @@ public class SocketServerClientHandler implements Runnable {
     }
 
     /**
+     * Routine to call each time a clients disconnects
+     */
+    private void clientDisconnected(){
+        // Unsubscribing from broadcast list
+        parent.removeClient(this);
+
+        if(isLoggedIn()) {
+            // Set disconnected status in game
+            try {
+                parent.controller.disconnect(this.getClientNickname());
+            } catch (NoSuchPlayerException ignored) {}
+        }
+    }
+
+    /**
      * @return the client Nickname if it is logged in, its address otherwise
      */
     public String getClientNickname() {
         return clientNickname.orElse(socket.getRemoteSocketAddress().toString());
+    }
+
+    /**
+     * @return True if the client is logged in
+     */
+    private boolean isLoggedIn(){
+        return this.clientNickname.isPresent();
+    }
+
+    // Maybe synchronize on something else
+    public synchronized String getLastKeepAliveSent() {
+        return lastKeepAliveSent;
+    }
+
+    public synchronized String getLastKeepAliveReceived() {
+        return lastKeepAliveReceived;
+    }
+
+    public synchronized void setLastKeepAliveSent(String lastKeepAliveSent) {
+        this.lastKeepAliveSent = lastKeepAliveSent;
+    }
+
+    public synchronized void setLastKeepAliveReceived(String lastKeepAliveReceived) {
+        this.lastKeepAliveReceived = lastKeepAliveReceived;
+    }
+
+    private class ConnectionChecker implements Runnable {
+        private final SocketServerClientHandler client;
+
+        public ConnectionChecker(SocketServerClientHandler client) {
+            this.client = client;
+        }
+        @Override
+        public void run() {
+            //System.out.println("Checking connection to " + client.getClientNickname());
+
+            // Check connection only if client is logged in
+            if(!client.isLoggedIn()){
+                return;
+            }
+
+            // Send a random string
+            String randomString = UUID.randomUUID().toString();
+            client.setLastKeepAliveSent(randomString);
+            //System.out.println("Sending: " + randomString + " to " + client.getClientNickname());
+            client.send("ping," + randomString);
+
+            // Wait some time
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                System.out.println("Error during connection check");
+            }
+
+            //System.out.println("Check");
+            // Check if the random string came back
+            if(!getLastKeepAliveReceived().equals(randomString)){
+                //System.out.println("Failed, about to disconnect client");
+                client.clientDisconnected();
+                client.connectionCheckerDemon.shutdown();
+            }
+        }
     }
 }

@@ -245,11 +245,12 @@ public class Controller {
     }
 
     /**
-     * Records a players as disconnected
+     * Records a player as disconnected
      * @param nickname of the player disconnected
      */
     public void disconnect(String nickname) throws NoSuchPlayerException {
         users.remove(nickname);
         game.disconnect(nickname);
+        System.out.println(nickname + " disconnected in-game");
     }
 }
