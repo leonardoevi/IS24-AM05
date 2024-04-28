@@ -59,6 +59,18 @@ public class MessageDecoder {
                     parameters.add(Boolean.parseBoolean(scanner.next()));
                     break;
 
+                case DRAW_VISIBLE:
+                    cardName = scanner.next();
+                    Card toDraw;
+
+                    try {
+                        toDraw = ResourceCard.valueOf(cardName);
+                    } catch (IllegalArgumentException e) {
+                        toDraw = GoldCard.valueOf(cardName);
+                    }
+                    parameters.add(toDraw);
+                    break;
+
                 default:
                     throw new KoException(null);
             }

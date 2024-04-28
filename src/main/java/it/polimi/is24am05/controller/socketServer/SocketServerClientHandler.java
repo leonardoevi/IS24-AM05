@@ -77,8 +77,9 @@ public class SocketServerClientHandler implements Runnable {
                     // Filter heartbeat messages
                     setLastKeepAliveReceived(line.substring(5));
                 } else {
-                    //handleClientInput(line);
-                    handleClientInputDebug(line);
+                    // TODO: Change this line
+                    handleClientInput(line);
+                    //handleClientInputDebug(line);
                 }
             }
             clientDisconnected();
@@ -128,6 +129,10 @@ public class SocketServerClientHandler implements Runnable {
 
                 case DRAW_DECK:
                     this.parent.controller.drawDeck(this.getClientNickname(), (Boolean) message.get(1));
+                    break;
+
+                case DRAW_VISIBLE:
+                    this.parent.controller.drawVisible(this.getClientNickname(), (Card) message.get(1));
             }
         } catch (Exception e) {
             send("ko," + e.getMessage());
