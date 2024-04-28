@@ -7,6 +7,7 @@ import it.polimi.is24am05.controller.socketServer.SocketServer;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
+import it.polimi.is24am05.model.exceptions.deck.InvalidVisibleCardException;
 import it.polimi.is24am05.model.exceptions.game.*;
 import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
@@ -164,6 +165,14 @@ public class Controller {
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
     }
 
+    /**
+     * Allows a player to choose its objective card
+     * @param playerNickname player nickname
+     * @param objective objective chosen
+     * @throws NoSuchPlayerException propagated
+     * @throws MoveNotAllowedException propagated
+     * @throws ObjectiveNotAllowedException propagated
+     */
     public synchronized void chooseObjective(String playerNickname, Objective objective) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
@@ -172,6 +181,22 @@ public class Controller {
         game.chooseObjective(playerNickname, objective);
     }
 
+    /**
+     * Allows a player to place a card
+     * @param playerNickname player nickname
+     * @param card card placed
+     * @param frontVisible true if the card will be facing up (showing the front side)
+     * @param i row to place the card
+     * @param j column to place the card
+     * @throws PlacementNotAllowedException propagated
+     * @throws NoSuchPlayerException propagated
+     * @throws NotYourTurnException propagated
+     * @throws MoveNotAllowedException propagated
+     * @throws InvalidSideException propagated
+     * @throws InvalidCoordinatesException propagated
+     * @throws InvalidCardException propagated
+     * @throws NoAdjacentCardException propagated
+     */
     public synchronized void placeSide(String playerNickname, Card card, Boolean frontVisible, int i, int j) throws PlacementNotAllowedException, NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
@@ -186,12 +211,38 @@ public class Controller {
         game.placeSide(playerNickname, card, toPlay, i, j);
     }
 
+    /**
+     * Allows a player to draw a card from the decks
+     * @param playerNickname player nickname
+     * @param fromGold true if the card is drawn from the GoldCard deck
+     * @throws NoSuchPlayerException propagated
+     * @throws NotYourTurnException propagated
+     * @throws MoveNotAllowedException propagated
+     * @throws EmptyDeckException propagated
+     */
     public synchronized void drawDeck(String playerNickname, Boolean fromGold) throws NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, EmptyDeckException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
 
         game.drawDeck(playerNickname, fromGold);
+    }
+
+    /**
+     * Allows a player to draw a visible card
+     * @param playerNickname player nickname
+     * @param visible visible card chosen to draw
+     * @throws MoveNotAllowedException propagated
+     * @throws NoSuchPlayerException propagated
+     * @throws NotYourTurnException propagated
+     * @throws InvalidVisibleCardException propagated
+     */
+    public synchronized void drawVisible(String playerNickname, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException {
+        // A game must be loaded
+        if(this.game == null || this.lobbyState != LobbyState.STARTED)
+            throw new RuntimeException("Game not started yet");
+
+        game.drawVisible(playerNickname, visible);
     }
 
     /**
