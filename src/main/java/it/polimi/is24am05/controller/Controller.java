@@ -6,6 +6,7 @@ import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
 import it.polimi.is24am05.controller.socketServer.SocketServer;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.exceptions.deck.InvalidVisibleCardException;
 import it.polimi.is24am05.model.exceptions.game.*;
@@ -28,6 +29,7 @@ import java.util.List;
 import static it.polimi.is24am05.model.game.Game.MAX_PLAYERS;
 import static it.polimi.is24am05.model.game.Game.MIN_PLAYERS;
 
+// TODO: remove debug printf() commands
 public class Controller {
     private int numUsers;
 
@@ -68,11 +70,12 @@ public class Controller {
             // If the user was not part of the old game
             if(!game.getNicknames().contains(playerNickname))
                 throw new ConnectionRefusedException("User not part of the old game");
-            // If the user is not already connected
+            // If the user is already connected
             if(this.users.contains(playerNickname))
                 throw new ConnectionRefusedException("User already connected");
             // Add the user to the list of reconnected users
             users.add(playerNickname);
+            // TODO: tell the user the game is waiting for others to reconnect
 
             // If all have reconnected restart the game
             if(this.users.size() == this.numUsers) {
@@ -83,6 +86,7 @@ public class Controller {
                 }
 
                 this.lobbyState = LobbyState.STARTED;
+                // TODO: send the users the game state
             }
 
         } else if (this.lobbyState == LobbyState.NEW) {
@@ -102,6 +106,7 @@ public class Controller {
                     this.game = new Game(this.users);
                     System.out.println("New game started with players: " + this.game.getNicknames());
                     this.lobbyState = LobbyState.STARTED;
+                    // TODO: send the users the game state
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -118,6 +123,8 @@ public class Controller {
 
             try {
                 this.game.reconnect(playerNickname);
+                // TODO: send the user the game state
+                // If the game was stopped and now resumed after this connection, send it broadcast
             } catch (NoSuchPlayerException ignored) {}
         }
     }
@@ -301,7 +308,21 @@ public class Controller {
      */
     public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
         users.remove(nickname);
+
+        if(this.game == null)
+            return;
+
+        GameState stateBeforeDisconnection = game.getGameState();
         game.disconnect(nickname);
+        GameState stateAfterDisconnection = game.getGameState();
+
         System.out.println(nickname + " disconnected in-game");
+
+        // If the game is stopped after this disconnection
+        if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
+            // TODO tell all players the game was stopped
+            // Send the new game state
+            // They may be able to tell given the new game state
+        }
     }
 }
