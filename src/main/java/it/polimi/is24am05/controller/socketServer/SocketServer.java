@@ -17,7 +17,7 @@ public class SocketServer {
     protected final Controller controller;
 
     // Observer pattern?
-    private final List<SocketServerClientHandler> clients = new ArrayList<>();
+    private final List<SocketClientHandler> clients = new ArrayList<>();
 
     public SocketServer(Controller controller) {
         this.controller = controller;
@@ -45,7 +45,7 @@ public class SocketServer {
                 final Socket socket = serverSocket.accept();
 
                 // Let the thread pool handle the communication with the client
-                threadPool.submit(new SocketServerClientHandler(socket, this));
+                threadPool.submit(new SocketClientHandler(socket, this));
 
             } catch (final IOException e) {
                 break;
@@ -60,11 +60,8 @@ public class SocketServer {
      * Removes a Client from the broadcast list
      * @param toRemove client Handler handler to remove
      */
-    public void removeClient(SocketServerClientHandler toRemove){
+    public void removeClient(SocketClientHandler toRemove){
         synchronized (clients) {
-            if (!clients.contains(toRemove))
-                return;
-
             clients.remove(toRemove);
         }
 
@@ -75,7 +72,7 @@ public class SocketServer {
      * Adds a Client to the broadcast list
      * @param toAdd client Handler to add
      */
-    public void addClient(SocketServerClientHandler toAdd){
+    public void addClient(SocketClientHandler toAdd){
         synchronized (clients) {
             clients.add(toAdd);
         }
@@ -88,12 +85,12 @@ public class SocketServer {
      */
     public void sendBroadcast(String message){
         // Create a copy of the socket list
-        List<SocketServerClientHandler> clientsListCopy;
+        List<SocketClientHandler> clientsListCopy;
         synchronized (this.clients) {
             clientsListCopy = new ArrayList<>(this.clients);
         }
 
-        for (SocketServerClientHandler client : clientsListCopy) {
+        for (SocketClientHandler client : clientsListCopy) {
             client.send(message);
         }
     }
@@ -103,16 +100,16 @@ public class SocketServer {
      * @param message to send
      * @param toAvoid client not to send the message to
      */
-    public void sendBroadcast(String message, SocketServerClientHandler toAvoid){
+    public void sendBroadcast(String message, SocketClientHandler toAvoid){
         // Create a copy of the socket list
-        List<SocketServerClientHandler> clientsListCopy;
+        List<SocketClientHandler> clientsListCopy;
         synchronized (this.clients) {
             clientsListCopy = new ArrayList<>(this.clients);
         }
 
         clientsListCopy.remove(toAvoid);
 
-        for (SocketServerClientHandler client : clientsListCopy) {
+        for (SocketClientHandler client : clientsListCopy) {
             client.send(message);
         }
     }

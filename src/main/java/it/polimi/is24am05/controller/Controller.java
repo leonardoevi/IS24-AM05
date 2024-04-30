@@ -316,8 +316,6 @@ public class Controller {
         game.disconnect(nickname);
         GameState stateAfterDisconnection = game.getGameState();
 
-        System.out.println(nickname + " disconnected in-game");
-
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
             // TODO tell all players the game was stopped

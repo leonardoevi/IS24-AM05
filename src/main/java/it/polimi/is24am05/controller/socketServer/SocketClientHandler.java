@@ -21,7 +21,7 @@ import static it.polimi.is24am05.controller.socketServer.MessageDecoder.*;
 /**
  * Handles the connection with one client via the socket it is provided
  */
-public class SocketServerClientHandler implements Runnable {
+public class SocketClientHandler implements Runnable {
     /**
      * Socket connected to the client
      */
@@ -39,22 +39,51 @@ public class SocketServerClientHandler implements Runnable {
     private final SocketServer parent;
 
     /**
-     * Output channel
+     * Input channels
       */
     private Scanner in;
+
+    /**
+     * Output channel
+     */
     private PrintWriter out;
 
     /**
      * Used to check if connection is still up
      */
-    private String lastKeepAliveSent = "empty", lastKeepAliveReceived = "empty";
-    protected final ScheduledExecutorService connectionCheckerDemon = Executors.newSingleThreadScheduledExecutor();
+    private volatile String lastKeepAliveSent = "empty", lastKeepAliveReceived = "empty";
+    private final ScheduledExecutorService connectionCheckerDemon = Executors.newSingleThreadScheduledExecutor();
+    /**
+     * Seconds to wait before checking again if client is still connected
+     */
+    private static final int checkingInterval = 4;
 
-    public SocketServerClientHandler(Socket socket, SocketServer parent) {
+    /**
+     * Flag to know whether the client is still connected
+     */
+    volatile boolean clientConnected = true;
+
+    /**
+     * These objects are used to allow a thread to wait() instead of sleep(),
+     * avoiding busy waiting inside loops
+     */
+    private final Object uselessLock_1 = new Object(), uselessLock_2 = new Object();
+
+    /**
+     * Constructor
+     * @param socket to listen to
+     * @param parent Main server accepting connections
+     */
+    public SocketClientHandler(Socket socket, SocketServer parent) {
         this.socket = socket;
         this.parent = parent;
     }
 
+    /**
+     * This class asynchronously handles client's requests.
+     * When the clients quit or looses connection to the server, the proper Controller method is invoked and
+     * the thread terminates.
+     */
     @Override
     public void run() {
         try {
@@ -63,36 +92,53 @@ public class SocketServerClientHandler implements Runnable {
             this.out = new PrintWriter(socket.getOutputStream(), true );
 
             // Start a demon thread to check connection status with clients each 5 seconds
-            this.connectionCheckerDemon.scheduleAtFixedRate(new ConnectionChecker(this), 0, 5, TimeUnit.SECONDS);
+            this.connectionCheckerDemon
+                    .scheduleAtFixedRate(new ConnectionChecker(this, checkingInterval/2), 0, checkingInterval, TimeUnit.SECONDS);
 
-            // Handle communication with client
-            while (true) {
+            // Handle communication with client while they are connected
+            while (clientConnected) {
                 // Read next line
-                final String line = in.nextLine();
+                String line = null;
+                // If there is something in the buffer
+                if(socket.getInputStream().available() > 0){
+                    // Acquire the message
+                    line = in.nextLine();
+                } else {
+                    // Wait some time and go back to checking the buffer
+                    try {   synchronized (uselessLock_1) {  uselessLock_1.wait(100); }
+                        continue;
+                    } catch (InterruptedException e) {
+                        // Should never happen
+                        System.out.println(e.getMessage());
+                        System.out.println(getClientNickname() + " client Handler crashed");
+                        break;
+                    }
+                }
 
+                // Handle the request
                 // Check if the client wants to close the connection
                 if (line.equals("quit")) {
                     break;
                 } else if (line.startsWith("pong,")) {
                     // Filter heartbeat messages
-                    setLastKeepAliveReceived(line.substring(5));
+                    lastKeepAliveReceived = line.substring(5);
                 } else {
                     // TODO: Change this line
                     handleClientInput(line);
                     //handleClientInputDebug(line);
                 }
             }
+            // Call disconnection routine
             clientDisconnected();
         } catch (final IOException e) {
             System.out.println("Exited Loop Via Exception");
             System.err.println(e.getMessage());
         }
-        System.out.println("Exited loop normally");
     }
 
     /**
      * Handles the input from the Client
-     * If a client is logging in, saves its nickname
+     * If a client is logging in, its nickname is stored
      * @param inputLine client Input
      */
     private void handleClientInput(String inputLine) {
@@ -170,7 +216,7 @@ public class SocketServerClientHandler implements Runnable {
         scanner.useDelimiter(",");
 
         try {
-            if(scanner.next().equals("newConnection")){
+            if(scanner.next().equals("nc")){
                 String nickname = scanner.next();
 
                 if(scanner.hasNext())
@@ -214,12 +260,15 @@ public class SocketServerClientHandler implements Runnable {
                 parent.controller.disconnect(this.getClientNickname());
             } catch (NoSuchPlayerException ignored) {}
         }
+
+        // Deallocate resources
         in.close();
         out.close();
         try {
             socket.close();
         } catch (IOException ignored) {}
-        connectionCheckerDemon.shutdown();
+        // Kill connection checker demon
+        connectionCheckerDemon.shutdownNow();
     }
 
     /**
@@ -236,58 +285,47 @@ public class SocketServerClientHandler implements Runnable {
         return this.clientNickname.isPresent();
     }
 
-    // Maybe synchronize on something else
-    public synchronized String getLastKeepAliveSent() {
-        return lastKeepAliveSent;
-    }
-
-    public synchronized String getLastKeepAliveReceived() {
-        return lastKeepAliveReceived;
-    }
-
-    public synchronized void setLastKeepAliveSent(String lastKeepAliveSent) {
-        this.lastKeepAliveSent = lastKeepAliveSent;
-    }
-
-    public synchronized void setLastKeepAliveReceived(String lastKeepAliveReceived) {
-        this.lastKeepAliveReceived = lastKeepAliveReceived;
-    }
-
-
     /**
      * Check if the connection is still up by sending a message to the client.
      * If the client does not send a properly formatted message back, it is considered to have disconnected
      */
     private class ConnectionChecker implements Runnable {
-        private final SocketServerClientHandler client;
+        private final SocketClientHandler client;
+        private final int millisecondsToWait;
 
-        public ConnectionChecker(SocketServerClientHandler client) {
+        /**
+         * Checker builder
+         * @param client to check connection to
+         * @param secondsToWait before declaring the client disconnected if it fails to answer in time
+         */
+        public ConnectionChecker(SocketClientHandler client, int secondsToWait) {
             this.client = client;
+            this.millisecondsToWait = secondsToWait*1000;
         }
 
         @Override
         public void run() {
-            // Check connection only if client is logged in
-            if(!client.isLoggedIn()){
-                return;
-            }
             // Generate a random string
             String randomString = UUID.randomUUID().toString();
             // Set the string as the last sent
-            client.setLastKeepAliveSent(randomString);
+            lastKeepAliveSent = randomString;
             // Send the string
             client.send("ping," + randomString);
 
             // Wait some time
             try {
-                Thread.sleep(3000);
+                synchronized (uselessLock_2) {
+                    uselessLock_2.wait(millisecondsToWait);
+                }
             } catch (InterruptedException e) {
+                // Happens if user quits normally while the check is being performed
                 System.out.println("Error during connection check");
             }
 
             // Check if the random string came back in time
-            if(!getLastKeepAliveReceived().equals(randomString)){
-                client.clientDisconnected();
+            if(!lastKeepAliveReceived.equals(lastKeepAliveSent)){
+                System.out.println("Demon says " + getClientNickname() + " disconnected!");
+                clientConnected = false;
                 client.connectionCheckerDemon.shutdown();
             }
         }
