@@ -1,9 +1,11 @@
 package it.polimi.is24am05.controller;
 
 public interface GameServer {
-    public void start();
+    void start();
 
-    public void sendBroadcast(String message);
+    void sendBroadcast(String message);
 
-    public void send(String message, String player);
+    void sendBroadcast(String message, String player);
+
+    void send(String message, String player);
 }

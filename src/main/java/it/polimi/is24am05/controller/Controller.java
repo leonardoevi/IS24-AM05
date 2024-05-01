@@ -38,6 +38,7 @@ public class Controller {
      */
     private List<String> users = new LinkedList<>();
     private LobbyState lobbyState;
+    private final List<GameServer> servers = new LinkedList<>();
     public Game game;
 
     /**
@@ -48,6 +49,8 @@ public class Controller {
         this.game = game;
         this.numUsers = game.getNicknames().size();
         this.lobbyState = LobbyState.OLD;
+        setServers();
+
     }
 
     /**
@@ -55,9 +58,8 @@ public class Controller {
      */
     public Controller(){
         this.lobbyState = LobbyState.NEW;
+        setServers();
     }
-
-    // TODO: add rest of game methods, synchronize them!!
 
     /**
      * Handles a new connection from the network
@@ -75,18 +77,29 @@ public class Controller {
                 throw new ConnectionRefusedException("User already connected");
             // Add the user to the list of reconnected users
             users.add(playerNickname);
-            // TODO: tell the user the game is waiting for others to reconnect
 
-            // If all have reconnected restart the game
+            // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
                 for (String nickname : this.users) {
                     try {
                         game.reconnect(nickname);
                     } catch (NoSuchPlayerException ignored) {}
                 }
-
+                //tell all players the game is resumed
+                for (GameServer server : servers){
+                    server.sendBroadcast("Game resumed");
+                }
                 this.lobbyState = LobbyState.STARTED;
                 // TODO: send the users the game state
+                for (GameServer server : servers) {
+                    server.sendBroadcast(this.game.toString());
+                }
+            }
+            //tell the user the game is waiting for others to reconnect
+            else {
+                for (GameServer server : servers) {
+                    server.send("Waiting for others to reconnect", playerNickname);
+                }
             }
 
         } else if (this.lobbyState == LobbyState.NEW) {
@@ -107,6 +120,9 @@ public class Controller {
                     System.out.println("New game started with players: " + this.game.getNicknames());
                     this.lobbyState = LobbyState.STARTED;
                     // TODO: send the users the game state
+                    for (GameServer server : servers) {
+                        server.sendBroadcast(this.game.toString());
+                    }
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -124,7 +140,13 @@ public class Controller {
             try {
                 this.game.reconnect(playerNickname);
                 // TODO: send the user the game state
+                for (GameServer server : servers) {
+                    server.send(this.game.toString(), playerNickname);
+                }
                 // If the game was stopped and now resumed after this connection, send it broadcast
+                for (GameServer server : servers) {
+                    server.sendBroadcast("Game resumed");
+                }
             } catch (NoSuchPlayerException ignored) {}
         }
     }
@@ -270,8 +292,6 @@ public class Controller {
         }
 
         // Start threads for Socket and RMI servers, pass the controller.
-        Controller finalController = controller;
-        new Thread(() -> new SocketServer(finalController).start()).start();
     }
 
 
@@ -319,8 +339,18 @@ public class Controller {
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
             // TODO tell all players the game was stopped
+            for (GameServer server : servers) {
+                server.sendBroadcast("Game stopped");
+            }
             // Send the new game state
             // They may be able to tell given the new game state
+        }
+    }
+    private void setServers(){
+        SocketServer socketServer = new SocketServer(this);
+        this.servers.add(socketServer);
+        for(GameServer server: servers) {
+            new Thread(server::start).start();
         }
     }
 }

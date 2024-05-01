@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +57,7 @@ public class SocketClientHandler implements Runnable {
     /**
      * Seconds to wait before checking again if client is still connected
      */
-    private static final int checkingInterval = 4;
+    private static final int checkingInterval = 8;
 
     /**
      * Flag to know whether the client is still connected
@@ -68,6 +69,7 @@ public class SocketClientHandler implements Runnable {
      * avoiding busy waiting inside loops
      */
     private final Object uselessLock_1 = new Object(), uselessLock_2 = new Object();
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(4);
 
     /**
      * Constructor
@@ -94,16 +96,18 @@ public class SocketClientHandler implements Runnable {
             // Start a demon thread to check connection status with clients each 5 seconds
             this.connectionCheckerDemon
                     .scheduleAtFixedRate(new ConnectionChecker(this, checkingInterval/2), 0, checkingInterval, TimeUnit.SECONDS);
+            // Creating pool thread to handle input
 
             // Handle communication with client while they are connected
             while (clientConnected) {
                 // Read next line
-                String line = null;
+                String line;
                 // If there is something in the buffer
                 if(socket.getInputStream().available() > 0){
                     // Acquire the message
                     line = in.nextLine();
                 } else {
+                    line = null;
                     // Wait some time and go back to checking the buffer
                     try {   synchronized (uselessLock_1) {  uselessLock_1.wait(100); }
                         continue;
@@ -124,7 +128,8 @@ public class SocketClientHandler implements Runnable {
                     lastKeepAliveReceived = line.substring(5);
                 } else {
                     // TODO: Change this line
-                    handleClientInput(line);
+
+                    this.threadPool.submit(new Thread(()->{handleClientInput(line);}));
                     //handleClientInputDebug(line);
                 }
             }
@@ -141,7 +146,7 @@ public class SocketClientHandler implements Runnable {
      * If a client is logging in, its nickname is stored
      * @param inputLine client Input
      */
-    private void handleClientInput(String inputLine) {
+    private synchronized void handleClientInput(String inputLine) {
         // TODO: fill this function according to the protocol
 
         // If the client is not logged in
@@ -228,6 +233,8 @@ public class SocketClientHandler implements Runnable {
                 this.clientNickname = Optional.of(nickname);
                 // Subscribe to broadcast list
                 parent.addClient(this);
+                //Sending again to last one to connect
+                parent.send(parent.controller.game.toString(),getClientNickname());
                 // Send confirmation to client
                 send("ok," + "Hi " + getClientNickname() + "!");
             } else {throw new NoSuchElementException();}
@@ -264,6 +271,7 @@ public class SocketClientHandler implements Runnable {
         // Deallocate resources
         in.close();
         out.close();
+        this.threadPool.shutdown();
         try {
             socket.close();
         } catch (IOException ignored) {}

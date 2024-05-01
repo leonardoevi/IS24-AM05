@@ -1,6 +1,7 @@
 package it.polimi.is24am05.controller.socketServer;
 
 import it.polimi.is24am05.controller.Controller;
+import it.polimi.is24am05.controller.GameServer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -13,7 +14,7 @@ import java.util.concurrent.Executors;
 /**
  * Server using sockets protocol
  */
-public class SocketServer {
+public class SocketServer implements GameServer {
     protected final Controller controller;
 
     // Observer pattern?
@@ -94,6 +95,24 @@ public class SocketServer {
             client.send(message);
         }
     }
+    /**
+     * Used to send a message to all connected clients except player
+     * @param message to send
+     * @param player player who won't receive the message
+     */
+    public void sendBroadcast(String message, String player){
+        // Create a copy of the socket list
+        List<SocketClientHandler> clientsListCopy;
+        synchronized (this.clients) {
+            clientsListCopy = new ArrayList<>(this.clients);
+        }
+
+        for (SocketClientHandler client : clientsListCopy) {
+            if(!(client.getClientNickname().equals(player))) {
+                client.send(message);
+            }
+        }
+    }
 
     /**
      * Used to send a message to all connected clients except for one
@@ -113,7 +132,24 @@ public class SocketServer {
             client.send(message);
         }
     }
+    /**
+     * Used to send a message to player
+     * @param message to send
+     * @param player player who will receive the message
+     */
+    public void send(String message, String player){
+        // Create a copy of the socket list
+        List<SocketClientHandler> clientsListCopy;
+        synchronized (this.clients) {
+            clientsListCopy = new ArrayList<>(this.clients);
+        }
 
+        for (SocketClientHandler client : clientsListCopy) {
+            if(client.getClientNickname().equals(player)) {
+                client.send(message);
+            }
+        }
+    }
     /*
     private class ConnectionsChecker implements Runnable {
         private final SocketServer parent;
