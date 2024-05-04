@@ -480,9 +480,8 @@ public class Game implements Serializable, Cloneable {
         Game cloned=(Game) super.clone();
         cloned.players=new ArrayList<>();
         for(Player p: this.players){
+
             cloned.players.add(p.clone());
-
-
 
         }
 
@@ -499,6 +498,7 @@ public class Game implements Serializable, Cloneable {
         try {
             //copy of the current game
             Game gameToDisplay = this.clone();
+
             Player main = gameToDisplay.findPlayer(nickname); //Throws NoSuchPlayerException
 
             for (Player p : gameToDisplay.getPlayers()) {
@@ -534,7 +534,6 @@ public class Game implements Serializable, Cloneable {
                        p.setHandTodisplay(cardToDisplay);
 
                      }
-
                 }
             }
         return gameToDisplay;
