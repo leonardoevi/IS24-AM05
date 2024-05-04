@@ -298,4 +298,10 @@ public class Player implements Serializable {
         }
     }
 
+    public void setHandTodisplay(List<Card> handToDisplay)
+    {
+        this.hand=handToDisplay;
+
+    }
+
 }

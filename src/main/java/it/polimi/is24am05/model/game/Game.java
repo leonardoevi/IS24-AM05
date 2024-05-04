@@ -2,12 +2,16 @@ package it.polimi.is24am05.model.game;
 
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
 import it.polimi.is24am05.model.card.goldCard.GoldCard;
+import it.polimi.is24am05.model.card.goldCard.GoldCardVisible;
 import it.polimi.is24am05.model.card.resourceCard.ResourceCard;
+import it.polimi.is24am05.model.card.resourceCard.ResourceCardVisible;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.Color;
+import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
@@ -472,7 +476,52 @@ public class Game implements Serializable {
                         .filter(p -> p.getPoints() == winnerPoints && p.getSatisfiedObjectiveCards() == winnerObjectives)
                         .toList();
     }
+    public Game getPov(String nickname) throws NoSuchPlayerException {
 
+
+        try {
+            Game gameToDisplay = (Game) this.clone();
+
+            Player main = findPlayer(nickname); //Throws NoSuchPlayerException
+            for (Player p : gameToDisplay.getPlayers()) {
+                if(!p.getNickname().equals(nickname)) {
+                    List<Card> cardToDisplay=new ArrayList<>();
+                     for(Card c :p.getHand()) {
+
+                       if(c.getBackSide() instanceof GoldBackSide)
+                       {
+                           if(c.getBackSide().getSeed()== Resource.INSECT)
+                               cardToDisplay.add(GoldCardVisible.GCV_I);
+                           if(c.getBackSide().getSeed()== Resource.ANIMAL)
+                               cardToDisplay.add(GoldCardVisible.GCV_A);
+                           if(c.getBackSide().getSeed()== Resource.FUNGI)
+                               cardToDisplay.add(GoldCardVisible.GCV_F);
+                           if(c.getBackSide().getSeed()== Resource.PLANT)
+                               cardToDisplay.add(GoldCardVisible.GCV_P);
+
+                       }
+                       else{
+                           if(c.getBackSide().getSeed()== Resource.INSECT)
+                               cardToDisplay.add(ResourceCardVisible.RCV_I);
+                           if(c.getBackSide().getSeed()== Resource.ANIMAL)
+                               cardToDisplay.add(ResourceCardVisible.RCV_A);
+                           if(c.getBackSide().getSeed()== Resource.FUNGI)
+                               cardToDisplay.add(ResourceCardVisible.RCV_F);
+                           if(c.getBackSide().getSeed()== Resource.PLANT)
+                               cardToDisplay.add(ResourceCardVisible.RCV_P);
+
+                       }
+                       p.setHandTodisplay(cardToDisplay);
+
+                     }
+
+                }
+            }
+        return gameToDisplay;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
     // Getters and Setters
 
     public List<Player> getWinners() {
