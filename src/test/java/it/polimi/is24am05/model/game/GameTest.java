@@ -59,7 +59,9 @@ class GameTest {
         assertDoesNotThrow(() -> new Game(List.of("Acoustic", "Andrea", "Chad", "Ale")));
         try {
             game = new Game(players);
-        } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) { throw new RuntimeException(e); }
+        } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) {
+            throw new RuntimeException(e);
+        }
 
         // Game state should be PLACE_STARTER_CARDS
         assertEquals(GameState.PLACE_STARTER_CARDS, game.getGameState());
@@ -67,12 +69,12 @@ class GameTest {
         // No moves except for placeStarterSide() should be allowed
         // The exception is thrown regardless of the parameters
         assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective(players.getFirst(), Objective.O_088));
-        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null,0,0));
+        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null, 0, 0));
         assertThrows(MoveNotAllowedException.class, () -> game.drawDeck("pippo", true));
         assertThrows(MoveNotAllowedException.class, () -> game.drawVisible("pippo", null));
 
         // Make sure each player places their card
-        for(String name : players){
+        for (String name : players) {
             Card starterCard = game.getPlayers().stream()
                     .filter(p -> p.getNickname().equals(name))
                     .findFirst()
@@ -81,7 +83,9 @@ class GameTest {
 
             try {
                 game.placeStarterSide(name, starterCard.getBackSide());
-            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // Game state should be CHOOSE_OBJECTIVE
@@ -90,12 +94,12 @@ class GameTest {
         // No moves except for chooseObjective() should be allowed
         // The exception is thrown regardless of the parameters
         assertThrows(MoveNotAllowedException.class, () -> game.placeStarterSide("pippo", null));
-        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null,0,0));
+        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null, 0, 0));
         assertThrows(MoveNotAllowedException.class, () -> game.drawDeck("pippo", true));
         assertThrows(MoveNotAllowedException.class, () -> game.drawVisible("pippo", null));
 
         // Each player chooses an objective
-        for(String name : players){
+        for (String name : players) {
             Objective[] toChooseFrom = game.getPlayers().stream()
                     .filter(p -> p.getNickname().equals(name))
                     .findFirst()
@@ -106,7 +110,9 @@ class GameTest {
 
             try {
                 game.chooseObjective(name, choice);
-            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // Game state should be GAME
@@ -120,7 +126,7 @@ class GameTest {
         // Repeat nr_of_players * N - 1 times
         int N = 5;
 
-        for(int i=0; i < players.size()*N - 1; i++) {
+        for (int i = 0; i < players.size() * N - 1; i++) {
             Player current = getCurrentPlayer(game);
 
             // Current player State should be PLACE
@@ -165,7 +171,7 @@ class GameTest {
             int randomDecision = new Random().nextInt(4);
 
             // Draw from ResourceDeck
-            if(randomDecision == 0){
+            if (randomDecision == 0) {
                 try {
                     game.drawDeck(current.getNickname(), false);
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -175,7 +181,7 @@ class GameTest {
                 }
             }
             // Draw from GoldDeck
-            if(randomDecision == 1){
+            if (randomDecision == 1) {
                 try {
                     game.drawDeck(current.getNickname(), false);
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -185,7 +191,7 @@ class GameTest {
                 }
             }
             // Draw a Visible Resource Card
-            if(randomDecision == 2){
+            if (randomDecision == 2) {
                 try {
                     game.drawVisible(current.getNickname(), game.getResourceDeck().getVisible().stream().findAny().get());
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -195,7 +201,7 @@ class GameTest {
                 }
             }
             // Draw a Visible Gold Card
-            if(randomDecision == 3){
+            if (randomDecision == 3) {
                 try {
                     game.drawVisible(current.getNickname(), game.getGoldDeck().getVisible().stream().findAny().get());
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -213,7 +219,7 @@ class GameTest {
     }
 
     @Test
-    void Game2() {
+    void Game2() throws NoSuchPlayerException, CloneNotSupportedException {
         // Set up the same game as before
 
 
@@ -232,7 +238,9 @@ class GameTest {
         assertDoesNotThrow(() -> new Game(List.of("Acoustic", "Andrea", "Chad", "Ale")));
         try {
             game = new Game(players);
-        } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) { throw new RuntimeException(e); }
+        } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) {
+            throw new RuntimeException(e);
+        }
 
         // Game state should be PLACE_STARTER_CARDS
         assertEquals(GameState.PLACE_STARTER_CARDS, game.getGameState());
@@ -240,12 +248,12 @@ class GameTest {
         // No moves except for placeStarterSide() should be allowed
         // The exception is thrown regardless of the parameters
         assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective(players.getFirst(), Objective.O_088));
-        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null,0,0));
+        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null, 0, 0));
         assertThrows(MoveNotAllowedException.class, () -> game.drawDeck("pippo", true));
         assertThrows(MoveNotAllowedException.class, () -> game.drawVisible("pippo", null));
 
         // Make sure each player places their card
-        for(String name : players){
+        for (String name : players) {
             Card starterCard = game.getPlayers().stream()
                     .filter(p -> p.getNickname().equals(name))
                     .findFirst()
@@ -254,7 +262,9 @@ class GameTest {
 
             try {
                 game.placeStarterSide(name, starterCard.getBackSide());
-            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // Game state should be CHOOSE_OBJECTIVE
@@ -263,12 +273,12 @@ class GameTest {
         // No moves except for chooseObjective() should be allowed
         // The exception is thrown regardless of the parameters
         assertThrows(MoveNotAllowedException.class, () -> game.placeStarterSide("pippo", null));
-        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null,0,0));
+        assertThrows(MoveNotAllowedException.class, () -> game.placeSide("pippo", null, null, 0, 0));
         assertThrows(MoveNotAllowedException.class, () -> game.drawDeck("pippo", true));
         assertThrows(MoveNotAllowedException.class, () -> game.drawVisible("pippo", null));
 
         // Each player chooses an objective
-        for(String name : players){
+        for (String name : players) {
             Objective[] toChooseFrom = game.getPlayers().stream()
                     .filter(p -> p.getNickname().equals(name))
                     .findFirst()
@@ -279,11 +289,15 @@ class GameTest {
 
             try {
                 game.chooseObjective(name, choice);
-            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
         }
+        Game cloned=game.getPov("Chad");
 
         // Game state should be GAME
         assertEquals(GameState.GAME, game.getGameState());
+
 
         // No moves except for placeSide(), drawDeck() and drawVisible() should be allowed
         // The exception is thrown regardless of the parameters
@@ -291,7 +305,7 @@ class GameTest {
         assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective("pippo", null));
 
 
-        while(game.getGameState() != GameState.END) {
+        while (game.getGameState() != GameState.END) {
             Player current = getCurrentPlayer(game);
 
             // Current player State should be PLACE
@@ -316,7 +330,7 @@ class GameTest {
                      InvalidCoordinatesException | InvalidSideException |
                      NotYourTurnException | NoSuchPlayerException e) {
                 throw new RuntimeException(e);
-            } catch (PlacementNotAllowedException e){
+            } catch (PlacementNotAllowedException e) {
                 try {
                     // Place it facing down
                     game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
@@ -328,7 +342,7 @@ class GameTest {
             }
 
             // If there is nothing to draw
-            if( game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()){
+            if (game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()) {
                 continue;
             }
 
@@ -348,7 +362,7 @@ class GameTest {
             int randomDecision = new Random().nextInt(4);
 
             // Draw from ResourceDeck
-            if(randomDecision == 0){
+            if (randomDecision == 0) {
                 try {
                     game.drawDeck(current.getNickname(), false);
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -358,7 +372,7 @@ class GameTest {
                 }
             }
             // Draw from GoldDeck
-            if(randomDecision == 1){
+            if (randomDecision == 1) {
                 try {
                     game.drawDeck(current.getNickname(), false);
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -368,7 +382,7 @@ class GameTest {
                 }
             }
             // Draw a Visible Resource Card
-            if(randomDecision == 2){
+            if (randomDecision == 2) {
                 try {
                     game.drawVisible(current.getNickname(), game.getResourceDeck().getVisible().stream().findAny().orElse(null));
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -378,7 +392,7 @@ class GameTest {
                 }
             }
             // Draw a Visible Gold Card
-            if(randomDecision == 3){
+            if (randomDecision == 3) {
                 try {
                     game.drawVisible(current.getNickname(), game.getGoldDeck().getVisible().stream().findAny().orElse(null));
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -399,11 +413,11 @@ class GameTest {
         assertFalse(winners.isEmpty());
 
         // Announce winners
-        if(winners.size() == 1){
+        if (winners.size() == 1) {
             System.out.println("The winner is: " + winners.getFirst().getNickname());
         } else {
             String names = "";
-            for(Player winner : winners){
+            for (Player winner : winners) {
                 names = names + winner.getNickname() + " ";
             }
             System.out.println("The winners are " + names);
@@ -411,7 +425,7 @@ class GameTest {
         System.out.println();
 
         // Print statistics
-        for(String name : players){
+        for (String name : players) {
             Player p = getPlayer(game, name);
             System.out.println(name + ":");
             System.out.println("Points:" + p.getPoints());
@@ -425,12 +439,72 @@ class GameTest {
 
     }
 
+    public void playGameWithTest() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException {
+
+        List<String> players = List.of("Acoustic", "Andrea", "Chad", "Ale");
+
+            Game game=new Game(players);
+
+        for (String name : players) {
+            Card starterCard = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getStarterCard();
+
+            try {
+                game.placeStarterSide(name, starterCard.getBackSide());
+            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        for (String name : players) {
+            Objective[] toChooseFrom = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getObjectivesHand();
+
+            Objective choice = toChooseFrom[new Random().nextInt(toChooseFrom.length)];
+
+            try {
+                game.chooseObjective(name, choice);
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        for (String name : players) {
+            Objective[] toChooseFrom = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getObjectivesHand();
+
+            Objective choice = toChooseFrom[new Random().nextInt(toChooseFrom.length)];
+
+            try {
+                game.chooseObjective(name, choice);
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+
+    }
+
     @Test
-    void multipleGames() {
+    void multipleGames() throws NoSuchPlayerException, CloneNotSupportedException {
         int N = 100;
 
         for (int i = 0; i < N; i++)
             Game2();
+    }
+
+    @Test
+    void gameWithTest() throws NoSuchPlayerException, TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException {
+
+           // playGameWithTest();
     }
 
     @Test
@@ -703,4 +777,5 @@ class GameTest {
         System.out.println("Decks: ");
         System.out.println(deckToString(game.getResourceDeck(), false, game.getGoldDeck(), true));
     }
+
 }

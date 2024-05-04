@@ -9,6 +9,7 @@ import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
 import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
 import it.polimi.is24am05.model.exceptions.player.*;
+import it.polimi.is24am05.model.game.Game;
 import it.polimi.is24am05.model.objective.Objective;
 import it.polimi.is24am05.model.playArea.PlayArea;
 import it.polimi.is24am05.model.playArea.Tuple;
@@ -17,7 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player implements Serializable {
+public class Player implements Serializable, Cloneable {
 
     /**
      * nickname chosen by the player, it can't change during the game
@@ -298,10 +299,30 @@ public class Player implements Serializable {
         }
     }
 
-    public void setHandTodisplay(List<Card> handToDisplay)
+    public Player clone()
     {
-        this.hand=handToDisplay;
+        try {
+            Player cloned=(Player) super.clone();
+            return cloned;
+
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
+
+    /**
+     * places the side of the card in the player's playArea at coordinates (i,j)
+     *
+     * @param handToDisplay is the hand of the player that can be shown to other players
+     */
+       public void setHandTodisplay(List<Card> handToDisplay)
+        {
+            this.hand=new ArrayList<>(handToDisplay);
+
+        }
+
+
 
 }

@@ -29,7 +29,7 @@ import it.polimi.is24am05.model.objective.Objective;
 import java.io.Serializable;
 import java.util.*;
 
-public class Game implements Serializable {
+public class Game implements Serializable, Cloneable {
     /**
      * List of winners of the game, updated after game is ended.
      */
@@ -37,7 +37,7 @@ public class Game implements Serializable {
     /**
      * Players in the game. No player can be added.
      */
-    private final List<Player> players;
+    private List<Player> players;
 
     /**
      * Keeps track of the player that is expected to play i.e. players.get(turn)
@@ -476,38 +476,58 @@ public class Game implements Serializable {
                         .filter(p -> p.getPoints() == winnerPoints && p.getSatisfiedObjectiveCards() == winnerObjectives)
                         .toList();
     }
+    protected Game clone() throws CloneNotSupportedException {
+        Game cloned=(Game) super.clone();
+        cloned.players=new ArrayList<>();
+        for(Player p: this.players){
+            cloned.players.add(p.clone());
+
+
+
+        }
+
+        return cloned;
+    }
+    /**
+     * allows to display the game to a player with only necessary information
+     * @param nickname Player name
+     * @throws NoSuchPlayerException If such a player is not in the game
+     */
     public Game getPov(String nickname) throws NoSuchPlayerException {
 
 
         try {
-            Game gameToDisplay = (Game) this.clone();
+            //copy of the current game
+            Game gameToDisplay = this.clone();
+            Player main = gameToDisplay.findPlayer(nickname); //Throws NoSuchPlayerException
 
-            Player main = findPlayer(nickname); //Throws NoSuchPlayerException
             for (Player p : gameToDisplay.getPlayers()) {
+
+                //other players' hand's cards must show only the backSide
                 if(!p.getNickname().equals(nickname)) {
                     List<Card> cardToDisplay=new ArrayList<>();
                      for(Card c :p.getHand()) {
 
                        if(c.getBackSide() instanceof GoldBackSide)
                        {
-                           if(c.getBackSide().getSeed()== Resource.INSECT)
+                           if(c.getBackSide().getSeed().equals(Resource.INSECT))
                                cardToDisplay.add(GoldCardVisible.GCV_I);
-                           if(c.getBackSide().getSeed()== Resource.ANIMAL)
+                           if(c.getBackSide().getSeed().equals( Resource.ANIMAL))
                                cardToDisplay.add(GoldCardVisible.GCV_A);
-                           if(c.getBackSide().getSeed()== Resource.FUNGI)
+                           if(c.getBackSide().getSeed().equals( Resource.FUNGI))
                                cardToDisplay.add(GoldCardVisible.GCV_F);
-                           if(c.getBackSide().getSeed()== Resource.PLANT)
+                           if(c.getBackSide().getSeed().equals(Resource.PLANT))
                                cardToDisplay.add(GoldCardVisible.GCV_P);
 
                        }
                        else{
-                           if(c.getBackSide().getSeed()== Resource.INSECT)
+                           if(c.getBackSide().getSeed().equals(Resource.INSECT))
                                cardToDisplay.add(ResourceCardVisible.RCV_I);
-                           if(c.getBackSide().getSeed()== Resource.ANIMAL)
+                           if(c.getBackSide().getSeed().equals(Resource.ANIMAL))
                                cardToDisplay.add(ResourceCardVisible.RCV_A);
-                           if(c.getBackSide().getSeed()== Resource.FUNGI)
+                           if(c.getBackSide().getSeed().equals( Resource.FUNGI))
                                cardToDisplay.add(ResourceCardVisible.RCV_F);
-                           if(c.getBackSide().getSeed()== Resource.PLANT)
+                           if(c.getBackSide().getSeed().equals( Resource.PLANT))
                                cardToDisplay.add(ResourceCardVisible.RCV_P);
 
                        }
