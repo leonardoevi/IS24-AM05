@@ -5,11 +5,11 @@ import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.enums.state.PlayerState;
+import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
 import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
 import it.polimi.is24am05.model.exceptions.player.*;
-import it.polimi.is24am05.model.game.Game;
 import it.polimi.is24am05.model.objective.Objective;
 import it.polimi.is24am05.model.playArea.PlayArea;
 import it.polimi.is24am05.model.playArea.Tuple;
@@ -298,7 +298,9 @@ public class Player implements Serializable, Cloneable {
             this.points += objectivePoints;
         }
     }
-
+    /**
+     * returns a clone of the player
+     */
     public Player clone()
     {
         try {
@@ -313,15 +315,17 @@ public class Player implements Serializable, Cloneable {
     }
 
     /**
-     * Hides the player's hand from other players
+     * Hides the player's hand from other players and obscure player's objective hand and objective
      *
-     * @param handToDisplay is the hand of only back side card  that can be shown to other players
+     * @param handToDisplay is the hand of only back side cards  that can be shown to other players
      */
-       public void setHandTodisplay(List<Card> handToDisplay)
+       public void obscure(List<Card> handToDisplay)
         {
-            this.hand=new ArrayList<>(handToDisplay);
-
+            this.hand=handToDisplay;
+            this.objectivesHand=null;
+            this.objective=null;
         }
+
 
 
 

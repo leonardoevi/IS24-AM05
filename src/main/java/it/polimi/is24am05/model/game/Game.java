@@ -476,9 +476,16 @@ public class Game implements Serializable, Cloneable {
                         .filter(p -> p.getPoints() == winnerPoints && p.getSatisfiedObjectiveCards() == winnerObjectives)
                         .toList();
     }
+
+    /**
+     * returns a clone of the current game
+     *
+     * @throws CloneNotSupportedException If the clone does not work
+     */
     protected Game clone() throws CloneNotSupportedException {
         Game cloned=(Game) super.clone();
         cloned.players=new ArrayList<>();
+
         for(Player p: this.players){
 
             cloned.players.add(p.clone());
@@ -488,7 +495,7 @@ public class Game implements Serializable, Cloneable {
         return cloned;
     }
     /**
-     * allows to display the game to a player with only necessary information
+     * allows to display the game to a player with only necessary information about other players
      * @param nickname Player name
      * @throws NoSuchPlayerException If such a player is not in the game
      */
@@ -501,9 +508,9 @@ public class Game implements Serializable, Cloneable {
 
             Player main = gameToDisplay.findPlayer(nickname); //Throws NoSuchPlayerException
 
+            //obscure information about other players
             for (Player p : gameToDisplay.getPlayers()) {
 
-                //other players' hand's cards must show only the backSide
                 if(!p.getNickname().equals(nickname)) {
                     List<Card> cardToDisplay=new ArrayList<>();
                      for(Card c :p.getHand()) {
@@ -531,7 +538,8 @@ public class Game implements Serializable, Cloneable {
                                cardToDisplay.add(ResourceCardVisible.RCV_P);
 
                        }
-                       p.setHandTodisplay(cardToDisplay);
+                       //obscure information about the cloned player in the cloned game
+                       p.obscure(cardToDisplay);
 
                      }
                 }

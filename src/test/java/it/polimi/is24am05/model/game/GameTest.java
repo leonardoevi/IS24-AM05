@@ -508,12 +508,26 @@ class GameTest {
             }
         }
         List<Card> handbefore=getPlayer(game, "Acoustic").getHand();
+        Objective[] objectivesHandBefore=getPlayer(game, "Acoustic").getObjectivesHand();
+        Objective objectiveBefore=getPlayer(game, "Acoustic").getObjective();
+
         Game cloned=game.getPov("Chad");
-        List<Card> obscuredHand=getPlayer(cloned, "Acoustic").getHand();
+        assertEquals(null,getPlayer(cloned, "Acoustic").getObjectivesHand() );
+        assertEquals(null,getPlayer(cloned, "Acoustic").getObjective() );
+
         List<Card> handafter=getPlayer(game, "Acoustic").getHand();
-        System.out.println(handbefore);
-        System.out.println(obscuredHand);
-        System.out.println(handafter);
+        Objective[] objectivesHandAfter=getPlayer(game, "Acoustic").getObjectivesHand();
+        Objective objectiveAfter=getPlayer(game, "Acoustic").getObjective();
+
+
+        assertEquals(objectivesHandBefore, objectivesHandAfter);
+        assertEquals(objectiveBefore, objectiveBefore);
+        assertEquals(handbefore, handafter);
+
+        System.out.println(getPlayer(cloned, "Acoustic").getHand() );
+
+
+
 
 
 
