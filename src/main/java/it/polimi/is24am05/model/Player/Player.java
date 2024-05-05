@@ -313,9 +313,9 @@ public class Player implements Serializable, Cloneable {
     }
 
     /**
-     * places the side of the card in the player's playArea at coordinates (i,j)
+     * Hides the player's hand from other players
      *
-     * @param handToDisplay is the hand of the player that can be shown to other players
+     * @param handToDisplay is the hand of only back side card  that can be shown to other players
      */
        public void setHandTodisplay(List<Card> handToDisplay)
         {
