@@ -691,10 +691,17 @@ class GameTest {
         Game game;
 
         //CASE 1:
-        //all the players disconnect before placing the starter side
-        //all the players should be ready to play (playerState.place) ,  the game should be paused
+        //all the players disconnect before placing the starter side-> a random starters side will be placed for all the players and a random objective chose
+        //all the players should be ready to play (playerState.place) ,  the game should be paused ( no one is connected)
         //first player reconnect
+        //third player recconect
+        //the game should be in gamestate.GAME and is first player turn to play
+        //first player plays
+        //third player turn to play
+        //third player plays
         //second player reconnect
+        //first player turn to play
+
         try {
             game= new Game(List.of(A, L, M));
         } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {throw new RuntimeException(e);}
@@ -752,14 +759,13 @@ class GameTest {
 
         //CASE 2
         //A  places starterSide
-        //M  disconnect
+        //M  disconnect, a random starter side should be chosen for M
         //L  places starter Side
-        //L disconnect
+        //L disconnect. since there is only one player connected but the game is not started yet A can choose objective card
         //A chooses objective
-
+        //since all the other players are disconnected and A has chosen an objective card a random objective card should be chosen for them s
         //all the players should be ready to play (playerState.place) ,  the game should be paused
-
-        //player M reconnect the game should continue
+        //player M reconnect the game should continue, and it should be A turn to play
 
         try {
             game= new Game(List.of(A, L, M));
