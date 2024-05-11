@@ -288,7 +288,7 @@ class GameTest {
         assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective("pippo", null));
 
 
-        while(game.getGameState() != GameState.END) {
+        while (game.getGameState() != GameState.END) {
             Player current = getCurrentPlayer(game);
 
             // Current player State should be PLACE
@@ -313,7 +313,7 @@ class GameTest {
                      InvalidCoordinatesException | InvalidSideException |
                      NotYourTurnException | NoSuchPlayerException e) {
                 throw new RuntimeException(e);
-            } catch (PlacementNotAllowedException e){
+            } catch (PlacementNotAllowedException e) {
                 try {
                     // Place it facing down
                     game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
@@ -325,7 +325,7 @@ class GameTest {
             }
 
             // If there is nothing to draw
-            if( game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()){
+            if (game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()) {
                 continue;
             }
 
@@ -345,7 +345,7 @@ class GameTest {
             int randomDecision = new Random().nextInt(4);
 
             // Draw from ResourceDeck
-            if(randomDecision == 0){
+            if (randomDecision == 0) {
                 try {
                     game.drawDeck(current.getNickname(), false);
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -355,7 +355,7 @@ class GameTest {
                 }
             }
             // Draw from GoldDeck
-            if(randomDecision == 1){
+            if (randomDecision == 1) {
                 try {
                     game.drawDeck(current.getNickname(), false);
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -365,7 +365,7 @@ class GameTest {
                 }
             }
             // Draw a Visible Resource Card
-            if(randomDecision == 2){
+            if (randomDecision == 2) {
                 try {
                     game.drawVisible(current.getNickname(), game.getResourceDeck().getVisible().stream().findAny().orElse(null));
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -375,7 +375,7 @@ class GameTest {
                 }
             }
             // Draw a Visible Gold Card
-            if(randomDecision == 3){
+            if (randomDecision == 3) {
                 try {
                     game.drawVisible(current.getNickname(), game.getGoldDeck().getVisible().stream().findAny().orElse(null));
                 } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
@@ -396,11 +396,11 @@ class GameTest {
         assertFalse(winners.isEmpty());
 
         // Announce winners
-        if(winners.size() == 1){
+        if (winners.size() == 1) {
             System.out.println("The winner is: " + winners.getFirst().getNickname());
         } else {
             String names = "";
-            for(Player winner : winners){
+            for (Player winner : winners) {
                 names = names + winner.getNickname() + " ";
             }
             System.out.println("The winners are " + names);
@@ -408,7 +408,7 @@ class GameTest {
         System.out.println();
 
         // Print statistics
-        for(String name : players){
+        for (String name : players) {
             Player p = getPlayer(game, name);
             System.out.println(name + ":");
             System.out.println("Points:" + p.getPoints());
@@ -665,7 +665,9 @@ class GameTest {
 
     }
 
+
     @Test
+
     void multipleGames() {
         int N = 100;
 
@@ -673,10 +675,152 @@ class GameTest {
             Game2();
     }
 
+    @Test
+    void disconnectionsPreGame() {
+        gameWithDisconnectionsPreGame();
+    }
+
 
     // A game played deterministically starting from a save file
     // Useful to manually verify game state evolution
-    @Test
+
+    void gameWithDisconnectionsPreGame()  {
+        String path = "src/test/java/it/polimi/is24am05/model/game/";
+        String filename = "game_disconnections_save.sv";
+        String A = "Andre", L = "Leo", M = "Manu";
+        Game game;
+
+        //CASE 1:
+        //all the players disconnect before placing the starter side
+        //all the players should be ready to play (playerState.place) ,  the game should be paused
+        //first player reconnect
+        //second player reconnect
+        try {
+            game= new Game(List.of(A, L, M));
+        } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {throw new RuntimeException(e);}
+
+
+        A = game.getPlayers().get(0).getNickname();
+        M = game.getPlayers().get(1).getNickname();
+        L = game.getPlayers().get(2).getNickname();
+
+
+        // Make sure each player places their card
+        for (String name : List.of(A, L, M)) {
+            try {
+                game.disconnect(name);
+            } catch (NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            }
+        }
+         assertEquals(GameState.PAUSE, game.getGameState());
+
+        for (Player player : game.getPlayers()) {
+           assertEquals(player.getState(), PlayerState.PLACE);
+        }
+
+        try {
+            game.reconnect(A);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(GameState.PAUSE, game.getGameState());
+        assertEquals(game.getTurn(), 0 );
+
+        try {
+            game.reconnect(L);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(GameState.GAME, game.getGameState());
+        assertEquals(game.getTurn(), 0 );
+
+        deterministicallyPlay(game, A);
+        deterministicallyDraw(game, A);
+        assertEquals(game.getTurn(), 2 );
+        deterministicallyPlay(game, L);
+        deterministicallyDraw(game, L);
+
+        try {
+            game.reconnect(M);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(game.getTurn(), 0 );
+
+
+
+        //CASE 2
+        //A  places starterSide
+        //M  disconnect
+        //L  places starter Side
+        //L disconnect
+        //A chooses objective
+
+        //all the players should be ready to play (playerState.place) ,  the game should be paused
+
+        //player M reconnect the game should continue
+
+        try {
+            game= new Game(List.of(A, L, M));
+        } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {throw new RuntimeException(e);}
+
+
+        A = game.getPlayers().get(0).getNickname();
+        M = game.getPlayers().get(1).getNickname();
+        L = game.getPlayers().get(2).getNickname();
+
+        try {
+            game.placeStarterSide(A, game.getPlayers().get(0).getStarterCard().getFrontSide());
+        } catch (InvalidStarterSideException | NoSuchPlayerException | MoveNotAllowedException e) {
+            throw new RuntimeException(e);}
+
+        try {
+            game.disconnect(M);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            game.placeStarterSide(L, game.getPlayers().get(2).getStarterCard().getFrontSide());
+        } catch (InvalidStarterSideException | NoSuchPlayerException | MoveNotAllowedException e) {
+            throw new RuntimeException(e);}
+
+        try {
+            game.disconnect(L);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            game.chooseObjective(A, game.getPlayers().get(0).getObjectivesHand()[1]);
+        } catch ( NoSuchPlayerException | MoveNotAllowedException |
+                 ObjectiveNotAllowedException e) {
+            throw new RuntimeException(e);}
+        //since have chosen the objectivecard and all the other players are disconnected, random objectives will be chosen for disconnected players
+        assertEquals(game.getGameState(), GameState.PAUSE);
+        for (Player player : game.getPlayers()) {
+            assertEquals(player.getState(), PlayerState.PLACE);
+        }
+
+        try {
+            game.reconnect(M);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(game.getGameState(), GameState.GAME);
+
+
+
+
+
+
+
+
+
+        System.out.println(game.getGameState());
+        printGameState(game);
+
+    }
+
     void gameWithDisconnections() throws TooManyPlayersException, TooFewPlayersException, PlayerNamesMustBeDifferentException, NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException, ObjectiveNotAllowedException {
         String path = "src/test/java/it/polimi/is24am05/model/game/";
         String filename = "game_disconnections_save.sv";
