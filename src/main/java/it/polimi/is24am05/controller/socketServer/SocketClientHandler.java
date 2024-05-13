@@ -398,6 +398,7 @@ public class SocketClientHandler implements Runnable {
      */
     public synchronized void send(Message message) {
         try {
+            System.out.println("Sending message: " + message.title() + message.arguments());
             out.writeObject(message);
             out.flush();
         } catch (IOException ignored) {}

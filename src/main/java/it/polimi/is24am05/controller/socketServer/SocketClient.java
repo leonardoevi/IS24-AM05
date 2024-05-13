@@ -66,7 +66,9 @@ public class SocketClient {
 
     public synchronized void send(Message message){
         try {
+            System.out.println("Sending message: " + message.title() + message.arguments());
             socketOut.writeObject(message);
+            socketOut.flush();
         } catch (Exception ignored) {}
     }
 
