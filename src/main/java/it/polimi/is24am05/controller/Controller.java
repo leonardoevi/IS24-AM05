@@ -3,7 +3,9 @@ package it.polimi.is24am05.controller;
 import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
-import it.polimi.is24am05.controller.socketServer.SocketServer;
+import it.polimi.is24am05.controller.socketServer.Message;
+import it.polimi.is24am05.controller.socketServer.Server;
+import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.enums.state.GameState;
@@ -23,22 +25,23 @@ import it.polimi.is24am05.model.objective.Objective;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static it.polimi.is24am05.model.game.Game.MAX_PLAYERS;
 import static it.polimi.is24am05.model.game.Game.MIN_PLAYERS;
 
-// TODO: remove debug printf() commands
 public class Controller {
     private int numUsers;
 
     /**
      * List of connected clients, identified by name
      */
-    private List<String> users = new LinkedList<>();
+    private final List<String> users = new LinkedList<>();
     private LobbyState lobbyState;
-    private final List<GameServer> servers = new LinkedList<>();
+    private final Server server = new Server(this);
     public Game game;
 
     /**
@@ -49,8 +52,7 @@ public class Controller {
         this.game = game;
         this.numUsers = game.getNicknames().size();
         this.lobbyState = LobbyState.OLD;
-        setServers();
-
+        server.start();
     }
 
     /**
@@ -58,7 +60,7 @@ public class Controller {
      */
     public Controller(){
         this.lobbyState = LobbyState.NEW;
-        setServers();
+        server.start();
     }
 
     /**
@@ -77,7 +79,18 @@ public class Controller {
                 throw new ConnectionRefusedException("User already connected");
             // Add the user to the list of reconnected users
             users.add(playerNickname);
-
+            server.send(
+                new Message("ok", Map.of(
+                    "players", game.getConnectedPlayers().stream().map(Player::getNickname)
+                )),
+                playerNickname
+            );
+            server.sendBroadcast(
+                 new Message("ok", Map.of(
+                    "nickname", playerNickname
+                )),
+                playerNickname
+            );
             // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
                 for (String nickname : this.users) {
@@ -86,22 +99,13 @@ public class Controller {
                     } catch (NoSuchPlayerException ignored) {}
                 }
                 //tell all players the game is resumed
-                for (GameServer server : servers){
-                    server.sendBroadcast("Game resumed");
-                }
                 this.lobbyState = LobbyState.STARTED;
-                // TODO: send the users the game state
-                for (GameServer server : servers) {
-                    server.sendBroadcast(this.game.toString());
-                }
+                for (Player player : game.getPlayers())
+                    server.send(
+                        new Message("gameResumed", getGameResumed(player)),
+                        player.getNickname()
+                    );
             }
-            //tell the user the game is waiting for others to reconnect
-            else {
-                for (GameServer server : servers) {
-                    server.send("Waiting for others to reconnect", playerNickname);
-                }
-            }
-
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
             if(this.numUsers == 0)
@@ -113,16 +117,16 @@ public class Controller {
 
             this.users.add(playerNickname);
 
-            // If enough player are connected
+            // If all players are connected
             if(this.users.size() == this.numUsers) {
                 try {
                     this.game = new Game(this.users);
-                    System.out.println("New game started with players: " + this.game.getNicknames());
                     this.lobbyState = LobbyState.STARTED;
-                    // TODO: send the users the game state
-                    for (GameServer server : servers) {
-                        server.sendBroadcast(this.game.toString());
-                    }
+                    for (Player player : game.getPlayers())
+                        server.send(
+                            new Message("gameResumed", getGameCreated(player)),
+                            player.getNickname()
+                        );
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -139,16 +143,69 @@ public class Controller {
 
             try {
                 this.game.reconnect(playerNickname);
-                // TODO: send the user the game state
-                for (GameServer server : servers) {
-                    server.send(this.game.toString(), playerNickname);
-                }
-                // If the game was stopped and now resumed after this connection, send it broadcast
-                for (GameServer server : servers) {
-                    server.sendBroadcast("Game resumed");
-                }
+
+                Player player = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(playerNickname))
+                        .findFirst().get();
+                server.send(new Message("gameResumed", getGameResumed(player)), playerNickname);
+                server.sendBroadcast(new Message("gameResumed", Map.of("nickname", playerNickname)));
             } catch (NoSuchPlayerException ignored) {}
         }
+    }
+
+    Map<String, Object> getGameResumed(Player player) {
+        Map<String, Object> gameResumed = new HashMap<>();
+        gameResumed.put("resourceDeck", game.getResourceDeck());
+        gameResumed.put("goldDeck", game.getGoldDeck());
+        gameResumed.put("state", game.getGameState());
+        gameResumed.put("current", game.getTurn());
+
+        gameResumed.put("turn", game.getPlayers().indexOf(player));
+        gameResumed.put("color", player.getColor());
+        gameResumed.put("hand", player.getHand());
+        gameResumed.put("playArea", player.getPlayArea());
+        gameResumed.put("points", player.getPoints());
+
+        Map<String, Object> players = new HashMap<>();
+        for (Player p : game.getPlayers()) {
+            if (p.equals(player))
+                continue;
+
+            players.put(
+                p.getNickname(),
+                Map.of(
+                    "turn", game.getPlayers().indexOf(p),
+                    "color", p.getColor(),
+                    "hand", p.getBlurredHand(),
+                    "playArea", p.getPlayArea(),
+                    "points", p.getPoints()
+                )
+            );
+        }
+
+        gameResumed.put("players", players);
+        return gameResumed;
+    }
+
+    Map<String, Object> getGameCreated(Player player) {
+        Map<String, Object> gameCreated = new HashMap<>();
+        gameCreated.put("resourceDeck", game.getResourceDeck());
+        gameCreated.put("goldDeck", game.getGoldDeck());
+
+        Map<String, Object> players = new HashMap<>();
+        for (Player p : game.getPlayers()) {
+            players.put(
+                p.getNickname(),
+                Map.of(
+                    "turn", game.getPlayers().indexOf(p),
+                    "color", p.getColor(),
+                    "starterCard", p.getStarterCard()
+                )
+            );
+        }
+
+        gameCreated.put("players", players);
+        return gameCreated;
     }
 
     /**
@@ -192,22 +249,42 @@ public class Controller {
             game.placeStarterSide(playerNickname, toPlay.getFrontSide());
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
+
+        if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
+            Map<String, Object> players = new HashMap<>();
+            for (Player player : game.getPlayers()) {
+                players.put(player.getNickname(), Map.of("hand", player.getBlurredHand()));
+                server.send(new Message("handsAndObjectivesDealt", Map.of(
+                        "hand", player.getHand(),
+                        "objectives", player.getObjectivesHand()
+                )), player.getNickname());
+            }
+            server.sendBroadcast(new Message("handsAndObjectivesDealt", Map.of(
+                "resourceDeck", game.getResourceDeck(),
+                "goldDeck", game.getGoldDeck(),
+                "objectives", game.getSharedObjectives(),
+                "players", players
+            )));
+        }
     }
 
     /**
      * Allows a player to choose its objective card
      * @param playerNickname player nickname
-     * @param objective objective chosen
+     * @param objectiveId objective chosen
      * @throws NoSuchPlayerException propagated
      * @throws MoveNotAllowedException propagated
      * @throws ObjectiveNotAllowedException propagated
      */
-    public synchronized void chooseObjective(String playerNickname, Objective objective) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
+    public synchronized void chooseObjective(String playerNickname, String objectiveId) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
-
+        Objective objective = Objective.valueOf(objectiveId);
         game.chooseObjective(playerNickname, objective);
+
+        if (game.getGameState().equals(GameState.GAME))
+            server.sendBroadcast(new Message("gameStarted", Map.of()));
     }
 
     /**
@@ -290,8 +367,6 @@ public class Controller {
             System.out.println("Starting a new game");
             controller = new Controller();
         }
-
-        // Start threads for Socket and RMI servers, pass the controller.
     }
 
 
@@ -335,22 +410,15 @@ public class Controller {
         GameState stateBeforeDisconnection = game.getGameState();
         game.disconnect(nickname);
         GameState stateAfterDisconnection = game.getGameState();
+        server.sendBroadcast(new Message("quitGame", Map.of("nickname", nickname)));
 
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
-            // TODO tell all players the game was stopped
-            for (GameServer server : servers) {
-                server.sendBroadcast("Game stopped");
-            }
-            // Send the new game state
-            // They may be able to tell given the new game state
+            server.sendBroadcast(new Message("gamePaused", null));
         }
     }
-    private void setServers(){
-        SocketServer socketServer = new SocketServer(this);
-        this.servers.add(socketServer);
-        for(GameServer server: servers) {
-            new Thread(server::start).start();
-        }
+
+    public synchronized List<String> getUsers() {
+        return new LinkedList<>(users);
     }
 }

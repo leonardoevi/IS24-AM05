@@ -1,15 +1,6 @@
 package it.polimi.is24am05.controller.socketServer;
 
-import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
-import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
-import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
-import it.polimi.is24am05.controller.exceptions.KoException;
-import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
-import it.polimi.is24am05.model.objective.Objective;
-
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -17,7 +8,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static it.polimi.is24am05.controller.socketServer.MessageDecoder.*;
+import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
+import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.deck.Deck;
+import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 
 /**
  * Handles the connection with one client via the socket it is provided
@@ -42,18 +36,19 @@ public class SocketClientHandler implements Runnable {
     /**
      * Input channels
       */
-    private Scanner in;
+    private ObjectInputStream in;
 
     /**
      * Output channel
      */
-    private PrintWriter out;
+    private ObjectOutputStream out;
 
     /**
-     * Used to check if connection is still up
+     * Used to check if connection to client is still up
      */
     private volatile String lastKeepAliveSent = "empty", lastKeepAliveReceived = "empty";
     private final ScheduledExecutorService connectionCheckerDemon = Executors.newSingleThreadScheduledExecutor();
+
     /**
      * Seconds to wait before checking again if client is still connected
      */
@@ -69,7 +64,7 @@ public class SocketClientHandler implements Runnable {
      * avoiding busy waiting inside loops
      */
     private final Object uselessLock_1 = new Object(), uselessLock_2 = new Object();
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(4);
+    private final ExecutorService messageExecutor = Executors.newFixedThreadPool(4);
 
     /**
      * Constructor
@@ -90,24 +85,24 @@ public class SocketClientHandler implements Runnable {
     public void run() {
         try {
             // Initialize input and output channels
-            this.in = new Scanner(socket.getInputStream());
-            this.out = new PrintWriter(socket.getOutputStream(), true );
+            this.in = new ObjectInputStream(socket.getInputStream());
+            this.out = new ObjectOutputStream(socket.getOutputStream());
 
-            // Start a demon thread to check connection status with clients each 5 seconds
+            // Start a demon thread to check connection status with clients every checkingInterval seconds
             this.connectionCheckerDemon
                     .scheduleAtFixedRate(new ConnectionChecker(this, checkingInterval/2), 0, checkingInterval, TimeUnit.SECONDS);
             // Creating pool thread to handle input
 
             // Handle communication with client while they are connected
             while (clientConnected) {
-                // Read next line
-                String line;
+                // Read next object
+                Message message;
                 // If there is something in the buffer
                 if(socket.getInputStream().available() > 0){
                     // Acquire the message
-                    line = in.nextLine();
+                    message = (Message) in.readObject();
                 } else {
-                    line = null;
+                    message = null;
                     // Wait some time and go back to checking the buffer
                     try {   synchronized (uselessLock_1) {  uselessLock_1.wait(100); }
                         continue;
@@ -121,16 +116,15 @@ public class SocketClientHandler implements Runnable {
 
                 // Handle the request
                 // Check if the client wants to close the connection
-                if (line.equals("quit")) {
+                if (message.title().equals("quitServer")) {
                     break;
-                } else if (line.startsWith("pong,")) {
+                } else if (message.title().equals("pong")) {
                     // Filter heartbeat messages
-                    lastKeepAliveReceived = line.substring(5);
+                    lastKeepAliveReceived = (String) message.arguments().get("id");
                 } else {
-                    // TODO: Change this line
-
-                    this.threadPool.submit(new Thread(()->{handleClientInput(line);}));
-                    //handleClientInputDebug(line);
+                    this.messageExecutor.submit(new Thread(()->{
+                        handleClientInput(message);
+                    }));
                 }
             }
             // Call disconnection routine
@@ -138,74 +132,148 @@ public class SocketClientHandler implements Runnable {
         } catch (final IOException e) {
             System.out.println("Exited Loop Via Exception");
             System.err.println(e.getMessage());
+        } catch (ClassNotFoundException ignored) {
+            // Should not happen
         }
     }
 
     /**
      * Handles the input from the Client
      * If a client is logging in, its nickname is stored
-     * @param inputLine client Input
+     * @param message client Input
      */
-    private synchronized void handleClientInput(String inputLine) {
-        // TODO: fill this function according to the protocol
-
+    private synchronized void handleClientInput(Message message) {
         // If the client is not logged in
-        if(!isLoggedIn()){
-            handleLogin(inputLine);
+        if(!isLoggedIn()) {
+            handleLogin(message);
             return;
         }
 
         // If the message comes from a client that is logged in
-        List<Object> message;
         try {
-            message = decode(inputLine);
-        } catch (KoException e) {
-            send(e.getMessage());
-            return;
-        }
-
-        try {
-            switch ((String) message.getFirst()) {
-                case PLAY_STARTER_CARD:
-                    this.parent.controller.playStarterCard(this.getClientNickname(), (Boolean) message.get(1));
+            switch (message.title()) {
+                case "joinGame":
+                    parent.controller.newConnection((String) message.arguments().get("nickname"));
+                    send(new Message("ok", Map.of("nicknames", parent.controller.getUsers())));
+                    parent.server.sendBroadcast(
+                        new Message("joinGame", Map.of("nickname", clientNickname)),
+                        String.valueOf(clientNickname)
+                    );
                     break;
 
-                case CHOOSE_OBJECTIVE:
-                    this.parent.controller.chooseObjective(this.getClientNickname(), (Objective) message.get(1));
+                case "setNumberOfPlayers":
+                    parent.controller.newConnection(
+                        String.valueOf(clientNickname),
+                        (int) message.arguments().get("numberOfPlayers")
+                    );
+                    send(new Message("ok", Map.of()));
                     break;
 
-                case PLACE_CARD:
-                    this.parent.controller.placeSide(this.getClientNickname(), (Card) message.get(1), (Boolean) message.get(2), (Integer) message.get(3), (Integer) message.get(4));
+                case "placeStarterSide":
+                    parent.controller.playStarterCard(
+                        String.valueOf(clientNickname),
+                        (Boolean) message.arguments().get("isFront")
+                    );
+                    send(new Message("ok", Map.of(
+                        "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname))
+                    )));
+                    parent.server.sendBroadcast(
+                        new Message("placeStarterSide",
+                            Map.of(
+                                "nickname", String.valueOf(clientNickname),
+                                "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname))
+                            )
+                        ),
+                        String.valueOf(clientNickname)
+                    );
                     break;
 
-                case DRAW_DECK:
-                    this.parent.controller.drawDeck(this.getClientNickname(), (Boolean) message.get(1));
+                case "chooseObjectives":
+                    parent.controller.chooseObjective(
+                        String.valueOf(clientNickname),
+                        (String) message.arguments().get("objectiveId")
+                    );
+                    send(new Message("ok", Map.of()));
                     break;
 
-                case DRAW_VISIBLE:
-                    this.parent.controller.drawVisible(this.getClientNickname(), (Card) message.get(1));
+                case "placeSide":
+                    parent.controller.placeSide(
+                        String.valueOf(clientNickname),
+                        (Card) message.arguments().get("card"),
+                        (Boolean) message.arguments().get("isFront"),
+                        (int) message.arguments().get("i"),
+                        (int) message.arguments().get("j")
+                    );
+                    send(new Message("ok", Map.of(
+                        "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname)),
+                        "points", parent.controller.game.getPoints(String.valueOf(clientNickname))
+                    )));
+                    parent.server.sendBroadcast(
+                        new Message("placeStarterSide", Map.of(
+                            "nickname", String.valueOf(clientNickname),
+                            "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname)),
+                            "points", parent.controller.game.getPoints(String.valueOf(clientNickname))
+                        )),
+                        String.valueOf(clientNickname)
+                    );
+                    break;
+
+                case "drawVisibleCard":
+                    Card card = (Card) message.arguments().get("card"));
+                    parent.controller.drawVisible(
+                        String.valueOf(clientNickname),
+                        card
+                    );
+                    boolean isGold = card.getId() > 40;
+                    Deck deck = isGold ? parent.controller.game.getGoldDeck()
+                        : parent.controller.game.getResourceDeck();
+                    send(new Message("ok", Map.of(
+                        "deck", deck,
+                        "hand", parent.controller.game.getHand(String.valueOf(clientNickname))
+                    )));
+                    parent.server.sendBroadcast(
+                        new Message("drawVisibleCard", Map.of(
+                            "nickname", String.valueOf(clientNickname),
+                            "isGold", isGold,
+                            "deck", deck,
+                            "hand", parent.controller.game.getBlurredHand(String.valueOf(clientNickname))
+                        )),
+                        String.valueOf(clientNickname)
+                    );
+                    break;
+
+                case "drawDeck":
+                    boolean isGold2 = (boolean) message.arguments().get("isGold");
+                    parent.controller.drawDeck(
+                            String.valueOf(clientNickname),
+
+                    );
+                    Deck deck2 = isGold2 ? parent.controller.game.getGoldDeck()
+                        : parent.controller.game.getResourceDeck();
+                    send(new Message("ok", Map.of(
+                        "deck", deck2,
+                        "hand", parent.controller.game.getHand(String.valueOf(clientNickname))
+                    )));
+                    parent.server.sendBroadcast(
+                        new Message("drawVisibleCard", Map.of(
+                            "nickname", String.valueOf(clientNickname),
+                            "isGold", isGold2,
+                            "deck", deck2,
+                            "hand", parent.controller.game.getBlurredHand(String.valueOf(clientNickname))
+                        )),
+                        String.valueOf(clientNickname)
+                    );
+                    break;
             }
+        } catch (FirstConnectionException e) {
+            send(new Message("ok", Map.of(
+                "nicknames", List.of()
+            )));
         } catch (Exception e) {
-            send("ko," + e.getMessage());
-            return;
+            send(new Message("ko", Map.of(
+                "reason", e.toString()
+            )));
         }
-
-        send("ok");
-        if(this.parent.controller.game != null){
-            parent.sendBroadcast(this.parent.controller.game.toString());
-        }
-
-    }
-
-    // Used to make the server a chatServer
-    private void handleClientInputDebug(String inputLine){
-        // If the client is not logged in
-        if(clientNickname.isEmpty()){
-            handleLogin(inputLine);
-            return;
-        }
-
-        parent.sendBroadcast(getClientNickname() + " said: " + inputLine);
     }
 
     /**
@@ -213,37 +281,27 @@ public class SocketClientHandler implements Runnable {
      * It checks whether the message is a login formatted message, according to the protocol.
      * Tries to log the player in (meaning it can join a game), and stores its name.
      * If it fails, it lets the client know why.
-     * @param inputLine message received
+     * @param message message received
      */
-    private void handleLogin(String inputLine) {
-        // Initialize input string parser
-        Scanner scanner = new Scanner(inputLine);
-        scanner.useDelimiter(",");
-
+    private void handleLogin(Message message) {
         try {
-            if(scanner.next().equals("nc")){
-                String nickname = scanner.next();
-
-                if(scanner.hasNext())
-                    this.parent.controller.newConnection(nickname, scanner.nextInt());
-                else
-                    this.parent.controller.newConnection(nickname);
-
+            if(message.title().equals("joinServer")){
+                String nickname = (String) message.arguments().get("nickname");
                 // Set specified nickname
+                if (parent.server.getJoinedClients().contains(nickname))
+                    throw new Exception("Nickname already in use");
                 this.clientNickname = Optional.of(nickname);
                 // Subscribe to broadcast list
-                parent.addClient(this);
-                //Sending again to last one to connect
-                parent.send(parent.controller.game.toString(),getClientNickname());
+                parent.subscribe(this);
                 // Send confirmation to client
-                send("ok," + "Hi " + getClientNickname() + "!");
-            } else {throw new NoSuchElementException();}
-        } catch (NoSuchElementException e) {
-            // In case the message is not a login message
-            send("ko," + "Identify yourself");
-        } catch (ConnectionRefusedException | FirstConnectionException | InvalidNumUsersException e) {
-            // In case something went wrong with the login
-            send(e.getMessage());
+                send(new Message("ok", Map.of(
+                    "nicknames", parent.server.getJoinedClients()
+                )));
+            } else throw new Exception("Identify yourself");
+        } catch (Exception e) {
+            send(new Message("ko", Map.of(
+                    "reason", e.toString()
+            )));
         }
     }
 
@@ -251,27 +309,32 @@ public class SocketClientHandler implements Runnable {
      * Send a message to the correspondent client
      * @param message message to send in a string format
      */
-    public synchronized void send(String message){
-        out.println(message);
+    public synchronized void send(Message message) {
+        try {
+            out.writeObject(message);
+            out.flush();
+        } catch (IOException ignored) {}
     }
 
     /**
      * Routine to call when the client disconnects
      */
-    private void clientDisconnected(){
+    private void clientDisconnected() {
         if(isLoggedIn()) {
             try {
                 // Unsubscribing from broadcast list
-                parent.removeClient(this);
+                parent.unsubscribe(this);
                 // Set disconnected status in game
                 parent.controller.disconnect(this.getClientNickname());
             } catch (NoSuchPlayerException ignored) {}
         }
 
         // Deallocate resources
-        in.close();
-        out.close();
-        this.threadPool.shutdown();
+        try {
+            in.close();
+            out.close();
+        } catch (IOException ignored) {}
+        this.messageExecutor.shutdown();
         try {
             socket.close();
         } catch (IOException ignored) {}
@@ -318,7 +381,7 @@ public class SocketClientHandler implements Runnable {
             // Set the string as the last sent
             lastKeepAliveSent = randomString;
             // Send the string
-            client.send("ping," + randomString);
+            client.send(new Message("ping", Map.of("id", randomString)));
 
             // Wait some time
             try {

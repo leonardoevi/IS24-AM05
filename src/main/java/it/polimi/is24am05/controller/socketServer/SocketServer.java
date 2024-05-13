@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,12 +17,13 @@ import java.util.concurrent.Executors;
  */
 public class SocketServer implements GameServer {
     protected final Controller controller;
+    protected final Server server;
 
-    // Observer pattern?
     private final List<SocketClientHandler> clients = new ArrayList<>();
 
-    public SocketServer(Controller controller) {
+    public SocketServer(Controller controller, Server server) {
         this.controller = controller;
+        this.server = server;
     }
 
     public void start() {
@@ -33,7 +35,7 @@ public class SocketServer implements GameServer {
         // Create the server socket to accept clients connections
         try {
             serverSocket = new ServerSocket(6969); // 0 means it looks for any open ports
-        } catch (final IOException e) {
+        } catch (IOException e) {
             System.err.println(e.getMessage());
             return;
         }
@@ -57,122 +59,48 @@ public class SocketServer implements GameServer {
         threadPool.shutdown();
     }
 
-    /**
-     * Removes a Client from the broadcast list
-     * @param toRemove client Handler handler to remove
-     */
-    public void removeClient(SocketClientHandler toRemove){
+    public void subscribe(SocketClientHandler handler) {
         synchronized (clients) {
-            clients.remove(toRemove);
+            clients.add(handler);
         }
-
-        System.out.println("Client disconnected: " + toRemove.getClientNickname());
     }
 
-    /**
-     * Adds a Client to the broadcast list
-     * @param toAdd client Handler to add
-     */
-    public void addClient(SocketClientHandler toAdd){
+    public void unsubscribe(SocketClientHandler handler) {
         synchronized (clients) {
-            clients.add(toAdd);
-        }
-        System.out.println("Client connected: " + toAdd.getClientNickname());
-    }
-
-    /**
-     * Used to send a message to all connected clients
-     * @param message to send
-     */
-    public void sendBroadcast(String message){
-        // Create a copy of the socket list
-        List<SocketClientHandler> clientsListCopy;
-        synchronized (this.clients) {
-            clientsListCopy = new ArrayList<>(this.clients);
-        }
-
-        for (SocketClientHandler client : clientsListCopy) {
-            client.send(message);
-        }
-    }
-    /**
-     * Used to send a message to all connected clients except player
-     * @param message to send
-     * @param player player who won't receive the message
-     */
-    public void sendBroadcast(String message, String player){
-        // Create a copy of the socket list
-        List<SocketClientHandler> clientsListCopy;
-        synchronized (this.clients) {
-            clientsListCopy = new ArrayList<>(this.clients);
-        }
-
-        for (SocketClientHandler client : clientsListCopy) {
-            if(!(client.getClientNickname().equals(player))) {
-                client.send(message);
-            }
+            clients.remove(handler);
         }
     }
 
-    /**
-     * Used to send a message to all connected clients except for one
-     * @param message to send
-     * @param toAvoid client not to send the message to
-     */
-    public void sendBroadcast(String message, SocketClientHandler toAvoid){
-        // Create a copy of the socket list
-        List<SocketClientHandler> clientsListCopy;
-        synchronized (this.clients) {
-            clientsListCopy = new ArrayList<>(this.clients);
-        }
+    @Override
+    public void sendBroadcast(Message message) {
+        for (String player : controller.getUsers())
+            send(message, player);
+    }
 
-        clientsListCopy.remove(toAvoid);
-
-        for (SocketClientHandler client : clientsListCopy) {
-            client.send(message);
+    @Override
+    public void sendBroadcast(Message message, String player) {
+        for (String user : controller.getUsers()) {
+            if (user.equals(player)) continue;
+            send(message, user);
         }
     }
-    /**
-     * Used to send a message to player
-     * @param message to send
-     * @param player player who will receive the message
-     */
-    public void send(String message, String player){
-        // Create a copy of the socket list
-        List<SocketClientHandler> clientsListCopy;
-        synchronized (this.clients) {
-            clientsListCopy = new ArrayList<>(this.clients);
-        }
 
-        for (SocketClientHandler client : clientsListCopy) {
-            if(client.getClientNickname().equals(player)) {
-                client.send(message);
-            }
+    @Override
+    public void send(Message message, String player) {
+        List<SocketClientHandler> copy;
+        synchronized (clients) {
+            copy = new LinkedList<>(clients);
+        }
+        for (SocketClientHandler handler : copy) {
+            if (handler.getClientNickname().equals(player))
+                handler.send(message);
         }
     }
-    /*
-    private class ConnectionsChecker implements Runnable {
-        private final SocketServer parent;
 
-        private ConnectionsChecker(SocketServer parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        public void run() {
-            System.out.println("Checking connections routine...");
-            List<SocketServerClientHandler> clientsListCopy;
-            synchronized (parent.clients) {
-                clientsListCopy = new ArrayList<>(parent.clients);
-            }
-
-            for (SocketServerClientHandler client : clientsListCopy) {
-                if(!client.isConnected()){
-                    System.out.println("Connection checker noticed that " +client.getClientNickname()+ " is not connected");
-                    parent.removeClient(client);
-                }
-            }
+    @Override
+    public List<String> getJoinedClients() {
+        synchronized (clients) {
+            return clients.stream().map(SocketClientHandler::getClientNickname).toList();
         }
     }
-     */
 }

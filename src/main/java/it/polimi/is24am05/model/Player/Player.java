@@ -4,6 +4,7 @@ import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
+import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
@@ -298,4 +299,10 @@ public class Player implements Serializable {
         }
     }
 
+    public List<Resource> getBlurredHand() {
+        List<Resource> blurredHand = new ArrayList<>();
+        for (Card card : hand)
+            blurredHand.add(card.getBackSide().getSeed());
+        return blurredHand;
+    }
 }

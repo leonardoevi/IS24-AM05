@@ -8,6 +8,7 @@ import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.Color;
+import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
@@ -22,6 +23,7 @@ import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.objective.Objective;
 import it.polimi.is24am05.model.playArea.AreaDisplayer;
+import it.polimi.is24am05.model.playArea.PlayArea;
 
 import java.io.Serializable;
 import java.util.*;
@@ -669,5 +671,25 @@ public class Game implements Serializable {
     public Card getStarterCard(String playerNickname) throws NoSuchPlayerException {
         Player player = findPlayer(playerNickname);
         return player.getStarterCard();
+    }
+
+    public PlayArea getPlayArea(String nickname) throws NoSuchPlayerException {
+        Player player = findPlayer(nickname);
+        return player.getPlayArea();
+    }
+
+    public int getPoints(String nickname) throws NoSuchPlayerException {
+        Player player = findPlayer(nickname);
+        return player.getPoints();
+    }
+
+    public List<Card> getHand(String nickname) throws NoSuchPlayerException {
+        Player player = findPlayer(nickname);
+        return player.getHand();
+    }
+
+    public List<Resource> getBlurredHand(String nickname) throws NoSuchPlayerException {
+        Player player = findPlayer(nickname);
+        return player.getBlurredHand();
     }
 }
