@@ -25,10 +25,7 @@ import it.polimi.is24am05.model.objective.Objective;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static it.polimi.is24am05.model.game.Game.MAX_PLAYERS;
 import static it.polimi.is24am05.model.game.Game.MIN_PLAYERS;
@@ -267,13 +264,13 @@ public class Controller {
                 players.put(player.getNickname(), Map.of("hand", player.getBlurredHand()));
                 server.send(new Message("handsAndObjectivesDealt", Map.of(
                         "hand", player.getHand(),
-                        "objectives", player.getObjectivesHand()
+                        "objectives", Arrays.stream(player.getObjectivesHand()).map(Enum::toString).toArray()
                 )), player.getNickname());
             }
             server.sendBroadcast(new Message("handsAndObjectivesDealt", Map.of(
                 "resourceDeck", game.getResourceDeck(),
                 "goldDeck", game.getGoldDeck(),
-                "objectives", game.getSharedObjectives(),
+                "objectives", Arrays.stream(game.getSharedObjectives()).map(Enum::toString).toArray(),
                 "players", players
             )));
         }
