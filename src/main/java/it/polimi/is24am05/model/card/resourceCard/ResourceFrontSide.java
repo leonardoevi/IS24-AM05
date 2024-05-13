@@ -388,7 +388,7 @@ public enum ResourceFrontSide implements Side {
         return this.points;
     }
 
-    @Override
+
 
     public  String[][] toMatrix()
     {
@@ -400,7 +400,7 @@ public enum ResourceFrontSide implements Side {
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        for(String[] row : this.toMatrix()){
+        for(String[] row :this.toMatrix()){
             for (String s : row){
                 sb.append(s);
             }

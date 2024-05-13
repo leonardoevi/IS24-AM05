@@ -62,12 +62,13 @@ public enum Objective {
     }
     public String[][] toMatrix()
     {
-        return ObjectiveDisplayer.layoutObjectiveToString(this);
+        return ObjectiveDisplayer.layoutObjectiveToString(Objective.this);
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        for(String[] row : this.toMatrix()){
+        for(String[] row : toMatrix()){
             for (String s : row){
                 sb.append(s);
             }

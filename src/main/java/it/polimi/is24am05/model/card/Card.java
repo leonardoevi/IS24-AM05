@@ -24,7 +24,8 @@ public interface Card {
         return Integer.valueOf(this.toString().substring(4,6));
     }
 
-    public String[] [] toMatrix();
+   public String[] [] toMatrix();
+
     public String toString();
 
 

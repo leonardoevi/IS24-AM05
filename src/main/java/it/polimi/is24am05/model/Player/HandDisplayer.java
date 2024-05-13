@@ -1,7 +1,5 @@
 package it.polimi.is24am05.model.Player;
 
-// This code will probably be removed from the model and used in the view
-
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
 import it.polimi.is24am05.model.card.goldCard.GoldFrontSide;
@@ -72,10 +70,10 @@ public class HandDisplayer {
         List<String[][]> handMatrix = new ArrayList<>();
 
         String[][] spacer =    {{"       "},
-                                {"       "},
-                                {"   ·   "},
-                                {"       "},
-                                {"       "}};
+                {"       "},
+                {"   ·   "},
+                {"       "},
+                {"       "}};
 
         for(Card c : cards) {
             handMatrix.add(CardToMatrix(c));
@@ -126,8 +124,8 @@ public class HandDisplayer {
     public static String[][] sideToSide(List<String[][]> matrices){
         int rows = matrices.getFirst().length;
         int columns = matrices.stream()
-                    .mapToInt(x -> x[0].length)
-                    .sum();
+                .mapToInt(x -> x[0].length)
+                .sum();
 
         String[][] result = new String[rows][columns];
 

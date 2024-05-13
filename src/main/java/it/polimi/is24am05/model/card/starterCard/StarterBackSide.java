@@ -109,10 +109,12 @@ public enum StarterBackSide implements Side {
     public Resource getSeed() {
         return null;
     }
+
     public  String[][] toMatrix()
     {
         return SideDisplayer.sideToString(this);
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();

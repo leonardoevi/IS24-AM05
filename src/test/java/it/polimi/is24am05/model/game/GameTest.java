@@ -391,7 +391,7 @@ class GameTest {
 
             // Current player State should be PLACE
             assertEquals(PlayerState.PLACE, current.getState());
-           printGameState(game);
+          // printGameState(game);
 
         }
 
@@ -414,8 +414,16 @@ class GameTest {
         System.out.println();
 
         // Print statistics
+        for(Player p : game.getPlayers()) {
+            System.out.println("Player: " + p.getNickname());
+            System.out.println("Points: " + p.getPoints());
 
+            System.out.println("Play area: ");
+            System.out.println(p.getPlayArea());
 
+            System.out.println("hand: ");
+            System.out.println(p.handToString());
+        }
 
 
 
@@ -683,26 +691,29 @@ class GameTest {
 
             System.out.println("Play area: ");
             System.out.println(p.getPlayArea());
-  /*
+
+
             if(p.getState() == PlayerState.PLACE_STARTER_CARD) {
                 System.out.println("Hand: ");
-               // System.out.println(handToString(List.of(p.getStarterCard())));
+                System.out.println(handToString(List.of(p.getStarterCard())));
                 // System.out.println(p.starterCardToString());
             }
 
             if(p.getHand() != null && !p.getHand().isEmpty()) {
                 System.out.println("Hand: ");
-              //  System.out.println(handToString(p.getHand()));
+               System.out.println(handToString(p.getHand()));
               //  System.out.println(p.handToString());
             }
-     */
+
 
         }
 
-
+  /*
 
         System.out.println("Decks: ");
         System.out.println(deckToString(game.getResourceDeck(), false, game.getGoldDeck(), true));
+
+   */
 
 
     }

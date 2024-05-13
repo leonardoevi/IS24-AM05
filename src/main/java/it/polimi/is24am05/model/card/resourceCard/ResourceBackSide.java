@@ -108,10 +108,12 @@ public enum ResourceBackSide implements Side {
             return  Resource.ANIMAL;
         return Resource.INSECT;
     }
+
     public  String[][] toMatrix()
     {
         return SideDisplayer.sideToString(this);
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();

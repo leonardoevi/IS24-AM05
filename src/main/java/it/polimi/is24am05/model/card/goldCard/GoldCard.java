@@ -89,10 +89,12 @@ public enum GoldCard implements Card {
         return backSide;
     }
 
+
     public String[][] toMatrix()
     {
         return HandDisplayer.CardToMatrix(this);
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();

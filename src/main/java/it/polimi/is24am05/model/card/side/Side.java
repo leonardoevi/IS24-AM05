@@ -68,9 +68,9 @@ public interface Side {
         return 0;
     }
 
-    public  String[][] toMatrix();
+     public String[][] toMatrix();
 
 
-    @Override
-    public String  toString();
+
+    public String toString();
 }

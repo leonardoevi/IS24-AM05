@@ -109,7 +109,7 @@ public class Deck implements Serializable {
             return this.deck.getFirst().getBackSide().getCorner(Corner.CE).getFirst();
         } catch (InvalidCornerException ignored) { return null; }
     }
-    public String[][] toMatrix()
+    /* public String[][] toMatrix()
     {
         boolean isGold;
         if(this.getVisible().stream().findFirst().get() instanceof GoldCard)
@@ -118,6 +118,7 @@ public class Deck implements Serializable {
             isGold=false;
         return DeckDisplayer.deckToMatrix(this, isGold);
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
@@ -129,5 +130,7 @@ public class Deck implements Serializable {
         }
         return sb.toString();
     }
+
+     */
     }
 

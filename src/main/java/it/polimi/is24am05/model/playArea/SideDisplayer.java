@@ -38,9 +38,9 @@ public class SideDisplayer {
      * Character used to draw the card
      */
     public static final String MISSING_CORNER = "x", EMPTY_CORNER = "▫",
-    HORIZONTAL_DASH = "-", HORIZONTAL_FULL = "—", HORIZONTAL_DOTTED = "·",
-    VERTICAL_DASH = "|", VERTICAL_DOTTED = ":",
-    EMPTY_CENTER = "⊙";
+            HORIZONTAL_DASH = "-", HORIZONTAL_FULL = "—", HORIZONTAL_DOTTED = "·",
+            VERTICAL_DASH = "|", VERTICAL_DOTTED = ":",
+            EMPTY_CENTER = "⊙";
 
 
 

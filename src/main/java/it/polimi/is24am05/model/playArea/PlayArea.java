@@ -406,6 +406,7 @@ public class PlayArea implements Serializable {
         AreaDisplayer areaDisplayer=new AreaDisplayer(this);
         return areaDisplayer.areaToMatrix();
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
