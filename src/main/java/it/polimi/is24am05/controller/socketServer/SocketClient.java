@@ -1,9 +1,10 @@
 package it.polimi.is24am05.controller.socketServer;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class SocketClient {
@@ -13,7 +14,7 @@ public class SocketClient {
     private final int port;
 
     //Out
-    private PrintWriter socketOut;
+    private ObjectOutputStream socketOut;
 
     /**
      * Constructor
@@ -26,7 +27,6 @@ public class SocketClient {
     }
 
     public static void main(String[] args) {
-        //final SocketClient client = new SocketClient("192.168.1.5", 6969);
         final SocketClient client = new SocketClient("localhost", 6969);
         try {
             client.startClient();
@@ -41,7 +41,7 @@ public class SocketClient {
         System.out.println("Connection to server established");
 
         // Create i/o to server
-        this.socketOut = new PrintWriter(socket.getOutputStream(), true);
+        this.socketOut = new ObjectOutputStream(socket.getOutputStream());
         final Scanner stdin = new Scanner(System.in);
 
         // Start process to read input from server asynchronously
@@ -50,15 +50,12 @@ public class SocketClient {
         try {
             // Read stdin
             while (true) {
-                final String inputLine = stdin.nextLine();
-                if (inputLine.equals("quit")) {
-                    send(inputLine);
+                final String message = stdin.nextLine();
+                send(new Message(message, null));
+                if (message.equals("quitServer"))
                     break;
-                }
-
-                send(inputLine);
             }
-        } catch (final NoSuchElementException e) {
+        } catch (Exception e) {
             System.out.println("Connection closed");
         } finally {
             stdin.close();
@@ -67,14 +64,16 @@ public class SocketClient {
         }
     }
 
-    public synchronized void send(String line){
-        socketOut.println(line);
+    public synchronized void send(Message message){
+        try {
+            socketOut.writeObject(message);
+        } catch (Exception ignored) {}
     }
 
     /**
      * Runnable used to read messages from the Client's Socket input channel asynchronously
      */
-    public class ClientInReader implements Runnable {
+    public static class ClientInReader implements Runnable {
         /**
          * Socket to read input from
          */
@@ -89,26 +88,21 @@ public class SocketClient {
 
         @Override
         public void run() {
-            final Scanner socketIn;
+            final ObjectInputStream socketIn;
             try {
-                socketIn = new Scanner(socket.getInputStream());
+                socketIn = new ObjectInputStream(socket.getInputStream());
                 while (true) {
-                    handleServerInput(socketIn.nextLine());
+                    handleServerInput((Message) socketIn.readObject());
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchElementException | IllegalStateException ignored) {
-            }
+            } catch (Exception ignored) {}
         }
 
-        private void handleServerInput(String inputLine) {
-            // TODO: fill this function according to the protocol
-            if (inputLine.startsWith("ping,")) {
-                String code = inputLine.substring(5);
-                socketClient.send("pong," + code);
-            } else {
-                System.out.println(inputLine);
-            }
+        private void handleServerInput(Message message) {
+            if (message.title().equals("ping"))
+                socketClient.send(new Message("pong", Map.of(
+                    "id", message.arguments().get("id")
+                )));
+            else System.out.println(message.title() + message.arguments());
         }
     }
 }

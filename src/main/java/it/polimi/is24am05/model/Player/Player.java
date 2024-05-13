@@ -299,10 +299,11 @@ public class Player implements Serializable {
         }
     }
 
+    /**
+     * Gets the blurred hand of this player, i.e. the resources on the backsides.
+     * @return the blurred hand of this player, i.e. the resources on the backsides.
+     */
     public List<Resource> getBlurredHand() {
-        List<Resource> blurredHand = new ArrayList<>();
-        for (Card card : hand)
-            blurredHand.add(card.getBackSide().getSeed());
-        return blurredHand;
+        return hand.stream().map(Card::getBackSide).map(Side::getSeed).toList();
     }
 }

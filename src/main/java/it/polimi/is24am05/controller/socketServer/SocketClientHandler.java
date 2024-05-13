@@ -8,10 +8,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
+import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.deck.Deck;
+import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
+import it.polimi.is24am05.model.exceptions.deck.InvalidVisibleCardException;
+import it.polimi.is24am05.model.exceptions.game.MoveNotAllowedException;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
+import it.polimi.is24am05.model.exceptions.game.NotYourTurnException;
+import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
+import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
+import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
+import it.polimi.is24am05.model.exceptions.player.InvalidCardException;
+import it.polimi.is24am05.model.exceptions.player.InvalidSideException;
+import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
+import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 
 /**
  * Handles the connection with one client via the socket it is provided
@@ -34,12 +47,12 @@ public class SocketClientHandler implements Runnable {
     private final SocketServer parent;
 
     /**
-     * Input channels
+     * Input stream
       */
     private ObjectInputStream in;
 
     /**
-     * Output channel
+     * Output stream
      */
     private ObjectOutputStream out;
 
@@ -84,7 +97,7 @@ public class SocketClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            // Initialize input and output channels
+            // Initialize input and output streams
             this.in = new ObjectInputStream(socket.getInputStream());
             this.out = new ObjectOutputStream(socket.getOutputStream());
 
@@ -95,7 +108,7 @@ public class SocketClientHandler implements Runnable {
 
             // Handle communication with client while they are connected
             while (clientConnected) {
-                // Read next object
+                // Read next message
                 Message message;
                 // If there is something in the buffer
                 if(socket.getInputStream().available() > 0){
@@ -115,7 +128,7 @@ public class SocketClientHandler implements Runnable {
                 }
 
                 // Handle the request
-                // Check if the client wants to close the connection
+                // Check if the client wants to quit the server
                 if (message.title().equals("quitServer")) {
                     break;
                 } else if (message.title().equals("pong")) {
@@ -132,15 +145,13 @@ public class SocketClientHandler implements Runnable {
         } catch (final IOException e) {
             System.out.println("Exited Loop Via Exception");
             System.err.println(e.getMessage());
-        } catch (ClassNotFoundException ignored) {
-            // Should not happen
-        }
+        } catch (ClassNotFoundException ignored) {}
     }
 
     /**
      * Handles the input from the Client
      * If a client is logging in, its nickname is stored
-     * @param message client Input
+     * @param message client message
      */
     private synchronized void handleClientInput(Message message) {
         // If the client is not logged in
@@ -153,116 +164,25 @@ public class SocketClientHandler implements Runnable {
         try {
             switch (message.title()) {
                 case "joinGame":
-                    parent.controller.newConnection((String) message.arguments().get("nickname"));
-                    send(new Message("ok", Map.of("nicknames", parent.controller.getUsers())));
-                    parent.server.sendBroadcast(
-                        new Message("joinGame", Map.of("nickname", clientNickname)),
-                        String.valueOf(clientNickname)
-                    );
+                    joinGame(message.arguments());
                     break;
-
                 case "setNumberOfPlayers":
-                    parent.controller.newConnection(
-                        String.valueOf(clientNickname),
-                        (int) message.arguments().get("numberOfPlayers")
-                    );
-                    send(new Message("ok", Map.of()));
+                    setNumberOfPlayers(message.arguments());
                     break;
-
                 case "placeStarterSide":
-                    parent.controller.playStarterCard(
-                        String.valueOf(clientNickname),
-                        (Boolean) message.arguments().get("isFront")
-                    );
-                    send(new Message("ok", Map.of(
-                        "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname))
-                    )));
-                    parent.server.sendBroadcast(
-                        new Message("placeStarterSide",
-                            Map.of(
-                                "nickname", String.valueOf(clientNickname),
-                                "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname))
-                            )
-                        ),
-                        String.valueOf(clientNickname)
-                    );
+                    placeStarterSide(message.arguments());
                     break;
-
-                case "chooseObjectives":
-                    parent.controller.chooseObjective(
-                        String.valueOf(clientNickname),
-                        (String) message.arguments().get("objectiveId")
-                    );
-                    send(new Message("ok", Map.of()));
+                case "chooseObjective":
+                    chooseObjective(message.arguments());
                     break;
-
                 case "placeSide":
-                    parent.controller.placeSide(
-                        String.valueOf(clientNickname),
-                        (Card) message.arguments().get("card"),
-                        (Boolean) message.arguments().get("isFront"),
-                        (int) message.arguments().get("i"),
-                        (int) message.arguments().get("j")
-                    );
-                    send(new Message("ok", Map.of(
-                        "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname)),
-                        "points", parent.controller.game.getPoints(String.valueOf(clientNickname))
-                    )));
-                    parent.server.sendBroadcast(
-                        new Message("placeStarterSide", Map.of(
-                            "nickname", String.valueOf(clientNickname),
-                            "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname)),
-                            "points", parent.controller.game.getPoints(String.valueOf(clientNickname))
-                        )),
-                        String.valueOf(clientNickname)
-                    );
+                    placeSide(message.arguments());
                     break;
-
                 case "drawVisibleCard":
-                    Card card = (Card) message.arguments().get("card"));
-                    parent.controller.drawVisible(
-                        String.valueOf(clientNickname),
-                        card
-                    );
-                    boolean isGold = card.getId() > 40;
-                    Deck deck = isGold ? parent.controller.game.getGoldDeck()
-                        : parent.controller.game.getResourceDeck();
-                    send(new Message("ok", Map.of(
-                        "deck", deck,
-                        "hand", parent.controller.game.getHand(String.valueOf(clientNickname))
-                    )));
-                    parent.server.sendBroadcast(
-                        new Message("drawVisibleCard", Map.of(
-                            "nickname", String.valueOf(clientNickname),
-                            "isGold", isGold,
-                            "deck", deck,
-                            "hand", parent.controller.game.getBlurredHand(String.valueOf(clientNickname))
-                        )),
-                        String.valueOf(clientNickname)
-                    );
+                    drawVisibleCard(message.arguments());
                     break;
-
                 case "drawDeck":
-                    boolean isGold2 = (boolean) message.arguments().get("isGold");
-                    parent.controller.drawDeck(
-                            String.valueOf(clientNickname),
-
-                    );
-                    Deck deck2 = isGold2 ? parent.controller.game.getGoldDeck()
-                        : parent.controller.game.getResourceDeck();
-                    send(new Message("ok", Map.of(
-                        "deck", deck2,
-                        "hand", parent.controller.game.getHand(String.valueOf(clientNickname))
-                    )));
-                    parent.server.sendBroadcast(
-                        new Message("drawVisibleCard", Map.of(
-                            "nickname", String.valueOf(clientNickname),
-                            "isGold", isGold2,
-                            "deck", deck2,
-                            "hand", parent.controller.game.getBlurredHand(String.valueOf(clientNickname))
-                        )),
-                        String.valueOf(clientNickname)
-                    );
+                    drawDeck(message.arguments());
                     break;
             }
         } catch (FirstConnectionException e) {
@@ -306,8 +226,175 @@ public class SocketClientHandler implements Runnable {
     }
 
     /**
+     * Handles the joinGame message.
+     * @param arguments arguments of the message.
+     * @throws ConnectionRefusedException propagated.
+     * @throws FirstConnectionException propagated.
+     */
+    public void joinGame(Map<String, Object> arguments) throws ConnectionRefusedException, FirstConnectionException {
+        parent.controller.newConnection((String) arguments.get("nickname"));
+        send(new Message("ok", Map.of("nicknames", parent.controller.getUsers())));
+        parent.server.sendBroadcast(
+                new Message("joinGame", Map.of("nickname", clientNickname)),
+                String.valueOf(clientNickname)
+        );
+    }
+
+    /**
+     * Handles the setNumberOfPlayers message.
+     * @param arguments arguments of the message.
+     * @throws InvalidNumUsersException propagated.
+     * @throws FirstConnectionException propagated.
+     */
+    public void setNumberOfPlayers(Map<String, Object> arguments) throws InvalidNumUsersException, FirstConnectionException {
+        parent.controller.newConnection(
+            String.valueOf(clientNickname),
+            (int) arguments.get("numberOfPlayers")
+        );
+        send(new Message("ok", Map.of()));
+    }
+
+    /**
+     * Handles the placeStarterSide message.
+     * @param arguments arguments of the message.
+     * @throws NoSuchPlayerException propagated.
+     * @throws MoveNotAllowedException propagated.
+     * @throws InvalidStarterSideException propagated.
+     */
+    public void placeStarterSide(Map<String, Object> arguments) throws NoSuchPlayerException, MoveNotAllowedException, InvalidStarterSideException {
+        parent.controller.playStarterCard(
+            String.valueOf(clientNickname),
+            (Boolean) arguments.get("isFront")
+        );
+        send(new Message("ok", Map.of(
+            "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname))
+        )));
+        parent.server.sendBroadcast(
+            new Message("placeStarterSide",
+                Map.of(
+                    "nickname", String.valueOf(clientNickname),
+                    "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname))
+                )
+            ),
+            String.valueOf(clientNickname)
+        );
+    }
+
+    /**
+     * Handles the chooseObjective message.
+     * @param arguments arguments of the message.
+     * @throws NoSuchPlayerException propagated.
+     * @throws MoveNotAllowedException propagated.
+     * @throws ObjectiveNotAllowedException propagated.
+     */
+    public void chooseObjective(Map<String, Object> arguments) throws NoSuchPlayerException, MoveNotAllowedException, ObjectiveNotAllowedException {
+        parent.controller.chooseObjective(
+            String.valueOf(clientNickname),
+            (String) arguments.get("objectiveId")
+        );
+        send(new Message("ok", Map.of()));
+    }
+
+    /**
+     * Handles the placeSide message.
+     * @param arguments arguments of the message.
+     * @throws NoSuchPlayerException propagated.
+     * @throws PlacementNotAllowedException propagated.
+     * @throws NotYourTurnException propagated.
+     * @throws MoveNotAllowedException propagated.
+     * @throws InvalidSideException propagated.
+     * @throws InvalidCoordinatesException propagated.
+     * @throws InvalidCardException propagated.
+     * @throws NoAdjacentCardException propagated.
+     */
+    public void placeSide(Map<String, Object> arguments) throws NoSuchPlayerException, PlacementNotAllowedException, NotYourTurnException, MoveNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
+        parent.controller.placeSide(
+            String.valueOf(clientNickname),
+            (Card) arguments.get("card"),
+            (Boolean) arguments.get("isFront"),
+            (int) arguments.get("i"),
+            (int) arguments.get("j")
+        );
+        send(new Message("ok", Map.of(
+            "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname)),
+            "points", parent.controller.game.getPoints(String.valueOf(clientNickname))
+        )));
+        parent.server.sendBroadcast(
+            new Message("placeStarterSide", Map.of(
+                "nickname", String.valueOf(clientNickname),
+                "playArea", parent.controller.game.getPlayArea(String.valueOf(clientNickname)),
+                "points", parent.controller.game.getPoints(String.valueOf(clientNickname))
+            )),
+            String.valueOf(clientNickname)
+        );
+    }
+
+    /**
+     * Handles the drawVisible message.
+     * @param arguments arguments of the message.
+     * @throws NoSuchPlayerException propagated.
+     * @throws NotYourTurnException propagated.
+     * @throws InvalidVisibleCardException propagated.
+     * @throws MoveNotAllowedException propagated.
+     */
+    public void drawVisibleCard(Map<String, Object> arguments) throws NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException, MoveNotAllowedException {
+        Card card = (Card) arguments.get("card");
+        parent.controller.drawVisible(
+            String.valueOf(clientNickname),
+            card
+        );
+        boolean isGold = card.getId() > 40;
+        Deck deck = isGold ? parent.controller.game.getGoldDeck()
+            : parent.controller.game.getResourceDeck();
+        send(new Message("ok", Map.of(
+            "deck", deck,
+            "hand", parent.controller.game.getHand(String.valueOf(clientNickname))
+        )));
+        parent.server.sendBroadcast(
+            new Message("drawVisibleCard", Map.of(
+                "nickname", String.valueOf(clientNickname),
+                "isGold", isGold,
+                "deck", deck,
+                "hand", parent.controller.game.getBlurredHand(String.valueOf(clientNickname))
+            )),
+            String.valueOf(clientNickname)
+        );
+    }
+
+    /**
+     * Handles the drawDeck message.
+     * @param arguments arguments of the message.
+     * @throws NoSuchPlayerException propagated.
+     * @throws NotYourTurnException propagated.
+     * @throws MoveNotAllowedException propagated.
+     * @throws EmptyDeckException propagated.
+     */
+    public void drawDeck(Map<String, Object> arguments) throws NoSuchPlayerException, NotYourTurnException, MoveNotAllowedException, EmptyDeckException {
+        boolean isGold = (boolean) arguments.get("isGold");
+        parent.controller.drawDeck(
+            String.valueOf(clientNickname),
+            isGold
+        );
+        Deck deck = isGold ? parent.controller.game.getGoldDeck()
+            : parent.controller.game.getResourceDeck();
+        send(new Message("ok", Map.of(
+            "deck", deck,
+            "hand", parent.controller.game.getHand(String.valueOf(clientNickname))
+        )));
+        parent.server.sendBroadcast(
+            new Message("drawVisibleCard", Map.of(
+                "nickname", String.valueOf(clientNickname),
+                "isGold", isGold,
+                "deck", deck,
+                "hand", parent.controller.game.getBlurredHand(String.valueOf(clientNickname))
+            )),
+            String.valueOf(clientNickname)
+        );
+    }
+
+    /**
      * Send a message to the correspondent client
-     * @param message message to send in a string format
+     * @param message message to send
      */
     public synchronized void send(Message message) {
         try {
@@ -380,7 +467,7 @@ public class SocketClientHandler implements Runnable {
             String randomString = UUID.randomUUID().toString();
             // Set the string as the last sent
             lastKeepAliveSent = randomString;
-            // Send the string
+            // Send the message
             client.send(new Message("ping", Map.of("id", randomString)));
 
             // Wait some time

@@ -673,21 +673,45 @@ public class Game implements Serializable {
         return player.getStarterCard();
     }
 
+    /**
+     * Gets the playArea of the given player.
+     * @param nickname given player's nickname.
+     * @return the playArea of the given player.
+     * @throws NoSuchPlayerException if the given player is not in the game.
+     */
     public PlayArea getPlayArea(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getPlayArea();
     }
 
+    /**
+     * Gets the points of the given player.
+     * @param nickname given player's nickname.
+     * @return the points of the given player.
+     * @throws NoSuchPlayerException if the given player is not in the game.
+     */
     public int getPoints(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getPoints();
     }
 
+    /**
+     * Gets the hand of the given player.
+     * @param nickname given player's nickname.
+     * @return the hand of the given player.
+     * @throws NoSuchPlayerException if the given player is not in the game.
+     */
     public List<Card> getHand(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getHand();
     }
 
+    /**
+     * Gets the blurred hand of the given player.
+     * @param nickname given player's nickname.
+     * @return the playArea of the given player.
+     * @throws NoSuchPlayerException if the given player is not in the game.
+     */
     public List<Resource> getBlurredHand(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getBlurredHand();

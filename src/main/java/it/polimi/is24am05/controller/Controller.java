@@ -79,12 +79,14 @@ public class Controller {
                 throw new ConnectionRefusedException("User already connected");
             // Add the user to the list of reconnected users
             users.add(playerNickname);
+            // Reply to the user
             server.send(
                 new Message("ok", Map.of(
                     "players", game.getConnectedPlayers().stream().map(Player::getNickname)
                 )),
                 playerNickname
             );
+            // Broadcast update
             server.sendBroadcast(
                  new Message("ok", Map.of(
                     "nickname", playerNickname
@@ -143,7 +145,6 @@ public class Controller {
 
             try {
                 this.game.reconnect(playerNickname);
-
                 Player player = game.getPlayers().stream()
                     .filter(p -> p.getNickname().equals(playerNickname))
                         .findFirst().get();
@@ -153,6 +154,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Gets the arguments of the gameResumed message for the given player.
+     * @param player the player to send the message to.
+     * @return the arguments of the message.
+     */
     Map<String, Object> getGameResumed(Player player) {
         Map<String, Object> gameResumed = new HashMap<>();
         gameResumed.put("resourceDeck", game.getResourceDeck());
@@ -187,13 +193,18 @@ public class Controller {
         return gameResumed;
     }
 
+    /**
+     * Gets the arguments of the gameCreated message for the given player.
+     * @param player the player to send the message to.
+     * @return the arguments of the message.
+     */
     Map<String, Object> getGameCreated(Player player) {
         Map<String, Object> gameCreated = new HashMap<>();
         gameCreated.put("resourceDeck", game.getResourceDeck());
         gameCreated.put("goldDeck", game.getGoldDeck());
 
         Map<String, Object> players = new HashMap<>();
-        for (Player p : game.getPlayers()) {
+        for (Player p : game.getPlayers())
             players.put(
                 p.getNickname(),
                 Map.of(
@@ -202,7 +213,6 @@ public class Controller {
                     "starterCard", p.getStarterCard()
                 )
             );
-        }
 
         gameCreated.put("players", players);
         return gameCreated;
@@ -250,6 +260,7 @@ public class Controller {
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
 
+        // If the game state changed, i.e. all players placed their starter card, update the clients
         if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
             Map<String, Object> players = new HashMap<>();
             for (Player player : game.getPlayers()) {
@@ -271,7 +282,7 @@ public class Controller {
     /**
      * Allows a player to choose its objective card
      * @param playerNickname player nickname
-     * @param objectiveId objective chosen
+     * @param objectiveId id of the chosen objective
      * @throws NoSuchPlayerException propagated
      * @throws MoveNotAllowedException propagated
      * @throws ObjectiveNotAllowedException propagated
@@ -283,6 +294,7 @@ public class Controller {
         Objective objective = Objective.valueOf(objectiveId);
         game.chooseObjective(playerNickname, objective);
 
+        // If the game state changed, i.e. all players chose their objective, update the clients
         if (game.getGameState().equals(GameState.GAME))
             server.sendBroadcast(new Message("gameStarted", Map.of()));
     }
@@ -418,6 +430,10 @@ public class Controller {
         }
     }
 
+    /**
+     * Gets the list of users.
+     * @return the list of users.
+     */
     public synchronized List<String> getUsers() {
         return new LinkedList<>(users);
     }
