@@ -23,4 +23,9 @@ public interface Card {
     default int getId(){
         return Integer.valueOf(this.toString().substring(4,6));
     }
+
+    public String[] [] toMatrix();
+    public String toString();
+
+
 }

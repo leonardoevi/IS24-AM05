@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.deck;
 
+import it.polimi.is24am05.model.card.goldCard.GoldCard;
 import it.polimi.is24am05.model.enums.*;
 import it.polimi.is24am05.model.card.*;
 import it.polimi.is24am05.model.enums.element.*;
@@ -108,5 +109,25 @@ public class Deck implements Serializable {
             return this.deck.getFirst().getBackSide().getCorner(Corner.CE).getFirst();
         } catch (InvalidCornerException ignored) { return null; }
     }
+    public String[][] toMatrix()
+    {
+        boolean isGold;
+        if(this.getVisible().stream().findFirst().get() instanceof GoldCard)
+             isGold=true;
+        else
+            isGold=false;
+        return DeckDisplayer.deckToMatrix(this, isGold);
+    }
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    }
 
-}

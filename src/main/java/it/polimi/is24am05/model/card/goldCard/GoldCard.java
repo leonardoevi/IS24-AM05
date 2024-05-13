@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.card.goldCard;
 
+import it.polimi.is24am05.model.Player.HandDisplayer;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.Card;
 
@@ -87,4 +88,21 @@ public enum GoldCard implements Card {
     public Side getBackSide() {
         return backSide;
     }
+
+    public String[][] toMatrix()
+    {
+        return HandDisplayer.CardToMatrix(this);
+    }
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

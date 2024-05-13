@@ -400,4 +400,21 @@ public class PlayArea implements Serializable {
     public List<PlacedSide> getOrderedPlacements() {
         return orderedPlacements;
     }
+
+    public String[][]toMatrix()
+    {
+        AreaDisplayer areaDisplayer=new AreaDisplayer(this);
+        return areaDisplayer.areaToMatrix();
+    }
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }

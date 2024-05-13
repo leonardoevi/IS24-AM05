@@ -17,6 +17,7 @@ import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.ItemMultiplier;
 
 import it.polimi.is24am05.model.exceptions.card.InvalidCornerException;
 import it.polimi.is24am05.model.playArea.PlayArea;
+import it.polimi.is24am05.model.playArea.SideDisplayer;
 
 /**
  * Gold front sides.
@@ -627,6 +628,22 @@ public enum GoldFrontSide implements Side {
     public int getPoints() {
         return this.points;
     }
+    public  String[][] toMatrix()
+    {
+        return SideDisplayer.sideToString(this);
+    }
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 
 
 }

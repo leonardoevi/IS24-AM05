@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.game;
 
+import it.polimi.is24am05.model.Player.HandDisplayer;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
@@ -390,6 +391,7 @@ class GameTest {
 
             // Current player State should be PLACE
             assertEquals(PlayerState.PLACE, current.getState());
+
         }
 
         // Get winners
@@ -411,25 +413,33 @@ class GameTest {
         System.out.println();
 
         // Print statistics
+
         for(String name : players){
             Player p = getPlayer(game, name);
             System.out.println(name + ":");
             System.out.println("Points:" + p.getPoints());
             System.out.println("Cards Played: " + p.getPlayArea().getPlayArea().keySet().size());
+            System.out.println("Hand:\n ");
+
+            System.out.println("\n ");
+
             System.out.println("PlayArea:");
-            System.out.println(new AreaDisplayer(p.getPlayArea()));
+             System.out.println(new AreaDisplayer(p.getPlayArea()));
+            //System.out.println(HandDisplayer.handToString(p.getHand()));
 
 
             System.out.println();
         }
+        printGameState(game);
+
+
+
 
     }
 
     @Test
     void multipleGames() {
-        int N = 100;
 
-        for (int i = 0; i < N; i++)
             Game2();
     }
 

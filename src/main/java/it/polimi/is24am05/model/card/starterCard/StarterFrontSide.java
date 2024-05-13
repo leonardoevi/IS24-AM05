@@ -9,6 +9,7 @@ import it.polimi.is24am05.model.enums.Corner;
 import it.polimi.is24am05.model.card.side.Side;
 
 import it.polimi.is24am05.model.exceptions.card.InvalidCornerException;
+import it.polimi.is24am05.model.playArea.SideDisplayer;
 
 /**
  * Starter front sides.
@@ -121,4 +122,20 @@ public enum StarterFrontSide implements Side {
     public Resource getSeed() {
         return null;
     }
+    public  String[][] toMatrix()
+    {
+        return SideDisplayer.sideToString(this);
+    }
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

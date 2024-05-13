@@ -60,4 +60,19 @@ public enum Objective {
     public ObjectiveMultiplier getMultiplier() {
         return multiplier;
     }
+    public String[][] toMatrix()
+    {
+        return ObjectiveDisplayer.layoutObjectiveToString(this);
+    }
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }
