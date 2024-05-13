@@ -55,7 +55,7 @@ public enum StarterCard implements Card {
         return backSide;
     }
 
-
+    @Override
     public String[][] toMatrix()
     {
         return HandDisplayer.CardToMatrix(this);
@@ -71,6 +71,11 @@ public enum StarterCard implements Card {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public int getId() {
+        return Integer.valueOf(this.name().substring(4,6));
     }
 
 }

@@ -96,7 +96,7 @@ public enum ResourceBackSide implements Side {
         return List.of();
     }
 
-    @Override
+
     public Resource getSeed() {
         // Looking at the last 2 digits(fifth and sixth) of each card ID
         int id = Integer.parseInt(this.name().substring(5));
@@ -108,7 +108,7 @@ public enum ResourceBackSide implements Side {
             return  Resource.ANIMAL;
         return Resource.INSECT;
     }
-
+    @Override
     public  String[][] toMatrix()
     {
         return SideDisplayer.sideToString(this);

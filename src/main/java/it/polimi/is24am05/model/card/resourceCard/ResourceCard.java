@@ -84,11 +84,11 @@ public enum ResourceCard implements Card {
      *
      * @return the back side of this card.
      */
-    @Override
+
     public Side getBackSide() {
         return backSide;
     }
-
+    @Override
     public String[][] toMatrix()
     {
         return HandDisplayer.CardToMatrix(this);
@@ -104,6 +104,11 @@ public enum ResourceCard implements Card {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public int getId() {
+        return Integer.valueOf(this.name().substring(4,6));
     }
 
 }

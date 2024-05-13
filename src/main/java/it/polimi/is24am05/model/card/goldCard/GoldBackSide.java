@@ -109,8 +109,8 @@ public enum GoldBackSide implements Side {
             return  Resource.ANIMAL;
         return Resource.INSECT;
     }
-
-    public  String[][] toMatrix()
+    @Override
+    public String[][] toMatrix()
     {
         return SideDisplayer.sideToString(this);
     }

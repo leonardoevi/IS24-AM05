@@ -20,13 +20,11 @@ public interface Card {
      */
     Side getBackSide();
 
-    default int getId(){
-        return Integer.valueOf(this.toString().substring(4,6));
-    }
+    public int getId();
 
-   public String[] [] toMatrix();
+    public String[] [] toMatrix();
 
-    public String toString();
+   public String toString();
 
 
 }

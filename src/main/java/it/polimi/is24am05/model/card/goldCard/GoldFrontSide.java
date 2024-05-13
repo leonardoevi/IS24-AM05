@@ -628,7 +628,7 @@ public enum GoldFrontSide implements Side {
     public int getPoints() {
         return this.points;
     }
-
+    @Override
     public  String[][] toMatrix()
     {
         return SideDisplayer.sideToString(this);
