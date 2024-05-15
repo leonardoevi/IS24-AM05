@@ -1,7 +1,8 @@
-package it.polimi.is24am05.controller.socketServer;
+package it.polimi.is24am05.controller.server.socket;
 
 import it.polimi.is24am05.controller.Controller;
-import it.polimi.is24am05.controller.GameServer;
+import it.polimi.is24am05.controller.server.Network;
+import it.polimi.is24am05.controller.server.Server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,7 +16,7 @@ import java.util.concurrent.Executors;
 /**
  * Server using sockets protocol
  */
-public class SocketServer implements GameServer {
+public class SocketServer implements Network {
     /**
      * Controller.
      */

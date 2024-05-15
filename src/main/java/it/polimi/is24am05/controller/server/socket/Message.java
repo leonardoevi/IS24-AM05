@@ -1,4 +1,4 @@
-package it.polimi.is24am05.controller.socketServer;
+package it.polimi.is24am05.controller.server.socket;
 
 import java.io.Serializable;
 import java.util.Map;

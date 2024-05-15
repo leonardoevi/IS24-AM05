@@ -1,4 +1,4 @@
-package it.polimi.is24am05.controller.socketServer;
+package it.polimi.is24am05.controller.server.socket;
 
 import java.io.*;
 import java.net.Socket;
@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
+import it.polimi.is24am05.controller.exceptions.NicknameAlreadyUsedException;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
@@ -209,7 +210,7 @@ public class SocketClientHandler implements Runnable {
                 String nickname = (String) message.arguments().get("nickname");
                 // Set specified nickname
                 if (parent.server.getJoinedClients().contains(nickname))
-                    throw new Exception("Nickname already in use");
+                    throw new NicknameAlreadyUsedException(parent.server.getJoinedClients());
                 this.clientNickname = Optional.of(nickname);
                 // Subscribe to broadcast list
                 parent.subscribe(this);

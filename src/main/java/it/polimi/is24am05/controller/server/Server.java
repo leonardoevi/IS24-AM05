@@ -1,14 +1,15 @@
-package it.polimi.is24am05.controller.socketServer;
+package it.polimi.is24am05.controller.server;
 
 import it.polimi.is24am05.controller.Controller;
-import it.polimi.is24am05.controller.GameServer;
+import it.polimi.is24am05.controller.server.socket.Message;
+import it.polimi.is24am05.controller.server.socket.SocketServer;
 
 import java.util.List;
 
 /**
  * Wrapper of socket and RMI server.
  */
-public class Server implements GameServer {
+public class Server implements Network {
     /**
      * Controller.
      */
