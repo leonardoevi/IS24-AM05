@@ -142,6 +142,7 @@ public class Game implements Serializable {
 
         // Set game state
         this.gameState = GameState.PLACE_STARTER_CARDS;
+
     }
 
     /**
@@ -227,7 +228,7 @@ public class Game implements Serializable {
      * After placing the starter Cards each player receives a GoldCard, 2 ResourceCards and 2 Objectives.
      * Players must all choose which ObjectiveCard they wish to keep.
      */
-    private void dealHandsAndObjectives(){
+    private void dealHandsAndObjectives() throws NoSuchPlayerException {
         // Every Player has placed their starterCard
 
         // Each player draws 2 Resource Cards and 1 Gold Card
@@ -275,6 +276,16 @@ public class Game implements Serializable {
         // Player will now select an objective each
         this.gameState = GameState.CHOOSE_OBJECTIVE;
 
+        // for each player still disconnected, choose  random objective
+        for(String nickname: this.getDisconnected())
+        {
+            if(findPlayer(nickname).getState()==PlayerState.CHOOSE_OBJECTIVE)
+            {
+                chooseRandomObjective(nickname);
+            }
+        }
+
+
     }
 
     /**
@@ -306,11 +317,31 @@ public class Game implements Serializable {
         boolean allHaveChosen = this.players.stream()
                 .allMatch(p -> p.getState() == PlayerState.DRAW);
 
-        // It is time to start playing
+        // If each player has chosen an objective card
         if(allHaveChosen) {
-            this.gameState = GameState.GAME;
             for (Player p : players)
                 p.setState(PlayerState.PLACE);
+
+            //if there are enough players connected
+            if(this.connected.size() >=2)
+            {
+                this.gameState=GameState.GAME;
+
+                //if player that should play is disconnected, nextTurn()
+                if(getDisconnected().contains(this.players.get(this.turn).getNickname())){
+                    nextTurn();
+                }
+            }
+            else{
+                //it there are not enough players, the game is paused
+                this.lastGameState = GameState.GAME;
+                this.gameState = GameState.PAUSE;
+            }
+
+
+
+
+
         }
     }
 
@@ -514,32 +545,62 @@ public class Game implements Serializable {
                         .toList();
     }
 
+
+
     /**
      * handles the disconnection of a player
-     * If a player is disconnected after placing a card but before drawing, a random card is drawn to end its turn correctly
+     * if a player  disconnects before placing the starter Card, a random side is placed random
+     * if a player is disconnects before choosing the objective card , a random objective card is chosen random
+     * If a player is disconnects after placing a card but before drawing, a random card is drawn to end its turn correctly
      * @param nickname is the nickname of the player to disconnect
      * @throws NoSuchPlayerException propagated
      */
     public void disconnect(String nickname) throws NoSuchPlayerException {
+
         // If the player is already disconnected do nothing
         if(!this.connected.contains(findPlayer(nickname)))
             return;
 
-        // If the player is mid-turn make them draw a random card
+        //DISCONNECTION PRE GAME
+
+       //if a player disconnects before placing the starter card, a random side will be places
+        if(findPlayer(nickname).getState() == PlayerState.PLACE_STARTER_CARD)
+        {
+            this.connected.remove(findPlayer(nickname));
+            placeRandomStarterSide(nickname);
+            return;
+
+        }
+
+        //if the players disconnect after all the other players have placed the starter card a random objective will be chosen
+        // else the random objective for him will be chosen after all players have placed the starter card (see dealHeandAndObjectives()
+        if(findPlayer(nickname).getState() == PlayerState.CHOOSE_OBJECTIVE)
+        {
+            this.connected.remove(findPlayer(nickname));
+
+            if(gameState==GameState.CHOOSE_OBJECTIVE)
+               chooseRandomObjective(nickname);
+
+            return;
+        }
+
+         //DISCONNECTION DURING THE GAME
+
+        // If the player is mid-turn during the game  make them draw a random card
         if(this.players.get(this.turn).getNickname().equals(nickname) && findPlayer(nickname).getState() == PlayerState.DRAW)
             this.drawSomething(nickname);
 
         // Remove the player from connected players
         this.connected.remove(findPlayer(nickname));
 
-        // If exactly one player remains in the game after this disconnection
+        // If exactly one player remains in the game after this disconnection and we are not in the pre game, pause the game
         if(this.connected.size() == 1){
             this.lastGameState = this.gameState;
             this.gameState = GameState.PAUSE;
         }
 
         // If the player disconnecting was expected to play and there are enough players to keep playing
-        if(this.players.get(this.turn).getNickname().equals(nickname) && this.connected.size() >= 2){
+        if(this.players.get(this.turn).getNickname().equals(nickname) && this.connected.size()>=2 ){
             nextTurn();
         }
     }
@@ -556,15 +617,43 @@ public class Game implements Serializable {
 
         this.connected.add(findPlayer(nickname));
 
+        //RECONNECTION PRE GAME
+        //if a players reconnect PRE GAME, nothing happens
+
+        if(gameState==GameState.PLACE_STARTER_CARDS || gameState==GameState.CHOOSE_OBJECTIVE )
+            return;
+
+        //RECONNECTION DURING THE GAME
         // If there are enough players to play
         if(this.connected.size() == 2){
-            this.gameState = this.lastGameState;
-            this.lastGameState = null;
+
+              this.gameState = this.lastGameState;
+              this.lastGameState = null;
+
 
             // If the player that is expected to play is still not connected
             if(!this.connected.contains(this.players.get(this.turn)))
                 nextTurn();
         }
+    }
+    private void placeRandomStarterSide(String nickname) {
+        try {
+            Card starterCard=findPlayer(nickname).getStarterCard();
+            Side randomSide= new Random().nextInt(2) == 0 ? starterCard.getBackSide() : starterCard.getFrontSide();
+             placeStarterSide(nickname, randomSide );
+        } catch (NoSuchPlayerException | InvalidStarterSideException | MoveNotAllowedException ignored) {}
+
+
+    }
+
+    private void chooseRandomObjective(String nickname)
+    {
+        try {
+            Objective[] objectivesHand=findPlayer(nickname).getObjectivesHand();
+            Objective randomObjective=objectivesHand[new Random().nextInt(2)];
+             chooseObjective(nickname, randomObjective );
+        } catch (NoSuchPlayerException | MoveNotAllowedException | ObjectiveNotAllowedException ignored) {}
+
     }
 
     private void drawSomething(String nickname){
