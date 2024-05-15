@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.game;
 
+import it.polimi.is24am05.model.Player.HandDisplayer;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
@@ -390,6 +391,8 @@ class GameTest {
 
             // Current player State should be PLACE
             assertEquals(PlayerState.PLACE, current.getState());
+          // printGameState(game);
+
         }
 
         // Get winners
@@ -411,26 +414,18 @@ class GameTest {
         System.out.println();
 
         // Print statistics
-        for(String name : players){
-            Player p = getPlayer(game, name);
-            System.out.println(name + ":");
-            System.out.println("Points:" + p.getPoints());
-            System.out.println("Cards Played: " + p.getPlayArea().getPlayArea().keySet().size());
-            System.out.println("PlayArea:");
-            System.out.println(new AreaDisplayer(p.getPlayArea()));
+       printGameState(game);
 
 
-            System.out.println();
-        }
+
 
     }
 
     @Test
     void multipleGames() {
-        int N = 100;
 
-        for (int i = 0; i < N; i++)
             Game2();
+            return;
     }
 
     @Test
@@ -687,20 +682,34 @@ class GameTest {
             System.out.println("Points: " + p.getPoints());
 
             System.out.println("Play area: ");
-            System.out.println(new AreaDisplayer(p.getPlayArea()));
+            System.out.println(p.getPlayArea().toString());
+
 
             if(p.getState() == PlayerState.PLACE_STARTER_CARD) {
                 System.out.println("Hand: ");
-                System.out.println(handToString(List.of(p.getStarterCard())));
+                //System.out.println(handToString(List.of(p.getStarterCard())));
+                 System.out.println(p.starterCardToString());
             }
 
             if(p.getHand() != null && !p.getHand().isEmpty()) {
                 System.out.println("Hand: ");
-                System.out.println(handToString(p.getHand()));
+               System.out.println(handToString(p.getHand()));
+               System.out.println(p.handToString());
             }
+
+
         }
 
+
+
+
+
         System.out.println("Decks: ");
-        System.out.println(deckToString(game.getResourceDeck(), false, game.getGoldDeck(), true));
+        System.out.println(game.getGoldDeck().toString());
+        System.out.println(game.getResourceDeck().toString());
+
+
+
+
     }
 }

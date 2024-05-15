@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.card.side;
 
+import it.polimi.is24am05.model.playArea.SideDisplayer;
 import it.polimi.is24am05.model.playArea.Tuple;
 
 /**
@@ -16,4 +17,5 @@ public class EmptyPlacedSide extends PlacedSide{
     public EmptyPlacedSide(Tuple actualCoord) {
         super(null, -1, actualCoord);
     }
+
 }

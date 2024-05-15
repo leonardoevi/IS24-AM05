@@ -67,4 +67,10 @@ public interface Side {
     default int getPoints(){
         return 0;
     }
+
+    public String[][] toMatrix();
+
+
+
+    public String toString();
 }

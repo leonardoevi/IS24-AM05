@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.card.starterCard;
 
+import it.polimi.is24am05.model.Player.HandDisplayer;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.Card;
 
@@ -53,4 +54,28 @@ public enum StarterCard implements Card {
     public Side getBackSide() {
         return backSide;
     }
+
+    @Override
+    public String[][] toMatrix()
+    {
+        return HandDisplayer.CardToMatrix(this);
+    }
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(String[] row : this.toMatrix()){
+            for (String s : row){
+                sb.append(s);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public int getId() {
+        return Integer.valueOf(this.name().substring(4,6));
+    }
+
 }

@@ -297,5 +297,13 @@ public class Player implements Serializable {
             this.points += objectivePoints;
         }
     }
+    public String handToString()
+    {
+        return HandDisplayer.handToString(this.hand);
+    }
+    public String starterCardToString()
+    {
+        return HandDisplayer.handToString(List.of(this.starterCard));
+    }
 
 }

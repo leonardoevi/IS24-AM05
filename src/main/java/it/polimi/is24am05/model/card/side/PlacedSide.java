@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.card.side;
 
+import it.polimi.is24am05.model.playArea.SideDisplayer;
 import it.polimi.is24am05.model.playArea.Tuple;
 
 import java.io.Serializable;
@@ -55,4 +56,7 @@ public class PlacedSide implements Serializable {
     public Tuple getActualCoord() {
         return actualCoord;
     }
+
+
+
 }
