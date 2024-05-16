@@ -1,81 +1,221 @@
 package it.polimi.is24am05.controller.server;
 
-import it.polimi.is24am05.controller.Controller;
-import it.polimi.is24am05.controller.server.socket.Message;
-import it.polimi.is24am05.controller.server.socket.SocketServer;
+import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.deck.Deck;
+import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
+import it.polimi.is24am05.model.game.Game;
+import it.polimi.is24am05.model.playArea.PlayArea;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-/**
- * Wrapper of socket and RMI server.
- */
-public class Server implements Network {
-    /**
-     * Controller.
-     */
-    private final Controller controller;
-    /**
-     * Socket server.
-     */
-    private SocketServer socketServer;
+public class Server {
+    private final List<ClientHandler> clientHandlers;
 
-    /**
-     * Constructor.
-     * @param controller controller.
-     */
-    public Server(Controller controller) {
-        this.controller = controller;
+    public Server(List<ClientHandler> clientHandlers) {
+        this.clientHandlers = clientHandlers;
     }
 
-    /**
-     * Starts the server.
-     */
-    @Override
-    public void start() {
-        socketServer = new SocketServer(controller, this);
-        socketServer.start();
-        // TODO: add RMI
+    public void start() throws IOException {
+        startSocket();
+        startRMI();
     }
 
-    /**
-     * Broadcasts a message to all clients.
-     * @param message the message broadcasted.
-     */
-    @Override
-    public void sendBroadcast(Message message) {
-        socketServer.sendBroadcast(message);
-        // TODO: add RMI
+    private void startSocket() throws IOException {
+        ServerSocket serverSocket;
+        // Define a fixed pool of threads to handle clients connections
+        final ExecutorService threadPool = Executors.newFixedThreadPool(8);
+        // Create the server socket to accept clients connections
+        serverSocket = new ServerSocket(6969);
+
+        System.out.println("Socket Server ready on port: " + serverSocket.getLocalPort());
+
+        // Keep accepting connections
+        while (true) {
+            try {
+                final Socket socket = serverSocket.accept();
+                // Let the thread pool handle the communication with the client
+                threadPool.submit(new SocketClientHandler(socket, this));
+            } catch (IOException ignored) {
+                break;
+            }
+        }
+
+        System.out.println("Shutting down thread pool");
+        threadPool.shutdown();
     }
 
-    /**
-     * Broadcasts a message to all clients, except the given one.
-     * @param message the message broadcasted.
-     * @param client the client to not send the message to.
-     */
-    @Override
-    public void sendBroadcast(Message message, String client) {
-        socketServer.sendBroadcast(message, client);
-        // TODO: add RMI
+    private void startRMI() {}
+
+    public synchronized List<String> getNicknames(){
+        return clientHandlers.stream().map(ClientHandler::getNickname).toList();
     }
 
-    /**
-     * Sends a message to a client.
-     * @param message the message broadcasted.
-     * @param client the client to send the message to.
-     */
-    @Override
-    public void send(Message message, String client) {
-        socketServer.send(message, client);
-        // TODO: add RMI
+    public synchronized void subscribe(ClientHandler clientHandler) {
+        clientHandlers.add(clientHandler);
     }
 
-    /**
-     * Gets the list of joined clients.
-     * @return the list of joined clients.
-     */
-    @Override
-    public List<String> getJoinedClients() {
-        return socketServer.getJoinedClients();
-        // TODO: add RMI, merge lists
+    public synchronized void unsubscribe(ClientHandler clientHandler) {
+        clientHandlers.remove(clientHandler);
+    }
+
+    private synchronized ClientHandler getClientHandler(String nickname) throws NoSuchPlayerException {
+        return clientHandlers.stream().filter(h -> h.getNickname().equals(nickname)).findFirst()
+                .orElseThrow(NoSuchPlayerException::new);
+    }
+
+    public void notifyJoinServer(String client) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyJoinServer();
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyJoinGame(String client, List<String> nicknames) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyJoinGame(nicknames);
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyOthersJoinGame(String client, String nickname) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers.stream()
+                    .filter(c -> !c.getNickname().equals(client)).toList());
+        }
+        for(ClientHandler c : copy)
+            c.notifyOthersJoinGame(nickname);
+    }
+
+    public void notifyAllGameCreated(String client, Game pov) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers);
+        }
+        for(ClientHandler c : copy)
+            c.notifyAllGameCreated(pov);
+    }
+
+    public void notifyPlaceStarterSide(String client, PlayArea playArea) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyPlaceStarterSide(playArea);
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyOthersPlaceStarterSide(String client, String nickname, PlayArea playArea) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers.stream()
+                    .filter(c -> !c.getNickname().equals(client)).toList());
+        }
+        for(ClientHandler c : copy)
+            c.notifyOthersPlaceStarterSide(nickname, playArea);
+    }
+
+    public void notifyAllHandsAndObjectivesDealt(String client, Game pov) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers);
+        }
+        for(ClientHandler c : copy)
+            c.notifyAllHandsAndObjectivesDealt(pov);
+    }
+
+    public void notifyChooseObjective(String client) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyChooseObjective();
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyAllGameStarted(String client) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers);
+        }
+        for(ClientHandler c : copy)
+            c.notifyAllGameStarted();
+    }
+
+    public void notifyPlaceSide(String client, PlayArea playArea, int points) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyPlaceSide(playArea, points);
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyOthersPlaceSide(String client, String nickname, PlayArea playArea, int points) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers.stream()
+                    .filter(c -> !c.getNickname().equals(client)).toList());
+        }
+        for(ClientHandler c : copy)
+            c.notifyOthersPlaceSide(nickname, playArea, points);
+    }
+
+    public void notifyDrawVisible(String client, Deck deck, List<Card> hand) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyDrawVisible(deck, hand);
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyOthersDrawVisible(String client, String nickname, boolean isGold, Deck deck, List<Card> hand) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers.stream()
+                    .filter(c -> !c.getNickname().equals(client)).toList());
+        }
+        for(ClientHandler c : copy)
+            c.notifyOthersDrawVisible(nickname, isGold, deck, hand);
+    }
+
+    public void notifyDrawDeck(String client, Deck deck, List<Card> hand) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyDrawDeck(deck, hand);
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyOthersDrawDeck(String client, String nickname, boolean isGold, Deck deck, List<Card> hand) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers.stream()
+                    .filter(c -> !c.getNickname().equals(client)).toList());
+        }
+        for(ClientHandler c : copy)
+            c.notifyOthersDrawDeck(nickname, isGold, deck, hand);
+    }
+
+    public void notifyGameResumed(String client, Game pov) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyGameResumed(pov);
+        } catch (NoSuchPlayerException ignored) {}
+    }
+
+    public void notifyOthersGameResumed(String client, String nickname) {
+        List<ClientHandler> copy;
+        synchronized (this){
+            copy = new ArrayList<>(clientHandlers.stream()
+                    .filter(c -> !c.getNickname().equals(client)).toList());
+        }
+        for(ClientHandler c : copy)
+            c.notifyOthersGameResumed(nickname);
+    }
+
+    public void notifyException(String client, Exception exception) {
+        try {
+            ClientHandler clientHandler = getClientHandler(client);
+            clientHandler.notifyException(exception);
+        } catch (NoSuchPlayerException ignored) {}
     }
 }
