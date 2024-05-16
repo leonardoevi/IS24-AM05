@@ -3,7 +3,6 @@ package it.polimi.is24am05.controller;
 import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
-import it.polimi.is24am05.controller.server.socket.Message;
 import it.polimi.is24am05.controller.server.Server;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;

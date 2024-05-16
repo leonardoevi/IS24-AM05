@@ -21,7 +21,7 @@ public abstract class ClientHandler implements VirtualClient {
         return nickname;
     }
 
-    private void joinServer(String nickname) {
+    protected void joinServer(String nickname) {
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {
                 notifyException(new AlreadyUsedNicknameException(server.getNicknames()));
@@ -32,7 +32,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void joinGame() {
+    protected void joinGame() {
         try {
             controller.newConnection(nickname);
         } catch (Exception e) {
@@ -40,7 +40,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void setNumberOfPlayers(int numberOfPlayers) {
+    protected void setNumberOfPlayers(int numberOfPlayers) {
         try {
             controller.newConnection(nickname, numberOfPlayers);
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void placeStarterSide(boolean isFront) {
+    protected void placeStarterSide(boolean isFront) {
         try {
             controller.playStarterCard(nickname, isFront);
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void chooseObjective(String objectiveId) {
+    protected void chooseObjective(String objectiveId) {
         try {
             controller.chooseObjective(nickname, objectiveId);
         } catch (Exception e) {
@@ -64,7 +64,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void placeSide(String cardId, boolean isFront, int i, int j) {
+    protected void placeSide(String cardId, boolean isFront, int i, int j) {
         try {
             Card card;
             try {
@@ -78,7 +78,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void drawVisible(String cardId) {
+    protected void drawVisible(String cardId) {
         try {
             Card card;
             try {
@@ -92,7 +92,7 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void drawDeck(boolean isGold) {
+    protected void drawDeck(boolean isGold) {
         try {
             controller.drawDeck(nickname, isGold);
         } catch (Exception e) {
@@ -100,9 +100,10 @@ public abstract class ClientHandler implements VirtualClient {
         }
     }
 
-    private void disconnect() {
+    protected void disconnect() {
         try {
             controller.disconnect(nickname);
+            server.unsubscribe(this);
         } catch (Exception e) {
             notifyException(e);
         }

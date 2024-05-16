@@ -1,5 +1,8 @@
 package it.polimi.is24am05.controller.server;
 
+import it.polimi.is24am05.controller.Controller;
+import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
+import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
@@ -9,6 +12,10 @@ import it.polimi.is24am05.model.playArea.PlayArea;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -16,22 +23,30 @@ import java.util.concurrent.Executors;
 
 public class Server {
     private final List<ClientHandler> clientHandlers;
+    private final Controller controller;
 
-    public Server(List<ClientHandler> clientHandlers) {
-        this.clientHandlers = clientHandlers;
+    public Server(Controller controller) {
+        this.clientHandlers = new ArrayList<>();
+        this.controller = controller;
     }
 
-    public void start() throws IOException {
-        startSocket();
+    public void start() {
+        new Thread(() -> startSocket()).start();
+
         startRMI();
     }
 
-    private void startSocket() throws IOException {
+    private void startSocket() {
         ServerSocket serverSocket;
         // Define a fixed pool of threads to handle clients connections
         final ExecutorService threadPool = Executors.newFixedThreadPool(8);
         // Create the server socket to accept clients connections
-        serverSocket = new ServerSocket(6969);
+        try {
+            serverSocket = new ServerSocket(6969);
+        } catch (IOException e) {
+            System.out.println("Failed to start socket server");
+            return;
+        }
 
         System.out.println("Socket Server ready on port: " + serverSocket.getLocalPort());
 
@@ -40,7 +55,7 @@ public class Server {
             try {
                 final Socket socket = serverSocket.accept();
                 // Let the thread pool handle the communication with the client
-                threadPool.submit(new SocketClientHandler(socket, this));
+                threadPool.submit(new SocketClientHandler(controller,this, socket));
             } catch (IOException ignored) {
                 break;
             }
@@ -50,7 +65,17 @@ public class Server {
         threadPool.shutdown();
     }
 
-    private void startRMI() {}
+    private void startRMI() {
+        RmiHandlersProvider handlersProvider = new RmiHandlersProviderImp(controller, this);
+        Registry registry = null;
+        try {
+            registry = LocateRegistry.createRegistry(6969);
+            registry.bind("RmiHandlerProvider", handlersProvider);
+        } catch (RemoteException | AlreadyBoundException e) {
+            System.out.println("Failed to start socket server");
+        }
+        System.out.println("RMI Server bound and ready on port: 6969");
+    }
 
     public synchronized List<String> getNicknames(){
         return clientHandlers.stream().map(ClientHandler::getNickname).toList();
