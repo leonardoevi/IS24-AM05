@@ -7,6 +7,7 @@ import it.polimi.is24am05.controller.server.Server;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.exceptions.deck.InvalidVisibleCardException;
@@ -44,7 +45,7 @@ public class Controller {
      * Controller for a loaded game
      * @param game old game
      */
-    public Controller(Game game) {
+    public Controller(Game game) throws IOException {
         this.game = game;
         this.numUsers = game.getNicknames().size();
         this.lobbyState = LobbyState.OLD;
@@ -54,7 +55,7 @@ public class Controller {
     /**
      * Controller for a new game
      */
-    public Controller(){
+    public Controller() throws IOException {
         this.lobbyState = LobbyState.NEW;
         server.start();
     }
@@ -76,19 +77,9 @@ public class Controller {
             // Add the user to the list of reconnected users
             users.add(playerNickname);
             // Reply to the user
-            server.send(
-                new Message("ok", Map.of(
-                    "players", game.getConnectedPlayers().stream().map(Player::getNickname)
-                )),
-                playerNickname
-            );
+            server.notifyJoinGame(playerNickname, getUsers());
             // Broadcast update
-            server.sendBroadcast(
-                 new Message("ok", Map.of(
-                    "nickname", playerNickname
-                )),
-                playerNickname
-            );
+            server.notifyOthersJoinGame(playerNickname);
             // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
                 for (String nickname : this.users) {
@@ -99,10 +90,7 @@ public class Controller {
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
                 for (Player player : game.getPlayers())
-                    server.send(
-                        new Message("gameResumed", getGameResumed(player)),
-                        player.getNickname()
-                    );
+                    server.notifyGameResumed(player.getNickname(), null); // TODO: pass pov
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -121,10 +109,7 @@ public class Controller {
                     this.game = new Game(this.users);
                     this.lobbyState = LobbyState.STARTED;
                     for (Player player : game.getPlayers())
-                        server.send(
-                            new Message("gameResumed", getGameCreated(player)),
-                            player.getNickname()
-                        );
+                        server.notifyGameCreated(player.getNickname(), null);
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -141,77 +126,10 @@ public class Controller {
 
             try {
                 this.game.reconnect(playerNickname);
-                Player player = game.getPlayers().stream()
-                    .filter(p -> p.getNickname().equals(playerNickname))
-                        .findFirst().get();
-                server.send(new Message("gameResumed", getGameResumed(player)), playerNickname);
-                server.sendBroadcast(new Message("gameResumed", Map.of("nickname", playerNickname)));
+                server.notifyGameResumed(playerNickname, null); // TODO: pass pov
+                server.notifyOthersGameResumed(playerNickname);
             } catch (NoSuchPlayerException ignored) {}
         }
-    }
-
-    /**
-     * Gets the arguments of the gameResumed message for the given player.
-     * @param player the player to send the message to.
-     * @return the arguments of the message.
-     */
-    Map<String, Object> getGameResumed(Player player) {
-        Map<String, Object> gameResumed = new HashMap<>();
-        gameResumed.put("resourceDeck", game.getResourceDeck());
-        gameResumed.put("goldDeck", game.getGoldDeck());
-        gameResumed.put("state", game.getGameState());
-        gameResumed.put("current", game.getTurn());
-
-        gameResumed.put("turn", game.getPlayers().indexOf(player));
-        gameResumed.put("color", player.getColor());
-        gameResumed.put("hand", player.getHand());
-        gameResumed.put("playArea", player.getPlayArea());
-        gameResumed.put("points", player.getPoints());
-
-        Map<String, Object> players = new HashMap<>();
-        for (Player p : game.getPlayers()) {
-            if (p.equals(player))
-                continue;
-
-            players.put(
-                p.getNickname(),
-                Map.of(
-                    "turn", game.getPlayers().indexOf(p),
-                    "color", p.getColor(),
-                    "hand", p.getBlurredHand(),
-                    "playArea", p.getPlayArea(),
-                    "points", p.getPoints()
-                )
-            );
-        }
-
-        gameResumed.put("players", players);
-        return gameResumed;
-    }
-
-    /**
-     * Gets the arguments of the gameCreated message for the given player.
-     * @param player the player to send the message to.
-     * @return the arguments of the message.
-     */
-    Map<String, Object> getGameCreated(Player player) {
-        Map<String, Object> gameCreated = new HashMap<>();
-        gameCreated.put("resourceDeck", game.getResourceDeck());
-        gameCreated.put("goldDeck", game.getGoldDeck());
-
-        Map<String, Object> players = new HashMap<>();
-        for (Player p : game.getPlayers())
-            players.put(
-                p.getNickname(),
-                Map.of(
-                    "turn", game.getPlayers().indexOf(p),
-                    "color", p.getColor(),
-                    "starterCard", p.getStarterCard()
-                )
-            );
-
-        gameCreated.put("players", players);
-        return gameCreated;
     }
 
     /**
@@ -256,22 +174,13 @@ public class Controller {
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
 
+        server.notifyPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname));
+        server.notifyOthersPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname));
         // If the game state changed, i.e. all players placed their starter card, update the clients
         if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
-            Map<String, Object> players = new HashMap<>();
             for (Player player : game.getPlayers()) {
-                players.put(player.getNickname(), Map.of("hand", player.getBlurredHand()));
-                server.send(new Message("handsAndObjectivesDealt", Map.of(
-                        "hand", player.getHand(),
-                        "objectives", Arrays.stream(player.getObjectivesHand()).map(Enum::toString).toArray()
-                )), player.getNickname());
+                server.notifyHandsAndObjectivesDealt(player.getNickname(), null); // TODO: pass pov
             }
-            server.sendBroadcast(new Message("handsAndObjectivesDealt", Map.of(
-                "resourceDeck", game.getResourceDeck(),
-                "goldDeck", game.getGoldDeck(),
-                "objectives", Arrays.stream(game.getSharedObjectives()).map(Enum::toString).toArray(),
-                "players", players
-            )));
         }
     }
 
@@ -290,9 +199,10 @@ public class Controller {
         Objective objective = Objective.valueOf(objectiveId);
         game.chooseObjective(playerNickname, objective);
 
+        server.notifyChooseObjective(playerNickname);
         // If the game state changed, i.e. all players chose their objective, update the clients
         if (game.getGameState().equals(GameState.GAME))
-            server.sendBroadcast(new Message("gameStarted", Map.of()));
+            server.notifyAllGameStarted();
     }
 
     /**
@@ -323,6 +233,9 @@ public class Controller {
             toPlay = card.getBackSide();
 
         game.placeSide(playerNickname, card, toPlay, i, j);
+
+        server.notifyPlaceSide(playerNickname, game.getPlayArea(playerNickname), game.getPoints(playerNickname));
+        server.notifyOthersPlaceSide(playerNickname, game.getPlayArea(playerNickname), game.getPoints(playerNickname));
     }
 
     /**
@@ -340,6 +253,10 @@ public class Controller {
             throw new RuntimeException("Game not started yet");
 
         game.drawDeck(playerNickname, fromGold);
+
+        Deck deck = fromGold ? game.getGoldDeck() : game.getResourceDeck();
+        server.notifyDrawDeck(playerNickname, deck, game.getHand(playerNickname));
+        server.notifyOthersDrawDeck(playerNickname, fromGold, deck, null); // TODO: pass hand pov
     }
 
     /**
@@ -357,23 +274,26 @@ public class Controller {
             throw new RuntimeException("Game not started yet");
 
         game.drawVisible(playerNickname, visible);
+
+        boolean isGold = visible.getId() > 40;
+        Deck deck = visible.getId() > 40 ? game.getGoldDeck() : game.getResourceDeck();
+        server.notifyDrawVisible(playerNickname, deck, game.getHand(playerNickname));
+        server.notifyOthersDrawVisible(playerNickname, isGold, deck, null); // TODO: pass hand pov
     }
 
     /**
      * Starts Socket and RMI servers.
      * @param args One string containing the path to an old game save file
      */
-    public static void main(String[] args) {
-        Controller controller;
+    public static void main(String[] args) throws IOException {
         try {
             Game oldGame = loadGame(args[0]);
             System.out.println("Old game loaded");
-            controller = new Controller(oldGame);
-
+            new Controller(oldGame);
         } catch (IOException | ClassNotFoundException | ArrayIndexOutOfBoundsException e) {
             // Create a lobby for a new game if the file provided is not found or no file is provided
             System.out.println("Starting a new game");
-            controller = new Controller();
+            new Controller();
         }
     }
 
@@ -418,11 +338,11 @@ public class Controller {
         GameState stateBeforeDisconnection = game.getGameState();
         game.disconnect(nickname);
         GameState stateAfterDisconnection = game.getGameState();
-        server.sendBroadcast(new Message("quitGame", Map.of("nickname", nickname)));
 
+        server.notifyOthersQuitGame(nickname);
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
-            server.sendBroadcast(new Message("gamePaused", null));
+            server.notifyAllGamePaused(nickname);
         }
     }
 

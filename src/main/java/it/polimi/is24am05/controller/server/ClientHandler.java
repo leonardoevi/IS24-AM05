@@ -21,6 +21,14 @@ public abstract class ClientHandler implements VirtualClient {
         return nickname;
     }
 
+    public Controller getController() {
+        return controller;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
     protected void joinServer(String nickname) {
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {

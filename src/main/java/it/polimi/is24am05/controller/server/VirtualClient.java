@@ -17,13 +17,13 @@ public interface VirtualClient {
 
     void notifyOthersJoinGame(String nickname);
 
-    void notifyAllGameCreated(Game pov);
+    void notifyGameCreated(Game pov);
 
     void notifyPlaceStarterSide(PlayArea playArea);
 
     void notifyOthersPlaceStarterSide(String nickname, PlayArea playArea);
 
-    void notifyAllHandsAndObjectivesDealt(Game pov);
+    void notifyHandsAndObjectivesDealt(Game pov);
 
     void notifyChooseObjective();
 
@@ -44,6 +44,10 @@ public interface VirtualClient {
     void notifyGameResumed(Game pov);
 
     void notifyOthersGameResumed(String nickname);
+
+    void notifyOthersQuitGame(String nickname);
+
+    void notifyAllGamePaused();
 
     void notifyException(Exception exception);
 }
