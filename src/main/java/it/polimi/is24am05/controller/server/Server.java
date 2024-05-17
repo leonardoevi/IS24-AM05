@@ -68,12 +68,12 @@ public class Server {
         RmiHandlersProvider handlersProvider = new RmiHandlersProviderImp(controller, this);
         Registry registry = null;
         try {
-            registry = LocateRegistry.createRegistry(6969);
+            registry = LocateRegistry.createRegistry(9696);
             registry.bind("RmiHandlerProvider", handlersProvider);
+            System.out.println("RMI Server bound and ready on port: 9696");
         } catch (RemoteException | AlreadyBoundException e) {
-            System.out.println("Failed to start socket server");
+            System.out.println("Failed to start RMI server");
         }
-        System.out.println("RMI Server bound and ready on port: 6969");
     }
 
     public synchronized List<String> getNicknames(){

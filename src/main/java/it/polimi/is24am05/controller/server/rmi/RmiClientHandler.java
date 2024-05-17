@@ -51,7 +51,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     }
 
     @Override
-    public void notifyAllGameCreated(Game pov) {
+    public void notifyGameCreated(Game pov) {
         try {
             virtualClient.printMessage("notifyAllGameCreated");
         } catch (RemoteException e) {
@@ -79,7 +79,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     }
 
     @Override
-    public void notifyAllHandsAndObjectivesDealt(Game pov) {
+    public void notifyHandsAndObjectivesDealt(Game pov) {
         try {
             virtualClient.printMessage("notifyAllHandsAndObjectivesDealt");
         } catch (RemoteException e) {
@@ -172,6 +172,24 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     public void notifyOthersGameResumed(String nickname) {
         try {
             virtualClient.printMessage("notifyOthersGameResumed");
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void notifyOthersQuitGame(String nickname) {
+        try {
+            virtualClient.printMessage("notifyOthersQuitGame");
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void notifyAllGamePaused() {
+        try {
+            virtualClient.printMessage("notifyAllGamePaused");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

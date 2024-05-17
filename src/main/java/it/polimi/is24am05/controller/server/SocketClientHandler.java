@@ -38,7 +38,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyAllGameCreated(Game pov) {
+    public void notifyGameCreated(Game pov) {
 
     }
 
@@ -53,7 +53,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyAllHandsAndObjectivesDealt(Game pov) {
+    public void notifyHandsAndObjectivesDealt(Game pov) {
 
     }
 
@@ -104,6 +104,16 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyOthersGameResumed(String nickname) {
+
+    }
+
+    @Override
+    public void notifyOthersQuitGame(String nickname) {
+
+    }
+
+    @Override
+    public void notifyAllGamePaused() {
 
     }
 
