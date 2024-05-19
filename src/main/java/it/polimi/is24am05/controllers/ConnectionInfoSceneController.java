@@ -77,6 +77,8 @@ public class ConnectionInfoSceneController implements Initializable {
         rmiConnection = !connectionTypeBox.getValue().equalsIgnoreCase("Socket");
 
 
+
+
     }
 
 
