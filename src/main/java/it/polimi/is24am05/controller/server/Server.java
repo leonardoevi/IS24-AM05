@@ -30,8 +30,8 @@ public class Server {
         this.controller = controller;
     }
 
-    public void start() {
-        new Thread(() -> startSocket()).start();
+    public void start() throws RemoteException {
+        new Thread(this::startSocket).start();
         startRMI();
     }
 
@@ -64,7 +64,7 @@ public class Server {
         threadPool.shutdown();
     }
 
-    private void startRMI() {
+    private void startRMI() throws RemoteException {
         RmiHandlersProvider handlersProvider = new RmiHandlersProviderImp(controller, this);
         Registry registry = null;
         try {

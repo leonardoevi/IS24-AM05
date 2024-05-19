@@ -9,12 +9,17 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public class RmiServerHandler extends ServerHandler implements RmiVirtualClient {
+public class RmiServerHandler extends ServerHandler {
     private RmiVirtualController virtualController;
+    private final RmiVirtualClient rmiFromServer;
 
-    public RmiServerHandler(String serverIP, String serverPort) {
+    public RmiServerHandler(String serverIP, String serverPort) throws RemoteException {
         super(serverIP, serverPort);
+        rmiFromServer = new RmiFromServer();
+
+        startConnection();
     }
 
 
@@ -22,7 +27,7 @@ public class RmiServerHandler extends ServerHandler implements RmiVirtualClient 
         // Try connecting to the server
         try {
             RmiHandlersProvider provider = (RmiHandlersProvider) Naming.lookup("rmi://" + serverIP + ":" + serverPort + "/RmiHandlerProvider");
-            virtualController = provider.connect(this);
+            virtualController = provider.connect(rmiFromServer);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -110,8 +115,13 @@ public class RmiServerHandler extends ServerHandler implements RmiVirtualClient 
         }
     }
 
-    @Override
-    public void printMessage(String message) throws RemoteException {
-        System.out.println(message);
+    class RmiFromServer extends UnicastRemoteObject implements RmiVirtualClient {
+
+        protected RmiFromServer() throws RemoteException {}
+
+        @Override
+        public void printMessageRMI(String message) throws RemoteException {
+            printText(message);
+        }
     }
 }

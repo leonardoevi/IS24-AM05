@@ -1,7 +1,5 @@
 package it.polimi.is24am05.client;
 
-import java.net.InetAddress;
-
 public abstract class ServerHandler implements VirtualServer{
     private String nickname;
 
@@ -21,7 +19,9 @@ public abstract class ServerHandler implements VirtualServer{
         return nickname;
     }
 
-    private void printText(String message){
-        System.out.println(message);
+    // Methods invoked by the SERVER from the network (better be protected)
+
+    protected void printText(String message){
+        System.out.println(nickname + ": " + message);
     }
 }

@@ -7,5 +7,5 @@ import java.rmi.RemoteException;
  * Interface visible from the RMI server java VM, allows the server to notify the client
  */
 public interface RmiVirtualClient extends Remote {
-    public void printMessage(String message) throws RemoteException;
+    public void printMessageRMI(String message) throws RemoteException;
 }

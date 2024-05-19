@@ -10,23 +10,33 @@ import it.polimi.is24am05.model.game.Game;
 import it.polimi.is24am05.model.playArea.PlayArea;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class RmiClientHandler extends ClientHandler implements RmiVirtualController {
+public class RmiClientHandler extends ClientHandler {
     private volatile String lastReceivedKey;
     private final RmiVirtualClient virtualClient;
 
-    public RmiClientHandler(Controller controller, Server server, RmiVirtualClient virtualClient) {
+    private final RmiVirtualController rmiFromClient;
+
+    public RmiClientHandler(Controller controller, Server server, RmiVirtualClient virtualClient) throws RemoteException {
         super(controller, server);
         this.virtualClient = virtualClient;
+        this.rmiFromClient = new RmiFromClient();
+    }
+
+    // This getter is needed to give the Client an object that implements the RmiVirtualController interface
+    public RmiVirtualController getRmiVirtualController() {
+        return rmiFromClient;
     }
 
     // Methods invoked by the Server, needed to notify the client of some events
+    // FROM SERVER TO CLIENT
 
     @Override
     public void notifyJoinServer() {
         try {
-            virtualClient.printMessage("notifyJoinServer");
+            virtualClient.printMessageRMI("notifyJoinServer");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -35,7 +45,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyJoinGame(List<String> nicknames) {
         try {
-            virtualClient.printMessage("notifyJoinGame");
+            virtualClient.printMessageRMI("notifyJoinGame");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -44,7 +54,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersJoinGame(String nickname) {
         try {
-            virtualClient.printMessage("notifyOthersJoinGame");
+            virtualClient.printMessageRMI("notifyOthersJoinGame");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -53,7 +63,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyGameCreated(Game pov) {
         try {
-            virtualClient.printMessage("notifyAllGameCreated");
+            virtualClient.printMessageRMI("notifyAllGameCreated");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +72,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyPlaceStarterSide(PlayArea playArea) {
         try {
-            virtualClient.printMessage("notifyPlaceStarterSide");
+            virtualClient.printMessageRMI("notifyPlaceStarterSide");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +81,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersPlaceStarterSide(String nickname, PlayArea playArea) {
         try {
-            virtualClient.printMessage("notifyOthersPlaceStarterSide");
+            virtualClient.printMessageRMI("notifyOthersPlaceStarterSide");
         } catch (RemoteException e) {
 
             throw new RuntimeException(e);
@@ -81,7 +91,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyHandsAndObjectivesDealt(Game pov) {
         try {
-            virtualClient.printMessage("notifyAllHandsAndObjectivesDealt");
+            virtualClient.printMessageRMI("notifyAllHandsAndObjectivesDealt");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -90,7 +100,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyChooseObjective() {
         try {
-            virtualClient.printMessage("notifyChooseObjective");
+            virtualClient.printMessageRMI("notifyChooseObjective");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -99,7 +109,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyAllGameStarted() {
         try {
-            virtualClient.printMessage("notifyAllGameStarted");
+            virtualClient.printMessageRMI("notifyAllGameStarted");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +118,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyPlaceSide(PlayArea playArea, int points) {
         try {
-            virtualClient.printMessage("notifyPlaceSide");
+            virtualClient.printMessageRMI("notifyPlaceSide");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -117,7 +127,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersPlaceSide(String nickname, PlayArea playArea, int points) {
         try {
-            virtualClient.printMessage("notifyOthersPlaceSide");
+            virtualClient.printMessageRMI("notifyOthersPlaceSide");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -126,7 +136,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyDrawVisible(Deck deck, List<Card> hand) {
         try {
-            virtualClient.printMessage("notifyDrawVisible");
+            virtualClient.printMessageRMI("notifyDrawVisible");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -135,7 +145,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersDrawVisible(String nickname, boolean isGold, Deck deck, List<Card> hand) {
         try {
-            virtualClient.printMessage("notifyOthersDrawVisible");
+            virtualClient.printMessageRMI("notifyOthersDrawVisible");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -144,7 +154,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyDrawDeck(Deck deck, List<Card> hand) {
         try {
-            virtualClient.printMessage("notifyDrawDeck");
+            virtualClient.printMessageRMI("notifyDrawDeck");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -153,7 +163,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersDrawDeck(String nickname, boolean isGold, Deck deck, List<Card> hand) {
         try {
-            virtualClient.printMessage("notifyOthersDrawDeck");
+            virtualClient.printMessageRMI("notifyOthersDrawDeck");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -162,7 +172,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyGameResumed(Game pov) {
         try {
-            virtualClient.printMessage("notifyGameResumed");
+            virtualClient.printMessageRMI("notifyGameResumed");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -171,7 +181,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersGameResumed(String nickname) {
         try {
-            virtualClient.printMessage("notifyOthersGameResumed");
+            virtualClient.printMessageRMI("notifyOthersGameResumed");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -180,7 +190,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyOthersQuitGame(String nickname) {
         try {
-            virtualClient.printMessage("notifyOthersQuitGame");
+            virtualClient.printMessageRMI("notifyOthersQuitGame");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -189,7 +199,7 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyAllGamePaused() {
         try {
-            virtualClient.printMessage("notifyAllGamePaused");
+            virtualClient.printMessageRMI("notifyAllGamePaused");
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -198,62 +208,70 @@ public class RmiClientHandler extends ClientHandler implements RmiVirtualControl
     @Override
     public void notifyException(Exception exception) {
         try {
-            virtualClient.printMessage(exception.getMessage());
+            virtualClient.printMessageRMI(exception.getMessage());
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    // RMI methods, implemented from the RmiVirtualController interface, invoked by the client
+    // this class implements RMI methods, from the RmiVirtualController interface, invoked by the client
+    // simply propagates RMI calls to the super class ClientHandler
+    class RmiFromClient extends UnicastRemoteObject implements RmiVirtualController {
 
-    @Override
-    public void joinServerRMI(String nickname) throws RemoteException {
-        super.joinServer(nickname);
-    }
+        protected RmiFromClient() throws RemoteException {
+        }
 
-    @Override
-    public void joinGameRMI() throws RemoteException {
-        super.joinGame();
-    }
+        // FROM CLIENT TO SERVER
 
-    @Override
-    public void setNumberOfPlayersRMI(int numberOfPlayers) throws RemoteException {
-        super.setNumberOfPlayers(numberOfPlayers);
-    }
+        @Override
+        public void joinServerRMI(String nickname) throws RemoteException {
+            joinServer(nickname);
+        }
 
-    @Override
-    public void placeStarterSideRMI(boolean isFront) throws RemoteException {
-        super.placeStarterSide(isFront);
-    }
+        @Override
+        public void joinGameRMI() throws RemoteException {
+            joinGame();
+        }
 
-    @Override
-    public void chooseObjectiveRMI(String objectiveId) throws RemoteException {
-        super.chooseObjective(objectiveId);
-    }
+        @Override
+        public void setNumberOfPlayersRMI(int numberOfPlayers) throws RemoteException {
+            setNumberOfPlayers(numberOfPlayers);
+        }
 
-    @Override
-    public void placeSideRMI(String cardId, boolean isFront, int i, int j) throws RemoteException {
-        super.placeSide(cardId, isFront, i, j);
-    }
+        @Override
+        public void placeStarterSideRMI(boolean isFront) throws RemoteException {
+            placeStarterSide(isFront);
+        }
 
-    @Override
-    public void drawVisibleRMI(String cardId) throws RemoteException {
-        super.drawVisible(cardId);
-    }
+        @Override
+        public void chooseObjectiveRMI(String objectiveId) throws RemoteException {
+            chooseObjective(objectiveId);
+        }
 
-    @Override
-    public void drawDeckRMI(boolean isGold) throws RemoteException {
-        super.drawDeck(isGold);
-    }
+        @Override
+        public void placeSideRMI(String cardId, boolean isFront, int i, int j) throws RemoteException {
+            placeSide(cardId, isFront, i, j);
+        }
 
-    @Override
-    public void disconnectRMI() throws RemoteException {
-        super.disconnect();
-    }
+        @Override
+        public void drawVisibleRMI(String cardId) throws RemoteException {
+            drawVisible(cardId);
+        }
 
-    @Override
-    public void pong(String key) throws RemoteException {
-        this.lastReceivedKey = key;
+        @Override
+        public void drawDeckRMI(boolean isGold) throws RemoteException {
+            drawDeck(isGold);
+        }
+
+        @Override
+        public void disconnectRMI() throws RemoteException {
+            disconnect();
+        }
+
+        @Override
+        public void pong(String key) throws RemoteException {
+            lastReceivedKey = key;
+        }
     }
 }
 

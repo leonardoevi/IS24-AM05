@@ -5,18 +5,21 @@ import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.Server;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public class RmiHandlersProviderImp implements RmiHandlersProvider {
+public class RmiHandlersProviderImp extends UnicastRemoteObject implements RmiHandlersProvider {
     private final Controller controller;
     private final Server server;
 
-    public RmiHandlersProviderImp(Controller controller, Server server) {
+    public RmiHandlersProviderImp(Controller controller, Server server) throws RemoteException {
         this.controller = controller;
         this.server = server;
     }
 
     @Override
     public RmiVirtualController connect(RmiVirtualClient virtualClient) throws RemoteException {
-        return new RmiClientHandler(controller, server, virtualClient);
+        System.out.println("New connection accepted!");
+        virtualClient.printMessageRMI("Ciao FROM SERVER!");
+        return new RmiClientHandler(controller, server, virtualClient).getRmiVirtualController();
     }
 }
