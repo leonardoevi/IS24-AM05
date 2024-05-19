@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="746.0" prefWidth="1303.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.controllers.ConnectionInfoSceneController">
+   <children>
+      <Label id="title" alignment="TOP_CENTER" contentDisplay="TOP" layoutX="-6.0" layoutY="64.0" prefHeight="90.0" prefWidth="1309.0" stylesheets="@ConnectionInfoScene.css" text="CODEX NATURALIS" />
+      <Label id="title2" layoutX="33.0" layoutY="200.0" prefHeight="71.0" prefWidth="385.0" stylesheets="@ConnectionInfoScene.css" text="CONNECTION TO SERVER" />
+      <Label layoutX="459.0" layoutY="362.0" stylesheets="@ConnectionInfoScene.css" text="Server Ip Address" />
+      <Label layoutX="459.0" layoutY="419.0" prefHeight="24.0" prefWidth="134.0" styleClass="lable" stylesheets="@ConnectionInfoScene.css" text="Server Port" />
+      <Label layoutX="456.0" layoutY="461.0" prefHeight="56.0" prefWidth="224.0" stylesheets="@ConnectionInfoScene.css" text="Connection type" />
+      <TextField fx:id="serverIpAddress" layoutX="847.0" layoutY="363.0" />
+      <TextField fx:id="serverPort" layoutX="848.0" layoutY="417.0" />
+      <ComboBox fx:id="connectionTypeBox" layoutX="848.0" layoutY="472.0" prefHeight="26.0" prefWidth="165.0" />
+      <Button fx:id="confirmButton" layoutX="1109.0" layoutY="566.0" mnemonicParsing="false" onAction="#askServerInformation" prefHeight="60.0" prefWidth="123.0" text="Connect " />
+   </children>
+</AnchorPane>

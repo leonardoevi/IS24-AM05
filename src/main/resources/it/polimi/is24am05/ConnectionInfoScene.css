@@ -1,0 +1,68 @@
+#title {
+    -fx-color-label-visible: #006400 ;
+    -fx-font-family: 'Georgia', serif; /* Font elegante */
+    -fx-font-size: 48px; /* Dimensione del testo grande */
+    -fx-font-weight: bold; /* Testo in grassetto */
+    -fx-text-fill: #006400 ; /* Colore del testo */
+    -fx-text-transform: uppercase; /* Testo in maiuscolo */
+    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
+    -fx-alignment: center;
+    -fx-text-align: center; /* Allineamento al centro */
+    -fx-margin: 20px 0; /* Margine sopra e sotto */
+}
+
+
+#back{
+
+
+
+}
+#title2 {
+    -fx-font-family: 'Georgia', serif; /* Font elegante */
+    -fx-font-size: 24px; /* Dimensione del testo grande */
+    -fx-font-weight: bold; /* Testo in grassetto */
+    -fx-color: #2c3e50; /* Colore del testo */
+    -fx-text-transform: uppercase; /* Testo in maiuscolo */
+    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
+
+    -fx-text-align: center; /* Allineamento al centro */
+    -fx-margin: 20px 0; /* Margine sopra e sotto */
+}
+.label{
+    -fx-font-family: 'Georgia', serif; /* Font elegante */
+    -fx-font-size: 20px; /* Dimensione del testo grande */
+    -fx-font-weight: bold; /* Testo in grassetto */
+    -fx-color: #2c3e50; /* Colore del testo */
+    -fx-text-transform: uppercase; /* Testo in maiuscolo */
+    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
+
+    -fx-text-align: center; /* Allineamento al centro */
+    -fx-margin: 20px 0; /* Margine sopra e sotto */
+
+}
+
+#confirmButton {
+
+    -fx-font-family: 'Georgia', serif;
+    -fx-font-size: 12px;
+
+    -fx-color: #fff;
+    -fx-background-color:  #006400 ;
+    -fx-padding: 15px 30px;
+    -fx-margin: 20px 0;
+    -fx-text-align: center;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 1px;
+    -fx-font-weight: bold;
+    -fx-border: none;
+    -fx-border-radius: 20px;
+    -fx-cursor: pointer;
+
+}
+
+#confirmButton:hover {
+    -fx-background-color: #c0392b;
+    -fx-transform: translateY(-3px);
+}
+
+

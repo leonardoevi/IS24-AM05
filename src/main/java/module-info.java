@@ -7,4 +7,6 @@ module it.polimi.is24am05 {
 
     opens it.polimi.is24am05 to javafx.fxml;
     exports it.polimi.is24am05;
+    exports it.polimi.is24am05.controllers;
+    opens it.polimi.is24am05.controllers to javafx.fxml;
 }
