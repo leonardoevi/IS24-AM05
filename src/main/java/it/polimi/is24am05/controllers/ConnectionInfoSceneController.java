@@ -1,5 +1,7 @@
 package it.polimi.is24am05.controllers;
 
+import it.polimi.is24am05.GUI;
+import it.polimi.is24am05.GUIMain;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -7,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -14,7 +17,7 @@ public class ConnectionInfoSceneController implements Initializable {
 
 
 
-
+  private GUI gui;
 
     @FXML
     private TextField serverIpAddress;
@@ -28,6 +31,10 @@ public class ConnectionInfoSceneController implements Initializable {
     @FXML
     private Button confirmButton;
 
+    public void setGUI(GUI gui)
+    {
+        this.gui=gui;
+    }
     @Override
     public void initialize (URL url, ResourceBundle resources) {
 
@@ -50,7 +57,7 @@ public class ConnectionInfoSceneController implements Initializable {
      * @param event The event on the button.
      */
     @FXML
-    public void askServerInformation(javafx.event.ActionEvent event) {
+    public void askServerInformation(javafx.event.ActionEvent event) throws IOException {
         String ipAddress, defaultIpAddress = "127.0.0.1";
         int port;
         boolean rmiConnection;
@@ -75,6 +82,7 @@ public class ConnectionInfoSceneController implements Initializable {
         }
 
         rmiConnection = !connectionTypeBox.getValue().equalsIgnoreCase("Socket");
+        gui.askNickname();
 
 
 

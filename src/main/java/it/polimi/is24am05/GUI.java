@@ -36,42 +36,9 @@ public class GUI {
     }
 
 
-    public void askNickname() throws IOException {
-        // When the server requires the client nickname, switch to the Nickname Request scene.
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/fxml/NicknameRequestScene.fxml"));
-        Parent root = loader.load();
-
-        nicknameRequestSceneController = loader.getController();
-        // nicknameRequestSceneController.setOnNicknameConfirmedListener(this::onNicknameConfirmed);
-
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/lobbyStyle.css")).toExternalForm());
-        changeScene(scene);
-    }
 
 
-   /*
-    public void askPlayersNumber() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/NumPlayerRequestScene.fxml"));
-            Parent root = loader.load();
 
-            NumPlayerRequestSceneController controller = loader.getController();
-           // controller.setClientManager(clientManager);
-           //  controller.setGUI(this);
-
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/css/lobbyStyle.css").toExternalForm());
-
-            changeScene(scene);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    */
     private void changeScene(Scene scene) {
         Platform.runLater(() -> {
             Stage stage = guiMain.getPrimaryStage();
@@ -82,6 +49,21 @@ public class GUI {
             stage.setFullScreenExitHint("");
             stage.show();
         });
+    }
+
+    public void askNickname() throws IOException {
+        // When the server requires the client nickname, switch to the Nickname Request scene.
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("nicknameRequestScene.fxml"));
+        Parent root = loader.load();
+
+        nicknameRequestSceneController = loader.getController();
+
+      //   nicknameRequestSceneController.setOnNicknameConfirmedListener(this::onNicknameConfirmed);
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("connectionInfoScene.css")).toExternalForm());
+        changeScene(scene);
     }
 
 }

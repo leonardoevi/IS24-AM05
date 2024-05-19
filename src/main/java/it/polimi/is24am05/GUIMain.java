@@ -23,7 +23,7 @@ public class GUIMain extends Application {
 
         scene.getStylesheets().add(GUIMain.class.getResource("ConnectionInfoScene.css").toExternalForm());
         ConnectionInfoSceneController controller = (ConnectionInfoSceneController) fxmlLoader.getController();
-
+        controller.setGUI(guiInterface);
         primaryStage.setTitle("Hello!");
         primaryStage.setScene(scene);
         primaryStage.setFullScreen(true);

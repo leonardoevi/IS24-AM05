@@ -41,7 +41,7 @@
 
 }
 
-#confirmButton {
+.confirmButton {
 
     -fx-font-family: 'Georgia', serif;
     -fx-font-size: 12px;
@@ -60,9 +60,9 @@
 
 }
 
-#confirmButton:hover {
+.confirmButton:hover {
     -fx-background-color: #c0392b;
-    -fx-transform: translateY(-3px);
+
 }
 
 
