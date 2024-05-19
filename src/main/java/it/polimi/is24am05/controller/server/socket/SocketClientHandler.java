@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class SocketClientHandler extends ClientHandler implements Runnable {
     private final Socket socket;
@@ -46,8 +45,8 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             this.inputStream = new ObjectInputStream(socket.getInputStream());
             this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
-            this.clientChecker
-                    .scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
+            // this.clientChecker
+            //        .scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
 
             while (isConnected) {
                 Message message;
@@ -64,12 +63,17 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
                     break;
                 }
 
+                System.out.println("Reading message...");
                 switch (message.title()) {
-                    case "quitServer": break;
-                    case "pong": pong = (String) message.arguments().get("id");
-                    default: messageDecoder.submit(new Thread(()->{
-                        handleClientInput(message);
-                    }));
+                    case "quitServer":
+                        break;
+                    case "pong":
+                        pong = (String) message.arguments().get("id");
+                        break;
+                    default:
+                        messageDecoder.submit(new Thread(()->{
+                            handleClientInput(message);
+                        }));
                 }
             }
             clientDisconnected();
@@ -91,6 +95,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     private void handleClientInput(Message message) {
         switch (message.title()) {
             case "joinServer":
+                System.out.println("Joining server...");
                 super.joinServer((String) message.arguments().get("nickname"));
                 break;
             case "joinGame":
@@ -116,7 +121,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             case "drawDeck":
                 super.drawDeck((boolean) message.arguments().get("isGold"));
                 break;
-            case "disconnect":
+            case "quitServer":
                 super.disconnect();
                 break;
         }
@@ -124,17 +129,17 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyJoinServer() {
-        send(new Message("ok", Map.of()));
+        send(new Message("joinedServer", Map.of()));
     }
 
     @Override
     public void notifyJoinGame(List<String> nicknames) {
-        send(new Message("ok", Map.of("nickname", nicknames)));
+        send(new Message("joinedGame", Map.of("nickname", nicknames)));
     }
 
     @Override
     public void notifyOthersJoinGame(String nickname) {
-        send(new Message("ok", Map.of("nickname", nickname)));
+        send(new Message("otherJoinedGame", Map.of("nickname", nickname)));
     }
 
     @Override
@@ -144,12 +149,12 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyPlaceStarterSide(PlayArea playArea) {
-        send(new Message("ok", Map.of("playArea", playArea)));
+        send(new Message("placedStarterSide", Map.of("playArea", playArea)));
     }
 
     @Override
     public void notifyOthersPlaceStarterSide(String nickname, PlayArea playArea) {
-        send(new Message("placeStarterSide", Map.of(
+        send(new Message("otherPlacedStarterSide", Map.of(
                 "nickname", nickname,
                 "playArea", playArea
         )));
@@ -162,7 +167,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyChooseObjective() {
-        send(new Message("ok", Map.of()));
+        send(new Message("chosenObjective", Map.of()));
     }
 
     @Override
@@ -172,7 +177,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyPlaceSide(PlayArea playArea, int points) {
-        send(new Message("ok", Map.of(
+        send(new Message("placedSide", Map.of(
                 "playArea", playArea,
                 "points", points
         )));
@@ -180,7 +185,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyOthersPlaceSide(String nickname, PlayArea playArea, int points) {
-        send(new Message("placeSide", Map.of(
+        send(new Message("otherPlacedSide", Map.of(
                 "nickname", nickname,
                 "playArea", playArea,
                 "points", points
@@ -189,7 +194,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyDrawVisible(Deck deck, List<Card> hand) {
-        send(new Message("ok", Map.of(
+        send(new Message("drawnVisible", Map.of(
                 "deck", deck,
                 "hand", hand
         )));
@@ -197,7 +202,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyOthersDrawVisible(String nickname, boolean isGold, Deck deck, List<Card> hand) {
-        send(new Message("drawVisible", Map.of(
+        send(new Message("otherDrawnVisible", Map.of(
                 "nickname", nickname,
                 "isGold", isGold,
                 "deck", deck,
@@ -207,7 +212,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyDrawDeck(Deck deck, List<Card> hand) {
-        send(new Message("ok", Map.of(
+        send(new Message("drawnDeck", Map.of(
                 "deck", deck,
                 "hand", hand
         )));
@@ -215,7 +220,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyOthersDrawDeck(String nickname, boolean isGold, Deck deck, List<Card> hand) {
-        send(new Message("drawDeck", Map.of(
+        send(new Message("otherDrawnDeck", Map.of(
                 "nickname", nickname,
                 "isGold", isGold,
                 "deck", deck,
@@ -230,12 +235,12 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void notifyOthersGameResumed(String nickname) {
-        send(new Message("gameResumed", Map.of("nickname", nickname)));
+        send(new Message("otherGameResumed", Map.of("nickname", nickname)));
     }
 
     @Override
     public void notifyOthersQuitGame(String nickname) {
-        send(new Message("quitGame", Map.of("nickname", nickname)));
+        send(new Message("otherQuitGame", Map.of("nickname", nickname)));
     }
 
     @Override

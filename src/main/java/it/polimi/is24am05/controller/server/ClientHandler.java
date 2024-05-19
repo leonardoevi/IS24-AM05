@@ -17,18 +17,6 @@ public abstract class ClientHandler implements VirtualClient {
         this.server = server;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public Controller getController() {
-        return controller;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
     protected void joinServer(String nickname) {
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {
@@ -37,6 +25,7 @@ public abstract class ClientHandler implements VirtualClient {
             }
             this.nickname = nickname;
             server.subscribe(this);
+            notifyJoinServer();
         }
     }
 
@@ -115,5 +104,17 @@ public abstract class ClientHandler implements VirtualClient {
         } catch (Exception e) {
             notifyException(e);
         }
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public Server getServer() {
+        return server;
     }
 }

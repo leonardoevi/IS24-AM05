@@ -3,6 +3,7 @@ package it.polimi.is24am05.controller.server;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
+import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
@@ -52,7 +53,7 @@ public class Server {
         // Keep accepting connections
         while (true) {
             try {
-                final Socket socket = serverSocket.accept();
+                Socket socket = serverSocket.accept();
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketClientHandler(controller,this, socket));
             } catch (IOException ignored) {
@@ -91,13 +92,6 @@ public class Server {
     private synchronized ClientHandler getClientHandler(String nickname) throws NoSuchPlayerException {
         return clientHandlers.stream().filter(h -> h.getNickname().equals(nickname)).findFirst()
                 .orElseThrow(NoSuchPlayerException::new);
-    }
-
-    public void notifyJoinServer(String client) {
-        try {
-            ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyJoinServer();
-        } catch (NoSuchPlayerException ignored) {}
     }
 
     public void notifyJoinGame(String client, List<String> nicknames) {
@@ -249,12 +243,5 @@ public class Server {
         }
         for(ClientHandler c : copy)
             c.notifyAllGamePaused();
-    }
-
-    public void notifyException(String client, Exception exception) {
-        try {
-            ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyException(exception);
-        } catch (NoSuchPlayerException ignored) {}
     }
 }
