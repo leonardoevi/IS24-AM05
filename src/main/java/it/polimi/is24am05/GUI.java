@@ -1,6 +1,7 @@
 package it.polimi.is24am05;
 
 import it.polimi.is24am05.controllers.NicknameRequestSceneController;
+import it.polimi.is24am05.controllers.WaitingRoomSceneController;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -57,13 +58,32 @@ public class GUI {
         loader.setLocation(getClass().getResource("nicknameRequestScene.fxml"));
         Parent root = loader.load();
 
-        nicknameRequestSceneController = loader.getController();
-
+        NicknameRequestSceneController controller = loader.getController();
+        controller.setGUI(this);
       //   nicknameRequestSceneController.setOnNicknameConfirmedListener(this::onNicknameConfirmed);
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("connectionInfoScene.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("NickNameRequestScene.css")).toExternalForm());
         changeScene(scene);
     }
+
+    public void switchToWaitingRoom() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("waitingRoomScene.fxml"));
+            Parent root = loader.load();
+
+            WaitingRoomSceneController controller = loader.getController();
+            controller.setGUI(this);
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("WaitingRoomScene.css")).toExternalForm());
+
+            changeScene(scene);
+        } catch(IOException e) {
+            System.out.println("Error");
+        }
+    }
+
 
 }

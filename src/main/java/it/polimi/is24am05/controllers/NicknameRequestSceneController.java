@@ -1,5 +1,6 @@
 package it.polimi.is24am05.controllers;
 
+import it.polimi.is24am05.GUI;
 import it.polimi.is24am05.GUIMain;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -15,13 +16,16 @@ public class NicknameRequestSceneController implements Initializable {
     @FXML
     private TextField playerNickname;
 
-
+    private GUI gui;
     @FXML
     private Button confirButton;
 
 
 
-
+    public void setGUI(GUI gui)
+    {
+        this.gui=gui;
+    }
 
     @Override
     public void initialize (URL url, ResourceBundle resources) {
@@ -46,6 +50,7 @@ public class NicknameRequestSceneController implements Initializable {
     public void onButtonClicked() {
         String nickname = getPlayerNickname();
         System.out.println(nickname);
+        gui.switchToWaitingRoom();
 
         }
     }

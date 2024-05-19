@@ -19,7 +19,7 @@ public class GUIMain extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(GUIMain.class.getResource("connectionInfoScene.fxml"));
 
         Parent root = (Parent)fxmlLoader.load();
-        Scene scene = new Scene(root, 320, 240);
+        Scene scene = new Scene(root);
 
         scene.getStylesheets().add(GUIMain.class.getResource("ConnectionInfoScene.css").toExternalForm());
         ConnectionInfoSceneController controller = (ConnectionInfoSceneController) fxmlLoader.getController();
