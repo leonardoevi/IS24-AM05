@@ -14,15 +14,12 @@ import java.util.Objects;
 
 public class GUI {
 
-  //  private ClientManager clientManager;
 
-    /** Reference to the {@code GUIMain} class. */
+
+    /** Reference to the GUIMain class. */
     private final GUIMain guiMain;
 
-    /** List of player's nicknames. */
-    private List<String> nicknameList;
 
-    // ---------- SCENE'S REFERENCES ----------
     /** Nickname request's scene. */
     private NicknameRequestSceneController nicknameRequestSceneController;
     /** Game's scene. */
@@ -39,15 +36,15 @@ public class GUI {
 
 
 
-
     private void changeScene(Scene scene) {
         Platform.runLater(() -> {
             Stage stage = guiMain.getPrimaryStage();
          //   stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/Publisher material/Icon 50x50px.png"))));
             stage.setTitle("My Shelfie");
             stage.setScene(scene);
+
             stage.setFullScreen(true);
-            stage.setFullScreenExitHint("");
+
             stage.show();
         });
     }
@@ -58,9 +55,8 @@ public class GUI {
         loader.setLocation(getClass().getResource("nicknameRequestScene.fxml"));
         Parent root = loader.load();
 
-        NicknameRequestSceneController controller = loader.getController();
-        controller.setGUI(this);
-      //   nicknameRequestSceneController.setOnNicknameConfirmedListener(this::onNicknameConfirmed);
+       nicknameRequestSceneController = loader.getController();
+        nicknameRequestSceneController.setGUI(this);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("NickNameRequestScene.css")).toExternalForm());
