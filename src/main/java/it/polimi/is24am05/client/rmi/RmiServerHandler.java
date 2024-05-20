@@ -3,8 +3,8 @@ package it.polimi.is24am05.client.rmi;
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiVirtualController;
+import it.polimi.is24am05.model.game.Game;
 
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -119,9 +119,15 @@ public class RmiServerHandler extends ServerHandler {
 
         protected RmiFromServer() throws RemoteException {}
 
+
         @Override
-        public void printMessageRMI(String message) throws RemoteException {
-            printText(message);
+        public void setGameRMI(Game game) throws RemoteException {
+            setGame(game);
+        }
+
+        @Override
+        public void addLogRMI(String log) throws RemoteException {
+            addLog(log);
         }
     }
 }

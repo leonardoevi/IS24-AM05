@@ -33,183 +33,23 @@ public class RmiClientHandler extends ClientHandler {
     // Methods invoked by the Server, needed to notify the client of some events
     // FROM SERVER TO CLIENT
 
+
     @Override
-    public void notifyJoinServer() {
+    public void setGame(Game game) {
         try {
-            virtualClient.printMessageRMI("notifyJoinServer");
+            virtualClient.setGameRMI(game);
         } catch (RemoteException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void notifyJoinGame(List<String> nicknames) {
+    public void addLog(String log) {
         try {
-            virtualClient.printMessageRMI("notifyJoinGame");
+            virtualClient.addLogRMI(log);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersJoinGame(String nickname) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersJoinGame");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyGameCreated(Game pov) {
-        try {
-            virtualClient.printMessageRMI("notifyAllGameCreated");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyPlaceStarterSide(PlayArea playArea) {
-        try {
-            virtualClient.printMessageRMI("notifyPlaceStarterSide");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersPlaceStarterSide(String nickname, PlayArea playArea) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersPlaceStarterSide");
-        } catch (RemoteException e) {
-
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyHandsAndObjectivesDealt(Game pov) {
-        try {
-            virtualClient.printMessageRMI("notifyAllHandsAndObjectivesDealt");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyChooseObjective() {
-        try {
-            virtualClient.printMessageRMI("notifyChooseObjective");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyAllGameStarted() {
-        try {
-            virtualClient.printMessageRMI("notifyAllGameStarted");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyPlaceSide(PlayArea playArea, int points) {
-        try {
-            virtualClient.printMessageRMI("notifyPlaceSide");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersPlaceSide(String nickname, PlayArea playArea, int points) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersPlaceSide");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyDrawVisible(Deck deck, List<Card> hand) {
-        try {
-            virtualClient.printMessageRMI("notifyDrawVisible");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersDrawVisible(String nickname, boolean isGold, Deck deck, List<Card> hand) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersDrawVisible");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyDrawDeck(Deck deck, List<Card> hand) {
-        try {
-            virtualClient.printMessageRMI("notifyDrawDeck");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersDrawDeck(String nickname, boolean isGold, Deck deck, List<Card> hand) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersDrawDeck");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyGameResumed(Game pov) {
-        try {
-            virtualClient.printMessageRMI("notifyGameResumed");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersGameResumed(String nickname) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersGameResumed");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyOthersQuitGame(String nickname) {
-        try {
-            virtualClient.printMessageRMI("notifyOthersQuitGame");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyAllGamePaused() {
-        try {
-            virtualClient.printMessageRMI("notifyAllGamePaused");
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void notifyException(Exception exception) {
-        try {
-            virtualClient.printMessageRMI(exception.getMessage());
-        } catch (RemoteException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }

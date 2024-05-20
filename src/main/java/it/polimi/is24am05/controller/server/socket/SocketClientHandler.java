@@ -122,134 +122,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         }
     }
 
-    @Override
-    public void notifyJoinServer() {
-        send(new Message("ok", Map.of()));
-    }
 
-    @Override
-    public void notifyJoinGame(List<String> nicknames) {
-        send(new Message("ok", Map.of("nickname", nicknames)));
-    }
-
-    @Override
-    public void notifyOthersJoinGame(String nickname) {
-        send(new Message("ok", Map.of("nickname", nickname)));
-    }
-
-    @Override
-    public void notifyGameCreated(Game pov) {
-        send(new Message("gameCreated", Map.of("pov", pov)));
-    }
-
-    @Override
-    public void notifyPlaceStarterSide(PlayArea playArea) {
-        send(new Message("ok", Map.of("playArea", playArea)));
-    }
-
-    @Override
-    public void notifyOthersPlaceStarterSide(String nickname, PlayArea playArea) {
-        send(new Message("placeStarterSide", Map.of(
-                "nickname", nickname,
-                "playArea", playArea
-        )));
-    }
-
-    @Override
-    public void notifyHandsAndObjectivesDealt(Game pov) {
-        send(new Message("handAndObjectivesDealt", Map.of("pov", pov)));
-    }
-
-    @Override
-    public void notifyChooseObjective() {
-        send(new Message("ok", Map.of()));
-    }
-
-    @Override
-    public void notifyAllGameStarted() {
-        send(new Message("gameStarted", Map.of()));
-    }
-
-    @Override
-    public void notifyPlaceSide(PlayArea playArea, int points) {
-        send(new Message("ok", Map.of(
-                "playArea", playArea,
-                "points", points
-        )));
-    }
-
-    @Override
-    public void notifyOthersPlaceSide(String nickname, PlayArea playArea, int points) {
-        send(new Message("placeSide", Map.of(
-                "nickname", nickname,
-                "playArea", playArea,
-                "points", points
-        )));
-    }
-
-    @Override
-    public void notifyDrawVisible(Deck deck, List<Card> hand) {
-        send(new Message("ok", Map.of(
-                "deck", deck,
-                "hand", hand
-        )));
-    }
-
-    @Override
-    public void notifyOthersDrawVisible(String nickname, boolean isGold, Deck deck, List<Card> hand) {
-        send(new Message("drawVisible", Map.of(
-                "nickname", nickname,
-                "isGold", isGold,
-                "deck", deck,
-                "hand", hand
-        )));
-    }
-
-    @Override
-    public void notifyDrawDeck(Deck deck, List<Card> hand) {
-        send(new Message("ok", Map.of(
-                "deck", deck,
-                "hand", hand
-        )));
-    }
-
-    @Override
-    public void notifyOthersDrawDeck(String nickname, boolean isGold, Deck deck, List<Card> hand) {
-        send(new Message("drawDeck", Map.of(
-                "nickname", nickname,
-                "isGold", isGold,
-                "deck", deck,
-                "hand", hand
-        )));
-    }
-
-    @Override
-    public void notifyGameResumed(Game pov) {
-        send(new Message("gameResumed", Map.of("pov", pov)));
-    }
-
-    @Override
-    public void notifyOthersGameResumed(String nickname) {
-        send(new Message("gameResumed", Map.of("nickname", nickname)));
-    }
-
-    @Override
-    public void notifyOthersQuitGame(String nickname) {
-        send(new Message("quitGame", Map.of("nickname", nickname)));
-    }
-
-    @Override
-    public void notifyAllGamePaused() {
-        send(new Message("gamePaused", Map.of()));
-    }
-
-    @Override
-    public void notifyException(Exception exception) {
-        send(new Message("ko", Map.of(
-                "exception", exception.toString(),
-                "reason", exception.getMessage()
-        )));
-    }
 
     public synchronized void send(Message message) {
         try {
@@ -274,5 +147,15 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             socket.close();
         } catch (IOException ignored) {}
         clientChecker.shutdownNow();
+    }
+
+    @Override
+    public void setGame(Game game) {
+        send(new Message("Game", Map.of("game", game)));
+    }
+
+    @Override
+    public void addLog(String log) {
+        send(new Message("Log", Map.of("log", log)));
     }
 }

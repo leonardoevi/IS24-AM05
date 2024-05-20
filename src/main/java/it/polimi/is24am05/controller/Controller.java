@@ -90,7 +90,7 @@ public class Controller {
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
                 for (Player player : game.getPlayers())
-                    server.notifyGameResumed(player.getNickname(), null); // TODO: pass pov
+                    server.notifyGameResumed(player.getNickname(), game); // TODO: pass pov
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -109,7 +109,7 @@ public class Controller {
                     this.game = new Game(this.users);
                     this.lobbyState = LobbyState.STARTED;
                     for (Player player : game.getPlayers())
-                        server.notifyGameCreated(player.getNickname(), null);
+                        server.notifyGameCreated(player.getNickname(), game);
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -126,7 +126,7 @@ public class Controller {
 
             try {
                 this.game.reconnect(playerNickname);
-                server.notifyGameResumed(playerNickname, null); // TODO: pass pov
+                server.notifyGameResumed(playerNickname, game); // TODO: pass pov
                 server.notifyOthersGameResumed(playerNickname);
             } catch (NoSuchPlayerException ignored) {}
         }
@@ -174,12 +174,12 @@ public class Controller {
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
 
-        server.notifyPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname));
-        server.notifyOthersPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname));
+        server.notifyPlaceStarterSide(playerNickname, game);
+        server.notifyOthersPlaceStarterSide(playerNickname, game);
         // If the game state changed, i.e. all players placed their starter card, update the clients
         if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
             for (Player player : game.getPlayers()) {
-                server.notifyHandsAndObjectivesDealt(player.getNickname(), null); // TODO: pass pov
+                server.notifyHandsAndObjectivesDealt(player.getNickname(), game); // TODO: pass pov
             }
         }
     }
@@ -234,8 +234,8 @@ public class Controller {
 
         game.placeSide(playerNickname, card, toPlay, i, j);
 
-        server.notifyPlaceSide(playerNickname, game.getPlayArea(playerNickname), game.getPoints(playerNickname));
-        server.notifyOthersPlaceSide(playerNickname, game.getPlayArea(playerNickname), game.getPoints(playerNickname));
+        server.notifyPlaceSide(playerNickname, game);
+        server.notifyOthersPlaceSide(playerNickname, game);
     }
 
     /**
@@ -255,8 +255,8 @@ public class Controller {
         game.drawDeck(playerNickname, fromGold);
 
         Deck deck = fromGold ? game.getGoldDeck() : game.getResourceDeck();
-        server.notifyDrawDeck(playerNickname, deck, game.getHand(playerNickname));
-        server.notifyOthersDrawDeck(playerNickname, fromGold, deck, null); // TODO: pass hand pov
+        server.notifyDrawDeck(playerNickname, game);
+        server.notifyOthersDrawDeck(playerNickname, game); // TODO: pass hand pov
     }
 
     /**
@@ -277,8 +277,8 @@ public class Controller {
 
         boolean isGold = visible.getId() > 40;
         Deck deck = visible.getId() > 40 ? game.getGoldDeck() : game.getResourceDeck();
-        server.notifyDrawVisible(playerNickname, deck, game.getHand(playerNickname));
-        server.notifyOthersDrawVisible(playerNickname, isGold, deck, null); // TODO: pass hand pov
+        server.notifyDrawVisible(playerNickname, game);
+        server.notifyOthersDrawVisible(playerNickname, game); // TODO: pass hand pov
     }
 
     /**

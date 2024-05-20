@@ -32,7 +32,7 @@ public abstract class ClientHandler implements VirtualClient {
     protected void joinServer(String nickname) {
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {
-                notifyException(new AlreadyUsedNicknameException(server.getNicknames()));
+                addLog(new AlreadyUsedNicknameException(server.getNicknames()).getMessage());
                 return;
             }
             this.nickname = nickname;
@@ -44,7 +44,7 @@ public abstract class ClientHandler implements VirtualClient {
         try {
             controller.newConnection(nickname);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ public abstract class ClientHandler implements VirtualClient {
         try {
             controller.newConnection(nickname, numberOfPlayers);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -60,7 +60,7 @@ public abstract class ClientHandler implements VirtualClient {
         try {
             controller.playStarterCard(nickname, isFront);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ public abstract class ClientHandler implements VirtualClient {
         try {
             controller.chooseObjective(nickname, objectiveId);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -82,7 +82,7 @@ public abstract class ClientHandler implements VirtualClient {
             }
             controller.placeSide(nickname, card, isFront, i, j);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -96,7 +96,7 @@ public abstract class ClientHandler implements VirtualClient {
             }
             controller.drawVisible(nickname, card);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -104,7 +104,7 @@ public abstract class ClientHandler implements VirtualClient {
         try {
             controller.drawDeck(nickname, isGold);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 
@@ -113,7 +113,7 @@ public abstract class ClientHandler implements VirtualClient {
             controller.disconnect(nickname);
             server.unsubscribe(this);
         } catch (Exception e) {
-            notifyException(e);
+            addLog(e.getMessage());
         }
     }
 }

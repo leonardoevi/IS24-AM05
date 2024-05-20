@@ -1,4 +1,4 @@
-package it.polimi.is24am05.client;
+package it.polimi.is24am05.client.exceptions;
 
 public class ConnectionFailedException extends Exception {
     @Override

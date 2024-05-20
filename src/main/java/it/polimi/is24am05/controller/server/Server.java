@@ -3,6 +3,7 @@ package it.polimi.is24am05.controller.server;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
+import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
@@ -96,14 +97,14 @@ public class Server {
     public void notifyJoinServer(String client) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyJoinServer();
+            clientHandler.addLog(client + " joined the server");
         } catch (NoSuchPlayerException ignored) {}
     }
 
     public void notifyJoinGame(String client, List<String> nicknames) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyJoinGame(nicknames);
+            clientHandler.addLog(nicknames.toString());
         } catch (NoSuchPlayerException ignored) {}
     }
 
@@ -114,44 +115,46 @@ public class Server {
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersJoinGame(client);
+            c.addLog(client + " joined the game");
     }
 
     public void notifyGameCreated(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyGameCreated(pov);
+            clientHandler.addLog("Game created!");
+            clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyPlaceStarterSide(String client, PlayArea playArea) {
+    public void notifyPlaceStarterSide(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyPlaceStarterSide(playArea);
+            clientHandler.addLog("Starter card placed!");
+            clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersPlaceStarterSide(String client, PlayArea playArea) {
+    public void notifyOthersPlaceStarterSide(String client, Game pov) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersPlaceStarterSide(client, playArea);
+            c.setGame(pov);
     }
 
     public void notifyHandsAndObjectivesDealt(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyHandsAndObjectivesDealt(pov);
+            clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 
     public void notifyChooseObjective(String client) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyChooseObjective();
+            clientHandler.addLog("Objective chosen!");
         } catch (NoSuchPlayerException ignored) {}
     }
 
@@ -161,64 +164,64 @@ public class Server {
             copy = new ArrayList<>(clientHandlers);
         }
         for(ClientHandler c : copy)
-            c.notifyAllGameStarted();
+            c.addLog("Game started!");
     }
 
-    public void notifyPlaceSide(String client, PlayArea playArea, int points) {
+    public void notifyPlaceSide(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyPlaceSide(playArea, points);
+                clientHandler.addLog("Card placed!");
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersPlaceSide(String client, PlayArea playArea, int points) {
+    public void notifyOthersPlaceSide(String client, Game pov) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersPlaceSide(client, playArea, points);
+            c.setGame(pov);
     }
 
-    public void notifyDrawVisible(String client, Deck deck, List<Card> hand) {
+    public void notifyDrawVisible(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyDrawVisible(deck, hand);
+            clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersDrawVisible(String client, boolean isGold, Deck deck, List<Card> hand) {
+    public void notifyOthersDrawVisible(String client, Game pov) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersDrawVisible(client, isGold, deck, hand);
+            c.setGame(pov);
     }
 
-    public void notifyDrawDeck(String client, Deck deck, List<Card> hand) {
+    public void notifyDrawDeck(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyDrawDeck(deck, hand);
+            clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersDrawDeck(String client, boolean isGold, Deck deck, List<Card> hand) {
+    public void notifyOthersDrawDeck(String client, Game pov) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersDrawDeck(client, isGold, deck, hand);
+            c.setGame(pov);
     }
 
     public void notifyGameResumed(String client, Game pov) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyGameResumed(pov);
+            clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 
@@ -229,7 +232,7 @@ public class Server {
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersGameResumed(client);
+            c.addLog("Game resumed!");
     }
 
     public void notifyOthersQuitGame(String client) {
@@ -239,7 +242,7 @@ public class Server {
                     .filter(c -> !c.getNickname().equals(client)).toList());
         }
         for(ClientHandler c : copy)
-            c.notifyOthersQuitGame(client);
+            c.addLog(client + " has quit the game!");
     }
 
     public void notifyAllGamePaused(String client) {
@@ -248,13 +251,13 @@ public class Server {
             copy = new ArrayList<>(clientHandlers);
         }
         for(ClientHandler c : copy)
-            c.notifyAllGamePaused();
+            c.addLog("Game paused!");
     }
 
     public void notifyException(String client, Exception exception) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyException(exception);
+            clientHandler.addLog(exception.getMessage());
         } catch (NoSuchPlayerException ignored) {}
     }
 }
