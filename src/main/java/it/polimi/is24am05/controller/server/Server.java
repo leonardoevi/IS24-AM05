@@ -4,11 +4,8 @@ import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
 import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
-import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 import it.polimi.is24am05.model.game.Game;
-import it.polimi.is24am05.model.playArea.PlayArea;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -171,6 +168,7 @@ public class Server {
         try {
             ClientHandler clientHandler = getClientHandler(client);
                 clientHandler.addLog("Card placed!");
+                clientHandler.setGame(pov);
         } catch (NoSuchPlayerException ignored) {}
     }
 

@@ -6,6 +6,7 @@ import static java.lang.Thread.sleep;
 
 public class Client {
     public static void main(String[] args) throws Exception {
+        /*
         ServerHandler serverHandler1 = new RmiServerHandler("localhost", "9696");
         sleep(2000);
 
@@ -24,6 +25,9 @@ public class Client {
 
         serverHandler1.placeStarterSide(false); sleep(2000);
         serverHandler2.placeStarterSide(false); sleep(2000);
+         */
 
+
+        new RmiServerHandler("localhost", "9696");
     }
 }
