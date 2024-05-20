@@ -46,8 +46,8 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             this.inputStream = new ObjectInputStream(socket.getInputStream());
             this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
-            this.clientChecker
-                    .scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
+            //this.clientChecker
+            //        .scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
 
             while (isConnected) {
                 Message message;
@@ -95,6 +95,9 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
                 break;
             case "joinGame":
                 super.joinGame();
+                break;
+            case "setNumberOfPlayers":
+                super.setNumberOfPlayers((int) message.arguments().get("numberOfPlayers"));
                 break;
             case "placeStarterSide":
                 super.placeStarterSide((boolean) message.arguments().get("isFront"));
@@ -151,6 +154,8 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void setGame(Game game) {
+        System.out.println("Sending via socket the following game");
+        System.out.println(game.toString());
         send(new Message("Game", Map.of("game", game)));
     }
 

@@ -51,6 +51,7 @@ public class Server {
         while (true) {
             try {
                 final Socket socket = serverSocket.accept();
+                System.out.println("New connection!");
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketClientHandler(controller,this, socket));
             } catch (IOException ignored) {

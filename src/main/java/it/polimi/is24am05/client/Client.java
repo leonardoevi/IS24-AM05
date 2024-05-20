@@ -1,6 +1,7 @@
 package it.polimi.is24am05.client;
 
 import it.polimi.is24am05.client.rmi.RmiServerHandler;
+import it.polimi.is24am05.client.socket.SocketServerHandler;
 
 import static java.lang.Thread.sleep;
 
@@ -28,6 +29,6 @@ public class Client {
          */
 
 
-        new RmiServerHandler("localhost", "9696");
+        new SocketServerHandler("localhost", "6969");
     }
 }
