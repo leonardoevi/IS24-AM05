@@ -1,13 +1,17 @@
 package it.polimi.is24am05.controller.server.socket;
 
+import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.ClientHandler;
 import it.polimi.is24am05.controller.server.Server;
 import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.deck.Deck;
+import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.starterCard.StarterCard;
+import it.polimi.is24am05.model.enums.Color;
+import it.polimi.is24am05.model.enums.element.Resource;
+import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
-import it.polimi.is24am05.model.game.Game;
-import it.polimi.is24am05.model.playArea.PlayArea;
+import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SocketClientHandler extends ClientHandler implements Runnable {
     private final Socket socket;
@@ -45,8 +50,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             this.inputStream = new ObjectInputStream(socket.getInputStream());
             this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
-            // this.clientChecker
-            //        .scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
+            this.clientChecker.scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
 
             while (isConnected) {
                 Message message;
@@ -143,17 +147,28 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyGameCreated(Game pov) {
-        send(new Message("gameCreated", Map.of("pov", pov)));
+    public void notifyGameCreated(
+            DeckPov resourceDeck, DeckPov goldDeck,
+            int playerTurn, Color color, StarterCard starterCard,
+            List<Map<String, Object>> players)
+    {
+        send(new Message("gameCreated", Map.of(
+                "resourceDeck", resourceDeck,
+                "goldDeck", goldDeck,
+                "turn", playerTurn,
+                "color", color,
+                "starterCard", starterCard,
+                "players", players
+        )));
     }
 
     @Override
-    public void notifyPlaceStarterSide(PlayArea playArea) {
+    public void notifyPlaceStarterSide(Side[][] playArea) {
         send(new Message("placedStarterSide", Map.of("playArea", playArea)));
     }
 
     @Override
-    public void notifyOthersPlaceStarterSide(String nickname, PlayArea playArea) {
+    public void notifyOthersPlaceStarterSide(String nickname, Side[][] playArea) {
         send(new Message("otherPlacedStarterSide", Map.of(
                 "nickname", nickname,
                 "playArea", playArea
@@ -161,13 +176,20 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyHandsAndObjectivesDealt(Game pov) {
-        send(new Message("handAndObjectivesDealt", Map.of("pov", pov)));
+    public void notifyHandsAndObjectivesDealt(DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives, List<Card> hand, List<Objective> playerObjectives, List<Map<String, Object>> players) {
+        send(new Message("handAndObjectivesDealt", Map.of(
+                "resourceDeck", resourceDeck,
+                "goldDeck", goldDeck,
+                "objectives", objectives,
+                "hand", hand,
+                "playerObjectives", playerObjectives,
+                "players", players
+        )));
     }
 
     @Override
-    public void notifyChooseObjective() {
-        send(new Message("chosenObjective", Map.of()));
+    public void notifyChooseObjective(Objective objective) {
+        send(new Message("chosenObjective", Map.of("objective", objective)));
     }
 
     @Override
@@ -176,7 +198,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyPlaceSide(PlayArea playArea, int points) {
+    public void notifyPlaceSide(Side[][] playArea, int points) {
         send(new Message("placedSide", Map.of(
                 "playArea", playArea,
                 "points", points
@@ -184,7 +206,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyOthersPlaceSide(String nickname, PlayArea playArea, int points) {
+    public void notifyOthersPlaceSide(String nickname, Side[][] playArea, int points) {
         send(new Message("otherPlacedSide", Map.of(
                 "nickname", nickname,
                 "playArea", playArea,
@@ -193,15 +215,16 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyDrawVisible(Deck deck, List<Card> hand) {
+    public void notifyDrawVisible(boolean isGold, DeckPov deck, List<Card> hand) {
         send(new Message("drawnVisible", Map.of(
+                "isGold", isGold,
                 "deck", deck,
                 "hand", hand
         )));
     }
 
     @Override
-    public void notifyOthersDrawVisible(String nickname, boolean isGold, Deck deck, List<Card> hand) {
+    public void notifyOthersDrawVisible(String nickname, boolean isGold, DeckPov deck, List<Resource> hand) {
         send(new Message("otherDrawnVisible", Map.of(
                 "nickname", nickname,
                 "isGold", isGold,
@@ -211,15 +234,16 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyDrawDeck(Deck deck, List<Card> hand) {
+    public void notifyDrawDeck(boolean isGold, DeckPov deck, List<Card> hand) {
         send(new Message("drawnDeck", Map.of(
+                "isGold", isGold,
                 "deck", deck,
                 "hand", hand
         )));
     }
 
     @Override
-    public void notifyOthersDrawDeck(String nickname, boolean isGold, Deck deck, List<Card> hand) {
+    public void notifyOthersDrawDeck(String nickname, boolean isGold, DeckPov deck, List<Resource> hand) {
         send(new Message("otherDrawnDeck", Map.of(
                 "nickname", nickname,
                 "isGold", isGold,
@@ -229,8 +253,28 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void notifyGameResumed(Game pov) {
-        send(new Message("gameResumed", Map.of("pov", pov)));
+    public void notifyGameResumed(
+            GameState state, int turn, DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives,
+            int playerTurn, Color color, StarterCard starterCard, List<Objective> playerObjectives, List<Card> hand, Side[][] playArea, int points,
+            List<Map<String, Object>> players
+    ) {
+        Map<String, Object> arguments = Map.of(
+                "state", state,
+                "turn", turn,
+                "resourceDeck", resourceDeck,
+                "goldDeck", goldDeck,
+                "objectives", objectives,
+                "playerTurn", playerTurn,
+                "color", color,
+                "starterCard", starterCard,
+                "playerObjectives", playerObjectives,
+                "hand", hand
+        );
+        // As Map.of can take up to 10 keys, this is the best work around
+        arguments.put("playArea", playArea);
+        arguments.put("points", points);
+        arguments.put("players", players);
+        send(new Message("gameResumed", arguments));
     }
 
     @Override

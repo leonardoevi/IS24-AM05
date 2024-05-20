@@ -796,13 +796,11 @@ public class Game implements Serializable {
     }
 
     /**
-     * Gets the blurred hand of the given player.
-     * @param nickname given player's nickname.
-     * @return the playArea of the given player.
-     * @throws NoSuchPlayerException if the given player is not in the game.
+     * Gets the turn of the given player.
+     * @param player the player.
+     * @return the turn.
      */
-    public List<Resource> getBlurredHand(String nickname) throws NoSuchPlayerException {
-        Player player = findPlayer(nickname);
-        return player.getBlurredHand();
+    public int getPlayerTurn(Player player) {
+        return players.indexOf(player);
     }
 }

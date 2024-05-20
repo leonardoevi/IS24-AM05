@@ -17,53 +17,81 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Reads the messages from the server.
+ */
 public class SocketServerReader implements Runnable {
 
+    /**
+     * Socket server handler, i.e. the parent who ran this reader.
+     */
     private final SocketServerHandler socketServerHandler;
+
+    /**
+     * Socket of this client.
+     */
     private final Socket socket;
 
+    /**
+     * Thread pool to read messages from the server.
+     */
     private final ExecutorService messageDecoder = Executors.newFixedThreadPool(4);
+
+    /**
+     * Useless object to wait between reads.
+     */
     private final Object lock = new Object();
 
+    /**
+     * Constructor.
+     * @param socketServerHandler the socket server handler.
+     * @param socket the socket of this client.
+     */
     public SocketServerReader(SocketServerHandler socketServerHandler, Socket socket) {
         this.socketServerHandler = socketServerHandler;
         this.socket = socket;
     }
 
+    /**
+     * Reads messages from the server and submits a decoder.
+     */
     @Override
     public void run() {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
             while (true) {
                 Message message;
-                if (inputStream.available() > 0)
+                if (inputStream.available() > 0) {
                     message = (Message) inputStream.readObject();
-                else try {
-                    synchronized (lock) {
-                        lock.wait(100);
+                } else {
+                    try {
+                        synchronized (lock) {
+                            lock.wait(100);
+                        }
+                        continue;
+                    } catch (InterruptedException ignored) {
+                        break;
                     }
-                    continue;
-                } catch (InterruptedException ignored) {
-                    break;
                 }
 
                 if (message.title().equals("ping")) {
                     socketServerHandler.send(
-                            new Message("pong", Map.of("id", message.arguments().get("id")))
+                        new Message("pong", Map.of("id", message.arguments().get("id")))
                     );
                 } else {
                     messageDecoder.submit(new Thread(() -> {
-                        handleServerInput(message);
+                        decodeServerInput(message);
                     }));
                 }
             }
         } catch (Exception ignored) {}
     }
 
-    private void handleServerInput(Message message) {
-        System.out.println("Handling server input...");
-        socketServerHandler.printText(message.toString());
-
+    /**
+     * Decodes a message from the server.
+     * @param message the message to decode.
+     */
+    private void decodeServerInput(Message message) {
         switch (message.title()) {
             case "joinedServer":
                 socketServerHandler.setConnected(true);
@@ -74,13 +102,11 @@ public class SocketServerReader implements Runnable {
             case "otherJoinedGame":
                 socketServerHandler.addLog((String) message.arguments().get("nickname"));
                 break;
-            case "setNumberOfPlayers":
-                socketServerHandler.addLog("Created game with specified number of players.");
             case "gameCreated":
                 socketServerHandler.setGameCreated(
                         (DeckPov) message.arguments().get("resourceDeck"),
                         (DeckPov) message.arguments().get("goldDeck"),
-                        (int) message.arguments().get("turn"),
+                        (int) message.arguments().get("playerTurn"),
                         (Color) message.arguments().get("color"),
                         (StarterCard) message.arguments().get("starterCard"),
                         (List<Map<String, Object>>) message.arguments().get("players")
@@ -101,9 +127,9 @@ public class SocketServerReader implements Runnable {
                 socketServerHandler.setHandsAndObjectivesDealt(
                         (DeckPov) message.arguments().get("resourceDeck"),
                         (DeckPov) message.arguments().get("goldDeck"),
-                        (List<Objective>) message.arguments().get("commonObjectives"),
-                        (List<Card>) message.arguments().get("hand"),
                         (List<Objective>) message.arguments().get("objectives"),
+                        (List<Card>) message.arguments().get("hand"),
+                        (List<Objective>) message.arguments().get("playerObjectives"),
                         (List<Map<String, Object>>) message.arguments().get("players")
                 );
                 break;
@@ -129,16 +155,29 @@ public class SocketServerReader implements Runnable {
                 );
                 break;
             case "drawnVisible":
-            case "drawnDeck":
-                socketServerHandler.setDrawn(
+                socketServerHandler.setDrawnVisible(
                         (boolean) message.arguments().get("isGold"),
                         (DeckPov) message.arguments().get("deck"),
                         (List<Card>) message.arguments().get("hand")
                 );
                 break;
             case "otherDrawnVisible":
+                socketServerHandler.setOtherDrawnVisible(
+                        (String) message.arguments().get("nickname"),
+                        (boolean) message.arguments().get("isGold"),
+                        (DeckPov) message.arguments().get("deck"),
+                        (List<Resource>) message.arguments().get("hand")
+                );
+                break;
+            case "drawnDeck":
+                socketServerHandler.setDrawnDeck(
+                        (boolean) message.arguments().get("isGold"),
+                        (DeckPov) message.arguments().get("deck"),
+                        (List<Card>) message.arguments().get("hand")
+                );
+                break;
             case "otherDrawnDeck":
-                socketServerHandler.setOtherDrawn(
+                socketServerHandler.setOtherDrawnDeck(
                         (String) message.arguments().get("nickname"),
                         (boolean) message.arguments().get("isGold"),
                         (DeckPov) message.arguments().get("deck"),

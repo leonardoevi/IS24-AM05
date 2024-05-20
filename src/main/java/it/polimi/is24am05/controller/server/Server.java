@@ -1,11 +1,15 @@
 package it.polimi.is24am05.controller.server;
 
+import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
 import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.deck.Deck;
+import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 import it.polimi.is24am05.model.game.Game;
 import it.polimi.is24am05.model.playArea.PlayArea;
@@ -19,6 +23,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -111,14 +116,14 @@ public class Server {
             c.notifyOthersJoinGame(client);
     }
 
-    public void notifyGameCreated(String client, Game pov) {
+    public void notifyGameCreated(String client, DeckPov resourceDeck, DeckPov goldDeck, int playerTurn, Color color, StarterCard starterCard, List<Map<String, Object>> players) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyGameCreated(pov);
+            clientHandler.notifyGameCreated(resourceDeck, goldDeck, playerTurn, color, starterCard, players);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyPlaceStarterSide(String client, PlayArea playArea) {
+    public void notifyPlaceStarterSide(String client, Side[][] playArea) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
             clientHandler.notifyPlaceStarterSide(playArea);

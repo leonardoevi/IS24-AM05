@@ -1,5 +1,6 @@
 package it.polimi.is24am05.model.deck;
 
+import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.model.enums.*;
 import it.polimi.is24am05.model.card.*;
 import it.polimi.is24am05.model.enums.element.*;
@@ -109,4 +110,15 @@ public class Deck implements Serializable {
         } catch (InvalidCornerException ignored) { return null; }
     }
 
+    /**
+     * Gets the pov of the deck.
+     * @return the pov of the deck.
+     */
+    public DeckPov getPov() {
+        return new DeckPov(
+                deck.getFirst().getFrontSide(),
+                visible.stream().toList().getFirst().getFrontSide(),
+                visible.stream().toList().getFirst().getFrontSide()
+        );
+    }
 }
