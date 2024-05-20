@@ -1,5 +1,6 @@
 package it.polimi.is24am05;
 
+import it.polimi.is24am05.controllers.GameSceneController;
 import it.polimi.is24am05.controllers.NicknameRequestSceneController;
 import it.polimi.is24am05.controllers.WaitingRoomSceneController;
 import javafx.application.Platform;
@@ -76,6 +77,26 @@ public class GUI {
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("WaitingRoomScene.css")).toExternalForm());
 
             changeScene(scene);
+            //TODO: DELETE THS
+            controller.changeScene();
+        } catch(IOException e) {
+            System.out.println("Error");
+        }
+    }
+    public void switchToGame() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("gameScene.fxml"));
+            Parent root = loader.load();
+
+            GameSceneController controller = loader.getController();
+            controller.setGUI(this);
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
+
+            changeScene(scene);
+           controller.update();
         } catch(IOException e) {
             System.out.println("Error");
         }

@@ -50,7 +50,7 @@ public class NicknameRequestSceneController implements Initializable {
     public void onButtonClicked() {
         String nickname = getPlayerNickname();
         System.out.println(nickname);
-        gui.switchToWaitingRoom();
+        gui.switchToGame();
 
         }
     }

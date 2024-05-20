@@ -1,6 +1,7 @@
 package it.polimi.is24am05.controllers;
 
 import it.polimi.is24am05.GUI;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -28,8 +29,12 @@ public class WaitingRoomSceneController implements Initializable {
     public void initialize (URL url, ResourceBundle resources) {
 
 
+    }
 
-
+    public void changeScene()
+    {
+        System.out.println("i switching");
+       gui.switchToGame();
     }
 
 
