@@ -4,6 +4,8 @@ import it.polimi.is24am05.GUI;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +33,48 @@ public class GameSceneController  implements Initializable  {
     private ImageView goldVisible1;
     @FXML
     private ImageView goldVisible2;
+    @FXML
+    private ImageView handBackSide1;
+    @FXML
+    private ImageView handFrontSide1;
+    @FXML
+    private ImageView handBackSide2;
+    @FXML
+    private ImageView handFrontSide2;
+    @FXML
+    private ImageView handBackSide3;
+    @FXML
+    private ImageView handFrontSide3;
+
+    @FXML
+    private ImageView commonObjective1;
+    @FXML
+    private ImageView commonObjective2;
+    @FXML
+
+
+    private ImageView myObjective;
+    @FXML
+
+    private Button buttonPlayer1;
+    @FXML
+
+    private Button buttonPlayer2;
+    @FXML
+
+    private Button buttonPlayer3;
+    @FXML
+
+    private Button buttonPlayer4;
+
+    @FXML
+
+    private Label myPoints;
+
+
+
+
+
     @FXML
     private StackPane leftSideBackground;
     @FXML
@@ -88,25 +132,32 @@ public class GameSceneController  implements Initializable  {
             playArea.getRowConstraints().add(rowConstraints);
         }
 
-        for (int row = 0; row < 20; row++) {
-            for (int col = 0; col < 20; col++) {
+        for (int row = 0; row < 15; row++) {
+            for (int col = 0; col < 15; col++) {
+
+                if((row+col)%2==0)
+                {
+
+                    ImageView card = new ImageView(new Image(imagePath));
+                    card.setFitHeight(60);
+                    card.setFitWidth(90);
+                    card.setPreserveRatio(false);  // Imposta la larghezza dell'immagine
+
+
+                    ; // Sovrapposizione sugli angoli
+
+
+                    playArea.add(card, col, row);
+                }
+
+
                 /*
-                ImageView card = new ImageView(new Image(imagePath));
-                Label label=new Label("diocane");
-                card.setFitHeight(50); // Imposta l'altezza dell'immagine
-                card.setFitWidth(90);  // Imposta la larghezza dell'immagine
-
-
-                GridPane.setMargin(card, new Insets(0, 0, 0, 0)); // Sovrapposizione sugli angoli
-
-
-                playArea.add(card, col, row);
-
-                 */
                 Label label = new Label("R" + row + ", C" + col);
 
                 // Aggiungi la Label alla cella corrispondente nel GridPane
                 playArea.add(label, col, row);
+
+                 */
             }
         }
 
@@ -149,10 +200,87 @@ public class GameSceneController  implements Initializable  {
         AnchorPane.setLeftAnchor(goldVisible2, 150.0);
 
 
+        handBackSide1.setImage(new Image(imageBackPath));
+        handBackSide1.setFitWidth(120);
+        handBackSide1.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handBackSide1, 50.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(handBackSide1, 20.0);
+
+        handFrontSide1.setImage(new Image(imageBackPath));
+        handFrontSide1.setFitWidth(120);
+        handFrontSide1.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handFrontSide1, 50.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(handFrontSide1, 150.0);
+
+        handBackSide2.setImage(new Image(imageBackPath));
+        handBackSide2.setFitWidth(120);
+        handBackSide2.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handBackSide2, 150.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(handBackSide2, 20.0);
+
+        handFrontSide2.setImage(new Image(imageBackPath));
+        handFrontSide2.setFitWidth(120);
+        handFrontSide2.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handFrontSide2, 150.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(handFrontSide2, 150.0);
+
+        handFrontSide3.setImage(new Image(imageBackPath));
+        handFrontSide3.setFitWidth(120);
+        handFrontSide3.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handFrontSide3, 250.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(handFrontSide3, 20.0);
+
+        handBackSide3.setImage(new Image(imageBackPath));
+        handBackSide3.setFitWidth(120);
+        handBackSide3.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handBackSide3, 250.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(handBackSide3, 150.0);
+
+        AnchorPane.setTopAnchor(myPoints, 30.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(myPoints, 90.0);
+        myPoints.setPrefWidth(200); // Imposta la larghezza preferita del Label
+        myPoints.setAlignment(Pos.CENTER);
+
+        commonObjective1.setImage(new Image(imageBackPath));
+        commonObjective1.setFitWidth(120);
+        commonObjective1.setFitHeight(90);
+        AnchorPane.setTopAnchor(commonObjective1, 130.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(commonObjective1, 20.0);
+
+        commonObjective2.setImage(new Image(imageBackPath));
+        commonObjective2.setFitWidth(120);
+        commonObjective2.setFitHeight(90);
+        AnchorPane.setTopAnchor(commonObjective2, 130.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(commonObjective2, 150.0);
+
+
+        myObjective.setImage(new Image(imageBackPath));
+        myObjective.setFitWidth(120);
+        myObjective.setFitHeight(90);
+        AnchorPane.setTopAnchor(myObjective, 280.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(myObjective, 100.0);
 
 
 
 
+        AnchorPane.setBottomAnchor(buttonPlayer1, 30.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(buttonPlayer1, 20.0);
+
+        AnchorPane.setBottomAnchor(buttonPlayer2, 70.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(buttonPlayer2, 20.0);
+
+        AnchorPane.setBottomAnchor(buttonPlayer3, 110.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(buttonPlayer3, 20.0);
+        AnchorPane.setBottomAnchor(buttonPlayer4, 140.0); // Distanza dal bordo superiore
+        AnchorPane.setRightAnchor(buttonPlayer4, 20.0);
+        buttonPlayer1.setPrefWidth(200); // Imposta la larghezza preferita del Button
+        buttonPlayer1.setAlignment(Pos.CENTER); // Cen
+        buttonPlayer2.setPrefWidth(200); // Imposta la larghezza preferita del Button
+        buttonPlayer2.setAlignment(Pos.CENTER); // Cen
+        buttonPlayer3.setPrefWidth(200); // Imposta la larghezza preferita del Button
+        buttonPlayer3.setAlignment(Pos.CENTER); // Cen
+        buttonPlayer4.setPrefWidth(200); // Imposta la larghezza preferita del Button
+        buttonPlayer4.setAlignment(Pos.CENTER);
 
 
 
