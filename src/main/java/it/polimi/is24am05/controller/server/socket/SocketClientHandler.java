@@ -3,13 +3,10 @@ package it.polimi.is24am05.controller.server.socket;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.ClientHandler;
 import it.polimi.is24am05.controller.server.Server;
-import it.polimi.is24am05.model.exceptions.game.*;
-import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.game.Game;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 import java.util.Map;
 
 public class SocketClientHandler extends ClientHandler implements Runnable {
@@ -24,18 +21,6 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void setGame(Game toSend) {
-        /*
-        Game fake;
-        try {
-            fake = new Game(List.of("Pippo", "Pluto"));
-            fake.placeStarterSide("Pippo", fake.getStarterCard("Pippo").getFrontSide());
-        } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException |
-                 NoSuchPlayerException | MoveNotAllowedException | InvalidStarterSideException e) {
-            throw new RuntimeException(e);
-        }
-
-        send(new Message("Game", Map.of("game", fake)));
-         */
 
         // Write game to file to get a clone of it
         Game toSendCopy;
@@ -76,7 +61,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
                 out.writeObject(message);
                 out.flush();
             } catch (IOException e) {
-                System.out.println("Error sending message: " + message + " to " + getNickname());
+                System.out.println("Error sending message: " + message.title() + " to " + getNickname());
             }
         }
     }
@@ -96,10 +81,15 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
                 Message message = (Message) in.readObject();
                 handleClientInput(message);
             } catch (Exception e){
-                System.out.println(e.getMessage());
+                //System.out.println("Error reading from socket: " + getNickname() + " -> " + e.getMessage());
                 break;
             }
         }
+
+        try {
+            socket.close();
+        } catch (IOException ignored) {}
+        disconnect();
     }
 
     private void handleClientInput(Message message) {
@@ -138,7 +128,4 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
                 break;
         }
     }
-
-
-
 }
