@@ -1,8 +1,6 @@
 package it.polimi.is24am05.controllers;
 
 import it.polimi.is24am05.GUI;
-import it.polimi.is24am05.GUIMain;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -50,7 +48,7 @@ public class NicknameRequestSceneController implements Initializable {
     public void onButtonClicked() {
         String nickname = getPlayerNickname();
         System.out.println(nickname);
-        gui.switchToGame();
+        gui.gameCreated();
 
         }
     }

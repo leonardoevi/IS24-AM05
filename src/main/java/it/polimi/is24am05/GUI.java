@@ -1,9 +1,9 @@
 package it.polimi.is24am05;
 
 import it.polimi.is24am05.controllers.DealStarterCardsSceneController;
-import it.polimi.is24am05.controllers.GameSceneController;
 import it.polimi.is24am05.controllers.NicknameRequestSceneController;
 import it.polimi.is24am05.controllers.WaitingRoomSceneController;
+import it.polimi.is24am05.model.game.Game;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 public class GUI {
@@ -21,10 +20,13 @@ public class GUI {
     /** Reference to the GUIMain class. */
     private final GUIMain guiMain;
 
-
+   private WaitingRoomSceneController waitingRoomSceneController;
     /** Nickname request's scene. */
     private NicknameRequestSceneController nicknameRequestSceneController;
     /** Game's scene. */
+
+    //TODO: change with gameCloned
+    private Game gameCloned;
    // private GameSceneController gameSceneController;
 
     /**
@@ -84,7 +86,7 @@ public class GUI {
             System.out.println("Error");
         }
     }
-    public void switchToGame() {
+    public void gameCreated() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("dealStarterCardsScene.fxml"));
@@ -102,6 +104,98 @@ public class GUI {
             System.out.println("Error");
         }
     }
+    /**
+     * Updates the view after adding a log.
+     */
+    public  void addedLog()
+    {
+        if(waitingRoomSceneController!=null)
+            Platform.runLater(()-> {waitingRoomSceneController.showPlayers(gameCloned.getNicknames());});
+    }
+
+
+
+
+    /**
+     * Updates the view after creating the game.
+     */
+
+
+    /**
+     * Updates the view after placing the starter side.
+     */
+    public  void placedStarterSide(){};
+
+    /**
+     * Updates the view after another player placed the starter side.
+     */
+    public  void otherPlacedStarterSide(){};
+
+    /**
+     * Updates the view after dealing the hands and objectives.
+     */
+    public  void handsAndObjectivesDealt(){};
+
+    /**
+     * Updates the view after choosing the objective.
+     */
+    public  void chosenObjective(){};
+
+    /**
+     * Updates the view after starting the game.
+     */
+    public  void gameStarted(){};
+
+    /**
+     * Updates the view after placing a side.
+     */
+    public  void placedSide(){};
+
+    /**
+     * Updates the view after another player placed a side.
+     */
+    public  void otherPlacedSide(){};
+
+    /**
+     * Updates the view after drawing a visible card.
+     */
+    public  void drawnVisible(){};
+
+    /**
+     * Updates the view after another player draws a visible card.
+     */
+    public  void otherDrawnVisible(){};
+
+    /**
+     * Updates the view after drawing from a deck.
+     */
+    public  void drawnDeck(){};
+
+    /**
+     * Updates the view after another player draws from a deck.
+     */
+    public  void otherDrawnDeck(){};
+
+    /**
+     * Updates the view after resuming the game.
+     */
+    public  void gameResumed(){};
+
+    /**
+     * Updates the view after another player reconnected to the game.
+     */
+    public  void otherGameResumed(){};
+
+    /**
+     * Updates the view after another player quit the game.
+     */
+    public  void otherQuitGame(){};
+
+    /**
+     * Updates the view after pausing the game.
+     */
+    public  void gamePaused(){};
+
 
 
 }
