@@ -11,4 +11,7 @@ import java.rmi.RemoteException;
 public interface RmiVirtualClient extends Remote {
     public void setGameRMI(Game game) throws RemoteException;
     public void addLogRMI(String log) throws RemoteException;
+
+    // Allow the server to ping the client
+    public void pingRMI() throws RemoteException;
 }

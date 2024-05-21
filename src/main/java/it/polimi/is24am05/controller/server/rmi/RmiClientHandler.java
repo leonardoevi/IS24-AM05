@@ -4,25 +4,25 @@ import it.polimi.is24am05.client.rmi.RmiVirtualClient;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.ClientHandler;
 import it.polimi.is24am05.controller.server.Server;
-import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.game.Game;
-import it.polimi.is24am05.model.playArea.PlayArea;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
+import java.util.concurrent.*;
 
 public class RmiClientHandler extends ClientHandler {
-    private volatile String lastReceivedKey;
     private final RmiVirtualClient virtualClient;
 
     private final RmiVirtualController rmiFromClient;
+
+    private final ScheduledExecutorService connectionDemon = Executors.newSingleThreadScheduledExecutor();
 
     public RmiClientHandler(Controller controller, Server server, RmiVirtualClient virtualClient) throws RemoteException {
         super(controller, server);
         this.virtualClient = virtualClient;
         this.rmiFromClient = new RmiFromClient();
+
+        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 0, 2, TimeUnit.SECONDS);
     }
 
     // This getter is needed to give the Client an object that implements the RmiVirtualController interface
@@ -107,10 +107,18 @@ public class RmiClientHandler extends ClientHandler {
         public void disconnectRMI() throws RemoteException {
             disconnect();
         }
+    }
 
+    private class ConnectionCheckRoutine implements Runnable {
         @Override
-        public void pong(String key) throws RemoteException {
-            lastReceivedKey = key;
+        public void run() {
+            try {
+                virtualClient.pingRMI();
+            } catch (RemoteException e) {
+                System.out.println(getNickname() + " is not responding!");
+                connectionDemon.shutdownNow();
+                disconnect();
+            }
         }
     }
 }

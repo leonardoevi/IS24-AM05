@@ -134,5 +134,9 @@ public class RmiServerHandler extends ServerHandler {
         public void addLogRMI(String log) throws RemoteException {
             addLog(log);
         }
+
+        @Override
+        public void pingRMI() throws RemoteException {
+        }
     }
 }
