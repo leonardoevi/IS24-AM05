@@ -50,19 +50,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             //        .scheduleAtFixedRate(new SocketClientChecker(this, checkingInterval / 2), 0, checkingInterval, TimeUnit.SECONDS);
 
             while (isConnected) {
-                Message message;
-                if(socket.getInputStream().available() > 0)
-                    message = (Message) inputStream.readObject();
-                else try {
-                    synchronized (lock) {
-                        lock.wait(100);
-                    }
-                    continue;
-                } catch (InterruptedException e) {
-                    // Should never happen
-                    System.out.println(getNickname() + " handler crashed");
-                    break;
-                }
+                Message message = (Message) inputStream.readObject();
 
                 switch (message.title()) {
                     case "quitServer": break;
@@ -73,7 +61,9 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
                 }
             }
             clientDisconnected();
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            System.out.println("Client disconnected, handler thread exiting");
+        }
     }
 
     public String getPong() {
@@ -131,7 +121,9 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
-        } catch (IOException ignored) {}
+            } catch (IOException e) {
+            System.out.println("Error sending message to " + getNickname());
+        }
     }
 
     private void clientDisconnected() {

@@ -118,13 +118,12 @@ public class SocketServerHandler extends ServerHandler {
                                 new Message("pong", Map.of("id", message.arguments().get("id")))
                         );
                     } else {
-                        messageDecoder.submit(new Thread(() -> {
-                            handleServerInput(message);
-                        }));
+                        handleServerInput(message);
                     }
                 }
             } catch (Exception e) {
                 System.out.println("Socket Reader exiting");
+                e.printStackTrace();
             }
         }
 

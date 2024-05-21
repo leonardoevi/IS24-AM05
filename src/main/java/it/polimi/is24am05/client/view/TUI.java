@@ -21,8 +21,10 @@ public class TUI extends View {
     public void updateGame() {
         try {
             Game toPrint = clientModel.getGame().orElseThrow(NullPointerException::new);
-            System.out.println(toPrint);
-        } catch (NullPointerException ignored) {}
+            System.out.println(toPrint.toString());
+        } catch (NullPointerException ignored) {
+            System.out.println("Game not found");
+        }
     }
 
     @Override
