@@ -28,7 +28,6 @@ public abstract class ServerHandler implements VirtualServer{
     }
 
     // Methods invoked by the SERVER from the network (better be protected)
-
     protected void setGame(Game game){
         this.clientModel.setGame(game);
     }

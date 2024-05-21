@@ -5,6 +5,7 @@ import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
 import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
+import it.polimi.is24am05.model.game.Game;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -38,7 +39,7 @@ public class Server {
         final ExecutorService threadPool = Executors.newFixedThreadPool(8);
         // Create the server socket to accept clients connections
         try {
-            serverSocket = new ServerSocket(6969);
+            serverSocket = new ServerSocket(9999);
         } catch (IOException e) {
             System.out.println("Failed to start socket server");
             return;
@@ -96,9 +97,10 @@ public class Server {
      * @param nicknames players nicknames to which an update will be sent
      */
     public void broadcastGameUpdated(List<String> nicknames) {
+        Game toSend = controller.game;
         for (String nickname : nicknames) {
             try{
-                getClientHandler(nickname).setGame(controller.game);
+                getClientHandler(nickname).setGame(toSend);
             } catch (NoSuchPlayerException e) {
                 System.out.println("Player " + nickname + " not found, unable to update game");
             }

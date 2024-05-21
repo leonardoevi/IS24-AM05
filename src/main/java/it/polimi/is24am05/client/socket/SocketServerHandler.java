@@ -17,14 +17,14 @@ public class SocketServerHandler extends ServerHandler {
     private final ObjectOutputStream outputStream;
 
     public static void main(String[] args) throws Exception {
-        new SocketServerHandler("localhost", "6969");
+        new SocketServerHandler("localhost", "9999");
     }
 
     public SocketServerHandler(String serverIP, String serverPort) throws IOException {
         super(serverIP, serverPort);
 
-        socket = new Socket(serverIP, Integer.parseInt(serverPort));
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
+        this.socket = new Socket(serverIP, Integer.parseInt(serverPort));
+        this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
         new Thread(new SocketServerReader(this, socket)).start();
     }
@@ -88,18 +88,16 @@ public class SocketServerHandler extends ServerHandler {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
             System.out.println("Failed sending message");
-            System.out.println(ignored.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
-    public class SocketServerReader implements Runnable {
+    public static class SocketServerReader implements Runnable {
 
         private final SocketServerHandler socketServerHandler;
         private final Socket socket;
-
-        private final ExecutorService messageDecoder = Executors.newFixedThreadPool(4);
 
         public SocketServerReader(SocketServerHandler socketServerHandler, Socket socket) {
             this.socketServerHandler = socketServerHandler;
@@ -113,13 +111,7 @@ public class SocketServerHandler extends ServerHandler {
                 while (true) {
                     Message message = (Message) inputStream.readObject();
 
-                    if (message.title().equals("ping")) {
-                        socketServerHandler.send(
-                                new Message("pong", Map.of("id", message.arguments().get("id")))
-                        );
-                    } else {
-                        handleServerInput(message);
-                    }
+                    handleServerInput(message);
                 }
             } catch (Exception e) {
                 System.out.println("Socket Reader exiting");
@@ -132,133 +124,19 @@ public class SocketServerHandler extends ServerHandler {
             switch (message.title()) {
                 case "Game":
                     // TODO : fix game message not returing what expected
-                    setGame((Game) message.arguments().get("game"));
+                    Game gameReceived = (Game) message.arguments().get("game");
+                    System.out.println("Classe Client");
+                    System.out.println(gameReceived);
+                    //socketServerHandler.setGame((Game) message.arguments().get("game"));
                     break;
 
                 case "Log":
-                    addLog((String) message.arguments().get("log"));
+                    socketServerHandler.addLog((String) message.arguments().get("log"));
                     break;
 
                 default:
                     System.out.println("Unknown message: " + message.title() + message.arguments());
                     break;
-
-                /*
-                case "joinedServer":
-                    socketServerHandler.addLog("Connected to server");
-                    break;
-                case "joinedGame":
-                    socketServerHandler.addLog((String) message.arguments().get("nicknames"));
-                    break;
-                case "otherJoinedGame":
-                    socketServerHandler.addLog((String) message.arguments().get("nickname"));
-                    break;
-                case "setNumberOfPlayers":
-                    socketServerHandler.addLog("Created game with specified number of players.");
-                case "gameCreated":
-                    socketServerHandler.setGameCreated(
-                            (DeckPov) message.arguments().get("resourceDeck"),
-                            (DeckPov) message.arguments().get("goldDeck"),
-                            (int) message.arguments().get("turn"),
-                            (Color) message.arguments().get("color"),
-                            (StarterCard) message.arguments().get("starterCard"),
-                            (List<Map<String, Object>>) message.arguments().get("players")
-                    );
-                    break;
-                case "placedStarterSide":
-                    socketServerHandler.setPlacedStarterSide(
-                            (Side[][]) message.arguments().get("playArea")
-                    );
-                    break;
-                case "otherPlacedStarterSide":
-                    socketServerHandler.setOtherPlacedStarterSide(
-                            (String) message.arguments().get("nickname"),
-                            (Side[][]) message.arguments().get("playArea")
-                    );
-                    break;
-                case "handsAndObjectivesDealt":
-                    socketServerHandler.setHandsAndObjectivesDealt(
-                            (DeckPov) message.arguments().get("resourceDeck"),
-                            (DeckPov) message.arguments().get("goldDeck"),
-                            (List<Objective>) message.arguments().get("commonObjectives"),
-                            (List<Card>) message.arguments().get("hand"),
-                            (List<Objective>) message.arguments().get("objectives"),
-                            (List<Map<String, Object>>) message.arguments().get("players")
-                    );
-                    break;
-                case "chosenObjective":
-                    socketServerHandler.setChosenObjective(
-                            (Objective) message.arguments().get("objective")
-                    );
-                    break;
-                case "gameStarted":
-                    socketServerHandler.setGameStarted();
-                    break;
-                case "placedSide":
-                    socketServerHandler.setPlacedSide(
-                            (Side[][]) message.arguments().get("playArea"),
-                            (int) message.arguments().get("points")
-                    );
-                    break;
-                case "otherPlacedSide":
-                    socketServerHandler.setOtherPlacedSide(
-                            (String) message.arguments().get("nickname"),
-                            (Side[][]) message.arguments().get("playArea"),
-                            (int) message.arguments().get("points")
-                    );
-                    break;
-                case "drawnVisible":
-                case "drawnDeck":
-                    socketServerHandler.setDrawn(
-                            (boolean) message.arguments().get("isGold"),
-                            (DeckPov) message.arguments().get("deck"),
-                            (List<Card>) message.arguments().get("hand")
-                    );
-                    break;
-                case "otherDrawnVisible":
-                case "otherDrawnDeck":
-                    socketServerHandler.setOtherDrawn(
-                            (String) message.arguments().get("nickname"),
-                            (boolean) message.arguments().get("isGold"),
-                            (DeckPov) message.arguments().get("deck"),
-                            (List<Resource>) message.arguments().get("hand")
-                    );
-                    break;
-                case "gameResumed":
-                    socketServerHandler.setGameResumed(
-                            (GameState) message.arguments().get("state"),
-                            (int) message.arguments().get("turn"),
-                            (DeckPov) message.arguments().get("resourceDeck"),
-                            (DeckPov) message.arguments().get("goldDeck"),
-                            (List<Objective>) message.arguments().get("objectives"),
-                            (int) message.arguments().get("playerTurn"),
-                            (Color) message.arguments().get("color"),
-                            (StarterCard) message.arguments().get("starterCard"),
-                            (List<Objective>) message.arguments().get("playerObjectives"),
-                            (List<Card>) message.arguments().get("hand"),
-                            (Side[][]) message.arguments().get("playArea"),
-                            (int) message.arguments().get("points"),
-                            (List<Map<String, Object>>) message.arguments().get("players")
-                    );
-                    break;
-                case "otherGameResumed":
-                    socketServerHandler.setOtherGameResumed(
-                            (String) message.arguments().get("nickname")
-                    );
-                    break;
-                case "otherQuitGame":
-                    socketServerHandler.setOtherQuitGame(
-                            (String) message.arguments().get("nickname")
-                    );
-                    break;
-                case "gamePaused":
-                    socketServerHandler.setGamePaused();
-                    break;
-                case "ko":
-                    socketServerHandler.addLog((String) message.arguments().get("reason"));
-                    break;
-
-                 */
             }
         }
     }

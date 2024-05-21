@@ -3,12 +3,13 @@ package it.polimi.is24am05.controller.server.socket;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.ClientHandler;
 import it.polimi.is24am05.controller.server.Server;
+import it.polimi.is24am05.model.exceptions.game.*;
+import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.game.Game;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
 
 public class SocketClientHandler extends ClientHandler implements Runnable {
@@ -22,8 +23,46 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     }
 
     @Override
-    public void setGame(Game game) {
-        send(new Message("Game", Map.of("game", game)));
+    public void setGame(Game toSend) {
+        /*
+        Game fake;
+        try {
+            fake = new Game(List.of("Pippo", "Pluto"));
+            fake.placeStarterSide("Pippo", fake.getStarterCard("Pippo").getFrontSide());
+        } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException |
+                 NoSuchPlayerException | MoveNotAllowedException | InvalidStarterSideException e) {
+            throw new RuntimeException(e);
+        }
+
+        send(new Message("Game", Map.of("game", fake)));
+         */
+
+        // Write game to file to get a clone of it
+        Game toSendCopy;
+        try {
+            FileOutputStream f = new FileOutputStream("copy.srz");
+            ObjectOutputStream o = new ObjectOutputStream(f);
+
+            // Write objects to file
+            o.writeObject(toSend);
+
+            o.close();
+            f.close();
+
+            FileInputStream fi = new FileInputStream(new File("copy.srz"));
+            ObjectInputStream oi = new ObjectInputStream(fi);
+
+            // Read objects
+            toSendCopy = (Game) oi.readObject();
+
+            oi.close();
+            fi.close();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Failed to copy game to file");
+            return;
+        }
+
+        send(new Message("Game", Map.of("game", toSendCopy)));
     }
 
     @Override
