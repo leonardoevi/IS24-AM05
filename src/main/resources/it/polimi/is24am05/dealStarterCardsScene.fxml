@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="839.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.controllers.DealStarterCardsSceneController">
+   <children>
+      <ImageView fx:id="mySCBackSide"  />
+      <ImageView fx:id="mySCFrontSide"  />
+      <ImageView fx:id="player1SCBackSide"  />
+      <ImageView fx:id="player1SCFrontSide"  />
+      <ImageView fx:id="player2SCFrontSide"  />
+      <ImageView fx:id="player2SCBackSide"  />
+      <ImageView fx:id="player3SCFrontSide"  />
+      <ImageView fx:id="player3SCBackSide"  />
+   </children>
+</AnchorPane>
