@@ -76,10 +76,8 @@ public class Controller {
                 throw new ConnectionRefusedException("User already connected");
             // Add the user to the list of reconnected users
             users.add(playerNickname);
-            // Reply to the user
-            server.notifyJoinGame(playerNickname, getUsers());
             // Broadcast update
-            server.notifyOthersJoinGame(playerNickname);
+            server.broadcastLog(users, playerNickname + "rejoined!");
             // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
                 for (String nickname : this.users) {
@@ -89,8 +87,8 @@ public class Controller {
                 }
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
-                for (Player player : game.getPlayers())
-                    server.notifyGameResumed(player.getNickname(), game); // TODO: pass pov
+                server.broadcastLog(users, "Game restarted!");
+                server.broadcastGameUpdated(users);
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -108,8 +106,7 @@ public class Controller {
                 try {
                     this.game = new Game(this.users);
                     this.lobbyState = LobbyState.STARTED;
-                    for (Player player : game.getPlayers())
-                        server.notifyGameCreated(player.getNickname(), game);
+                    server.broadcastGameUpdated(users);
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -125,9 +122,16 @@ public class Controller {
                 throw new ConnectionRefusedException("User already connected");
 
             try {
+                GameState stateBeforeReconnection = game.getGameState();
                 this.game.reconnect(playerNickname);
-                server.notifyGameResumed(playerNickname, game); // TODO: pass pov
-                server.notifyOthersGameResumed(playerNickname);
+                GameState stateAfterReconnection = game.getGameState();
+
+                server.gameUpdated(playerNickname);
+                server.broadcastLog(users, playerNickname + " reconnected!");
+
+                if(stateBeforeReconnection != stateAfterReconnection)
+                    server.broadcastLog(users, "Game resumed!");
+
             } catch (NoSuchPlayerException ignored) {}
         }
     }
@@ -174,14 +178,7 @@ public class Controller {
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
 
-        server.notifyPlaceStarterSide(playerNickname, game);
-        server.notifyOthersPlaceStarterSide(playerNickname, game);
-        // If the game state changed, i.e. all players placed their starter card, update the clients
-        if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
-            for (Player player : game.getPlayers()) {
-                server.notifyHandsAndObjectivesDealt(player.getNickname(), game); // TODO: pass pov
-            }
-        }
+        server.broadcastGameUpdated(users);
     }
 
     /**
@@ -199,10 +196,7 @@ public class Controller {
         Objective objective = Objective.valueOf(objectiveId);
         game.chooseObjective(playerNickname, objective);
 
-        server.notifyChooseObjective(playerNickname);
-        // If the game state changed, i.e. all players chose their objective, update the clients
-        if (game.getGameState().equals(GameState.GAME))
-            server.notifyAllGameStarted();
+        server.broadcastGameUpdated(users);
     }
 
     /**
@@ -234,8 +228,7 @@ public class Controller {
 
         game.placeSide(playerNickname, card, toPlay, i, j);
 
-        server.notifyPlaceSide(playerNickname, game);
-        server.notifyOthersPlaceSide(playerNickname, game);
+        server.broadcastGameUpdated(users);
     }
 
     /**
@@ -254,9 +247,7 @@ public class Controller {
 
         game.drawDeck(playerNickname, fromGold);
 
-        Deck deck = fromGold ? game.getGoldDeck() : game.getResourceDeck();
-        server.notifyDrawDeck(playerNickname, game);
-        server.notifyOthersDrawDeck(playerNickname, game); // TODO: pass hand pov
+        server.broadcastGameUpdated(users);
     }
 
     /**
@@ -275,10 +266,7 @@ public class Controller {
 
         game.drawVisible(playerNickname, visible);
 
-        boolean isGold = visible.getId() > 40;
-        Deck deck = visible.getId() > 40 ? game.getGoldDeck() : game.getResourceDeck();
-        server.notifyDrawVisible(playerNickname, game);
-        server.notifyOthersDrawVisible(playerNickname, game); // TODO: pass hand pov
+        server.broadcastGameUpdated(users);
     }
 
     /**
@@ -339,10 +327,10 @@ public class Controller {
         game.disconnect(nickname);
         GameState stateAfterDisconnection = game.getGameState();
 
-        server.notifyOthersQuitGame(nickname);
+        server.broadcastLog(users, nickname + " disconnected!");
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
-            server.notifyAllGamePaused(nickname);
+            server.broadcastLog(users, "Game paused!");
         }
     }
 

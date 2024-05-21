@@ -30,6 +30,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void joinServer(String nickname) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {
                 addLog(new AlreadyUsedNicknameException(server.getNicknames()).getMessage());
@@ -41,6 +46,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void joinGame() {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             controller.newConnection(nickname);
         } catch (Exception e) {
@@ -49,6 +59,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void setNumberOfPlayers(int numberOfPlayers) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             controller.newConnection(nickname, numberOfPlayers);
         } catch (Exception e) {
@@ -57,6 +72,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void placeStarterSide(boolean isFront) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             controller.playStarterCard(nickname, isFront);
         } catch (Exception e) {
@@ -65,6 +85,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void chooseObjective(String objectiveId) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             controller.chooseObjective(nickname, objectiveId);
         } catch (Exception e) {
@@ -73,6 +98,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void placeSide(String cardId, boolean isFront, int i, int j) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             Card card;
             try {
@@ -87,6 +117,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void drawVisible(String cardId) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             Card card;
             try {
@@ -101,6 +136,11 @@ public abstract class ClientHandler implements VirtualClient {
     }
 
     protected void drawDeck(boolean isGold) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
         try {
             controller.drawDeck(nickname, isGold);
         } catch (Exception e) {
@@ -110,7 +150,9 @@ public abstract class ClientHandler implements VirtualClient {
 
     protected void disconnect() {
         try {
-            controller.disconnect(nickname);
+            if(nickname != null)
+                controller.disconnect(nickname);
+
             server.unsubscribe(this);
         } catch (Exception e) {
             addLog(e.getMessage());
