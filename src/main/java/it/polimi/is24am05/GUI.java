@@ -1,6 +1,7 @@
 package it.polimi.is24am05;
 
 import it.polimi.is24am05.controllers.DealStarterCardsSceneController;
+import it.polimi.is24am05.controllers.GameSceneController;
 import it.polimi.is24am05.controllers.NicknameRequestSceneController;
 import it.polimi.is24am05.controllers.WaitingRoomSceneController;
 import it.polimi.is24am05.model.game.Game;
@@ -23,6 +24,8 @@ public class GUI {
    private WaitingRoomSceneController waitingRoomSceneController;
     /** Nickname request's scene. */
     private NicknameRequestSceneController nicknameRequestSceneController;
+
+    private GameSceneController gameSceneController;
     /** Game's scene. */
 
     //TODO: change with gameCloned
@@ -86,14 +89,17 @@ public class GUI {
             System.out.println("Error");
         }
     }
+    /**
+     * Updates the view after creating the game.
+     */
     public void gameCreated() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("dealStarterCardsScene.fxml"));
+            loader.setLocation(getClass().getResource("gameScene.fxml"));
             Parent root = loader.load();
 
-            DealStarterCardsSceneController controller = loader.getController();
-            controller.setGUI(this);
+            gameSceneController = loader.getController();
+            gameSceneController.setGUI(this);
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
@@ -111,14 +117,17 @@ public class GUI {
     {
         if(waitingRoomSceneController!=null)
             Platform.runLater(()-> {waitingRoomSceneController.showPlayers(gameCloned.getNicknames());});
+        if(
+               gameSceneController!=null
+        )
+            Platform.runLater(()-> {gameSceneController.showPlayers(gameCloned.getNicknames());});
+
     }
 
 
 
 
-    /**
-     * Updates the view after creating the game.
-     */
+
 
 
     /**
