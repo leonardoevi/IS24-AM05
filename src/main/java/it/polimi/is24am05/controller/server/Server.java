@@ -39,7 +39,7 @@ public class Server {
         final ExecutorService threadPool = Executors.newFixedThreadPool(8);
         // Create the server socket to accept clients connections
         try {
-            serverSocket = new ServerSocket(9999);
+            serverSocket = new ServerSocket(6969);
         } catch (IOException e) {
             System.out.println("Failed to start socket server");
             return;
@@ -51,7 +51,7 @@ public class Server {
         while (true) {
             try {
                 final Socket socket = serverSocket.accept();
-                System.out.println("New connection!");
+                System.out.println("New socket connection!");
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketClientHandler(controller,this, socket));
             } catch (IOException ignored) {

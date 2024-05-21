@@ -18,8 +18,7 @@ public class RmiHandlersProviderImp extends UnicastRemoteObject implements RmiHa
 
     @Override
     public RmiVirtualController connect(RmiVirtualClient virtualClient) throws RemoteException {
-        System.out.println("New connection accepted!");
-        virtualClient.addLogRMI("Ciao FROM SERVER!");
+        System.out.println("New rmi connection!");
         return new RmiClientHandler(controller, server, virtualClient).getRmiVirtualController();
     }
 }

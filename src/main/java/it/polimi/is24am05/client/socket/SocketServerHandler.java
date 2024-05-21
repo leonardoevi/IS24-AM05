@@ -17,7 +17,7 @@ public class SocketServerHandler extends ServerHandler {
     private final ObjectOutputStream outputStream;
 
     public static void main(String[] args) throws Exception {
-        new SocketServerHandler("localhost", "9999");
+        new SocketServerHandler("localhost", "6969");
     }
 
     public SocketServerHandler(String serverIP, String serverPort) throws IOException {
