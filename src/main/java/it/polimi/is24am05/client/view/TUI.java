@@ -11,10 +11,13 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 
 public class TUI extends View {
+    private final InputReader inputReader;
+
     public TUI(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
 
-        new Thread(new InputReader()).start();
+        inputReader = new InputReader();
+        new Thread(inputReader).start();
     }
 
     @Override
@@ -34,16 +37,29 @@ public class TUI extends View {
         } catch (NullPointerException ignored) {}
     }
 
+    public void serverUnreachable() {
+        inputReader.stopInputReader();
+    }
+
     class InputReader implements Runnable{
-        private volatile boolean quit = false;
+        private final Scanner stdin = new Scanner(System.in);
+        private boolean stdinClosed = false;
 
         @Override
         public void run() {
-            final Scanner stdin = new Scanner(System.in);
-            while (true) {
-                String line = stdin.nextLine();
-                handleInput(line);
+            // TODO : make sure this thread terminates
+            while (!stdinClosed) {
+                try {
+                    String line = stdin.nextLine();
+                    if(stdinClosed)
+                        break;
+
+                    handleInput(line);
+                } catch (IllegalStateException e) {
+                    break;
+                }
             }
+            System.out.println("Input reader exiting");
         }
 
         private void handleInput(String input){
@@ -93,7 +109,7 @@ public class TUI extends View {
 
                     case "10":
                         server.disconnect();
-                        quit = true;
+                        stopInputReader();
                         break;
 
                     default:
@@ -102,6 +118,10 @@ public class TUI extends View {
             } catch (NoSuchElementException e) {
                 System.out.println("Invalid input");;
             }
+        }
+
+        private void stopInputReader(){
+            stdinClosed = true;
         }
     }
 }

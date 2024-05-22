@@ -13,17 +13,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SocketServerHandler extends ServerHandler {
-    private final Socket socket;
+    private Socket socket;
     private final ObjectOutputStream outputStream;
 
-    public static void main(String[] args) throws Exception {
-        new SocketServerHandler("localhost", "6969");
+    public static void main(String[] args) {
+        try {
+            new SocketServerHandler("localhost", "6969");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public SocketServerHandler(String serverIP, String serverPort) throws IOException {
         super(serverIP, serverPort);
 
-        this.socket = new Socket(serverIP, Integer.parseInt(serverPort));
+        try {
+            this.socket = new Socket(serverIP, Integer.parseInt(serverPort));
+        } catch (IOException e) {
+            notifyViewServerUnreachable();
+            throw e;
+        }
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
         new Thread(new SocketServerReader(this, socket)).start();
@@ -115,7 +124,7 @@ public class SocketServerHandler extends ServerHandler {
                 }
             } catch (Exception e) {
                 System.out.println("Socket Reader exiting");
-                e.printStackTrace();
+                socketServerHandler.notifyViewServerUnreachable();
             }
         }
 
@@ -123,11 +132,7 @@ public class SocketServerHandler extends ServerHandler {
 
             switch (message.title()) {
                 case "Game":
-                    // TODO : fix game message not returing what expected
-                    Game gameReceived = (Game) message.arguments().get("game");
-                    System.out.println("Classe Client");
-                    System.out.println(gameReceived);
-                    //socketServerHandler.setGame((Game) message.arguments().get("game"));
+                    socketServerHandler.setGame((Game) message.arguments().get("game"));
                     break;
 
                 case "Log":

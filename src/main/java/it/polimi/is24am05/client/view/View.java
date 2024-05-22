@@ -13,4 +13,6 @@ public abstract class View implements Observer{
         this.server = server;
         clientModel.addObserver(this);
     }
+
+    public abstract void serverUnreachable();
 }

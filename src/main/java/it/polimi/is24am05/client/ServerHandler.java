@@ -8,6 +8,7 @@ import it.polimi.is24am05.model.game.Game;
 public abstract class ServerHandler implements VirtualServer{
     private String nickname;
     private final ClientModel clientModel;
+    private View view;
 
     protected final String serverIP;
     protected final String serverPort;
@@ -16,7 +17,7 @@ public abstract class ServerHandler implements VirtualServer{
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         clientModel = new ClientModel();
-        new TUI(clientModel, this);
+        view = new TUI(clientModel, this);
     }
 
     public void setNickname(String nickname) {
@@ -34,5 +35,9 @@ public abstract class ServerHandler implements VirtualServer{
 
     protected void addLog(String message){
         this.clientModel.addLog(message);
+    }
+
+    protected void notifyViewServerUnreachable(){
+        view.serverUnreachable();
     }
 }
