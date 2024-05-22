@@ -2,12 +2,13 @@ package it.polimi.is24am05.controller.server;
 
 import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
-import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.Color;
-import it.polimi.is24am05.model.game.Game;
-import it.polimi.is24am05.model.playArea.PlayArea;
+import it.polimi.is24am05.model.enums.element.Resource;
+import it.polimi.is24am05.model.enums.state.GameState;
+import it.polimi.is24am05.model.enums.state.PlayerState;
+import it.polimi.is24am05.model.objective.Objective;
 
 import java.util.List;
 import java.util.Map;
@@ -24,29 +25,33 @@ public interface VirtualClient {
 
     void notifyGameCreated(DeckPov resourceDeck, DeckPov goldDeck, int playerTurn, Color color, StarterCard starterCard, List<Map<String, Object>> players);
 
-    void notifyPlaceStarterSide(Side[][] playArea);
+    void notifyPlaceStarterSide(PlacedSide[][] playArea);
 
-    void notifyOthersPlaceStarterSide(String nickname, Side[][] playArea);
+    void notifyOthersPlaceStarterSide(String nickname, PlacedSide[][] playArea);
 
-    void notifyHandsAndObjectivesDealt(Game pov);
+    void notifyHandsAndObjectivesDealt(DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives, List<Card> hand, List<Objective> playerObjectives, List<Map<String, Object>> players);
 
-    void notifyChooseObjective();
+    void notifyChooseObjective(Objective objective);
 
     void notifyAllGameStarted();
 
-    void notifyPlaceSide(PlayArea playArea, int points);
+    void notifyPlaceSide(PlacedSide[][] playArea, int points);
 
-    void notifyOthersPlaceSide(String nickname, PlayArea playArea, int points);
+    void notifyOthersPlaceSide(String nickname, PlacedSide[][] playArea, int points);
 
-    void notifyDrawVisible(Deck deck, List<Card> hand);
+    void notifyDrawVisible(boolean isGold, DeckPov deck, List<Card> hand);
 
-    void notifyOthersDrawVisible(String nickname, boolean isGold, Deck deck, List<Card> hand);
+    void notifyOthersDrawVisible(String nickname, boolean isGold, DeckPov deck, List<Resource> hand);
 
-    void notifyDrawDeck(Deck deck, List<Card> hand);
+    void notifyDrawDeck(boolean isGold, DeckPov deck, List<Card> hand);
 
-    void notifyOthersDrawDeck(String nickname, boolean isGold, Deck deck, List<Card> hand);
+    void notifyOthersDrawDeck(String nickname, boolean isGold, DeckPov deck, List<Resource> hand);
 
-    void notifyGameResumed(Game pov);
+    void notifyGameResumed(
+            GameState state, int turn, DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives,
+            PlayerState playerState, int playerTurn, Color color, StarterCard starterCard, List<Objective> playerObjectives, List<Card> hand, PlacedSide[][] playArea, int points,
+            List<Map<String, Object>> players
+    );
 
     void notifyOthersGameResumed(String nickname);
 

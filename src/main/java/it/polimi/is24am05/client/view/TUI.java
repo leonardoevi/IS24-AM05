@@ -86,7 +86,7 @@ public class TUI extends View {
      */
     @Override
     public void placedSide() {
-
+        // TODO
     }
 
     /**

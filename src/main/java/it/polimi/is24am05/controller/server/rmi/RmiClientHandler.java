@@ -1,17 +1,26 @@
 package it.polimi.is24am05.controller.server.rmi;
 
+import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.client.rmi.RmiVirtualClient;
 import it.polimi.is24am05.controller.Controller;
 import it.polimi.is24am05.controller.server.ClientHandler;
 import it.polimi.is24am05.controller.server.Server;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.side.PlacedSide;
+import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.deck.Deck;
+import it.polimi.is24am05.model.enums.Color;
+import it.polimi.is24am05.model.enums.element.Resource;
+import it.polimi.is24am05.model.enums.state.GameState;
+import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.game.Game;
+import it.polimi.is24am05.model.objective.Objective;
 import it.polimi.is24am05.model.playArea.PlayArea;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 
 public class RmiClientHandler extends ClientHandler {
     private volatile String lastReceivedKey;
@@ -29,6 +38,108 @@ public class RmiClientHandler extends ClientHandler {
     public RmiVirtualController getRmiVirtualController() {
         return rmiFromClient;
     }
+
+    @Override
+    public void notifyJoinServer() {
+
+    }
+
+    @Override
+    public void notifyJoinGame(List<String> nicknames) {
+
+    }
+
+    @Override
+    public void notifyOthersJoinGame(String nickname) {
+
+    }
+
+    @Override
+    public void notifyGameCreated(DeckPov resourceDeck, DeckPov goldDeck, int playerTurn, Color color, StarterCard starterCard, List<Map<String, Object>> players) {
+
+    }
+
+    @Override
+    public void notifyPlaceStarterSide(PlacedSide[][] playArea) {
+
+    }
+
+    @Override
+    public void notifyOthersPlaceStarterSide(String nickname, PlacedSide[][] playArea) {
+
+    }
+
+    @Override
+    public void notifyHandsAndObjectivesDealt(DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives, List<Card> hand, List<Objective> playerObjectives, List<Map<String, Object>> players) {
+
+    }
+
+    @Override
+    public void notifyChooseObjective(Objective objective) {
+
+    }
+
+    @Override
+    public void notifyAllGameStarted() {
+
+    }
+
+    @Override
+    public void notifyPlaceSide(PlacedSide[][] playArea, int points) {
+
+    }
+
+    @Override
+    public void notifyOthersPlaceSide(String nickname, PlacedSide[][] playArea, int points) {
+
+    }
+
+    @Override
+    public void notifyDrawVisible(boolean isGold, DeckPov deck, List<Card> hand) {
+
+    }
+
+    @Override
+    public void notifyOthersDrawVisible(String nickname, boolean isGold, DeckPov deck, List<Resource> hand) {
+
+    }
+
+    @Override
+    public void notifyDrawDeck(boolean isGold, DeckPov deck, List<Card> hand) {
+
+    }
+
+    @Override
+    public void notifyOthersDrawDeck(String nickname, boolean isGold, DeckPov deck, List<Resource> hand) {
+
+    }
+
+    @Override
+    public void notifyGameResumed(GameState state, int turn, DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives, PlayerState playerState, int playerTurn, Color color, StarterCard starterCard, List<Objective> playerObjectives, List<Card> hand, PlacedSide[][] playArea, int points, List<Map<String, Object>> players) {
+
+    }
+
+    @Override
+    public void notifyOthersGameResumed(String nickname) {
+
+    }
+
+    @Override
+    public void notifyOthersQuitGame(String nickname) {
+
+    }
+
+    @Override
+    public void notifyAllGamePaused() {
+
+    }
+
+    @Override
+    public void notifyException(Exception exception) {
+
+    }
+
+    /*
 
     // Methods invoked by the Server, needed to notify the client of some events
     // FROM SERVER TO CLIENT
@@ -213,6 +324,8 @@ public class RmiClientHandler extends ClientHandler {
             throw new RuntimeException(e);
         }
     }
+
+    */
 
     // this class implements RMI methods, from the RmiVirtualController interface, invoked by the client
     // simply propagates RMI calls to the super class ClientHandler

@@ -44,6 +44,7 @@ public class SocketServerHandler extends ServerHandler {
      */
     @Override
     public void joinServer() {
+        System.out.println("sending join server");
         send(new Message("joinServer", Map.of("nickname", this.getNickname())));
     }
 
@@ -121,8 +122,8 @@ public class SocketServerHandler extends ServerHandler {
      * Sends a message to disconnect from the server.
      */
     @Override
-    public void disconnect() {
-        send(new Message("disconnect", Map.of()));
+    public void quitServer() {
+        send(new Message("quitServer", Map.of()));
     }
 
     /**
@@ -130,6 +131,7 @@ public class SocketServerHandler extends ServerHandler {
      * @param message the message to send.
      */
     public synchronized void send(Message message) {
+        System.out.println("sending message");
         try {
             outputStream.writeObject(message);
             outputStream.flush();

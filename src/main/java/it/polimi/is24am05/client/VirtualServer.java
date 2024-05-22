@@ -60,5 +60,5 @@ public interface VirtualServer {
     /**
      * Disconnects from the server.
      */
-    void disconnect();
+    void quitServer();
 }

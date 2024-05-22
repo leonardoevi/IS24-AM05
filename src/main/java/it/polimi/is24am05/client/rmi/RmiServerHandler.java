@@ -15,7 +15,7 @@ public class RmiServerHandler extends ServerHandler {
     private final RmiVirtualClient rmiFromServer;
 
     public RmiServerHandler(String serverIP, String serverPort) throws RemoteException {
-        super(serverIP, serverPort);
+        super(serverIP, serverPort, null); // TODO: pass view
         rmiFromServer = new RmiFromServer();
 
         startConnection();
@@ -32,7 +32,52 @@ public class RmiServerHandler extends ServerHandler {
         }
     }
 
+    @Override
+    public void joinServer() {
 
+    }
+
+    @Override
+    public void joinGame() {
+
+    }
+
+    @Override
+    public void setNumberOfPlayers(int numberOfPlayers) {
+
+    }
+
+    @Override
+    public void placeStarterSide(boolean isFront) {
+
+    }
+
+    @Override
+    public void chooseObjective(String objectiveId) {
+
+    }
+
+    @Override
+    public void placeSide(String cardId, boolean isFront, int i, int j) {
+
+    }
+
+    @Override
+    public void drawVisible(String cardId) {
+
+    }
+
+    @Override
+    public void drawDeck(boolean isGold) {
+
+    }
+
+    @Override
+    public void quitServer() {
+
+    }
+
+    /*
     @Override
     public void joinServer() {
         try {
@@ -113,6 +158,7 @@ public class RmiServerHandler extends ServerHandler {
             throw new RuntimeException(e);
         }
     }
+     */
 
     class RmiFromServer extends UnicastRemoteObject implements RmiVirtualClient {
 

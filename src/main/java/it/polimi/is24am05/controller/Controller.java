@@ -1,5 +1,6 @@
 package it.polimi.is24am05.controller;
 
+import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.controller.exceptions.ConnectionRefusedException;
 import it.polimi.is24am05.controller.exceptions.FirstConnectionException;
 import it.polimi.is24am05.controller.exceptions.InvalidNumUsersException;
@@ -7,9 +8,7 @@ import it.polimi.is24am05.controller.server.Server;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
-import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.state.GameState;
-import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.exceptions.deck.InvalidVisibleCardException;
 import it.polimi.is24am05.model.exceptions.game.*;
@@ -91,7 +90,7 @@ public class Controller {
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
                 for (Player player : game.getPlayers())
-                    server.notifyGameResumed(player.getNickname(), null); // TODO
+                    gameResumed(player);
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -128,8 +127,9 @@ public class Controller {
 
             try {
                 this.game.reconnect(playerNickname);
-                server.notifyGameResumed(playerNickname, null); // TODO
-                server.notifyOthersGameResumed(playerNickname);
+                Player player = game.getPlayers().stream().filter(p -> p.getNickname().equals(playerNickname)).findFirst().get();
+                gameResumed(player);
+                server.notifyOthersGameResumed(player.getNickname());
             } catch (NoSuchPlayerException ignored) {}
         }
     }
@@ -142,6 +142,7 @@ public class Controller {
             players.add(Map.of(
                     "nickname", p.getNickname(),
                     "turn", game.getPlayerTurn(p),
+                    "color", p.getColor(),
                     "starterCard", p.getStarterCard()
             ));
         }
@@ -152,6 +153,41 @@ public class Controller {
                 game.getPlayerTurn(player),
                 player.getColor(),
                 player.getStarterCard(),
+                players
+        );
+    }
+
+    public void gameResumed(Player player) {
+        List<Map<String, Object>> players = new ArrayList<>();
+        for (Player p : game.getPlayers()) {
+            if (p.equals(player))
+                continue;
+            players.add(Map.of(
+                    "nickname", p.getNickname(),
+                    "state", p.getState(),
+                    "turn", game.getPlayerTurn(p),
+                    "color", player.getColor(),
+                    "starterCard", p.getStarterCard(),
+                    "hand", p.getHand(),
+                    "playArea", p.getPlayArea().getMatrixPlayArea(),
+                    "points", p.getPoints()
+            ));
+        }
+        server.notifyGameResumed(
+                player.getNickname(),
+                game.getGameState(),
+                game.getTurn(),
+                game.getResourceDeck().getPov(),
+                game.getGoldDeck().getPov(),
+                Arrays.stream(game.getSharedObjectives()).toList(),
+                player.getState(),
+                game.getPlayerTurn(player),
+                player.getColor(),
+                player.getStarterCard(),
+                Arrays.stream(player.getObjectivesHand()).toList(),
+                player.getHand(),
+                player.getPlayArea().getMatrixPlayArea(),
+                player.getPoints(),
                 players
         );
     }
@@ -198,14 +234,36 @@ public class Controller {
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
 
-        server.notifyPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname));
-        server.notifyOthersPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname));
+        server.notifyPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname).getMatrixPlayArea());
+        server.notifyOthersPlaceStarterSide(playerNickname, game.getPlayArea(playerNickname).getMatrixPlayArea());
+
         // If the game state changed, i.e. all players placed their starter card, update the clients
         if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
             for (Player player : game.getPlayers()) {
-                server.notifyHandsAndObjectivesDealt(player.getNickname(), null); // TODO
+                notifyHandsAndObjectivesDealt(player);
             }
         }
+    }
+
+    void notifyHandsAndObjectivesDealt(Player player) {
+        List<Map<String, Object>> players = new ArrayList<>();
+        for (Player p : game.getPlayers()) {
+            if (p.equals(player))
+                continue;
+            players.add(Map.of(
+                    "nickname", p.getNickname(),
+                    "hand", p.getHand()
+            ));
+        }
+        server.notifyHandsAndObjectivesDealt(
+                player.getNickname(),
+                game.getResourceDeck().getPov(),
+                game.getGoldDeck().getPov(),
+                Arrays.stream(game.getSharedObjectives()).toList(),
+                player.getHand(),
+                Arrays.stream(player.getObjectivesHand()).toList(),
+                players
+        );
     }
 
     /**
@@ -223,7 +281,7 @@ public class Controller {
         Objective objective = Objective.valueOf(objectiveId);
         game.chooseObjective(playerNickname, objective);
 
-        server.notifyChooseObjective(playerNickname);
+        server.notifyChooseObjective(playerNickname, objective);
         // If the game state changed, i.e. all players chose their objective, update the clients
         if (game.getGameState().equals(GameState.GAME))
             server.notifyAllGameStarted();
@@ -250,16 +308,11 @@ public class Controller {
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
 
-        Side toPlay;
-        if(frontVisible)
-            toPlay = card.getFrontSide();
-        else
-            toPlay = card.getBackSide();
-
+        Side toPlay = frontVisible ? card.getFrontSide() : card.getBackSide();
         game.placeSide(playerNickname, card, toPlay, i, j);
 
-        server.notifyPlaceSide(playerNickname, game.getPlayArea(playerNickname), game.getPoints(playerNickname));
-        server.notifyOthersPlaceSide(playerNickname, game.getPlayArea(playerNickname), game.getPoints(playerNickname));
+        server.notifyPlaceSide(playerNickname, game.getPlayArea(playerNickname).getMatrixPlayArea(), game.getPoints(playerNickname));
+        server.notifyOthersPlaceSide(playerNickname, game.getPlayArea(playerNickname).getMatrixPlayArea(), game.getPoints(playerNickname));
     }
 
     /**
@@ -278,9 +331,10 @@ public class Controller {
 
         game.drawDeck(playerNickname, fromGold);
 
-        Deck deck = fromGold ? game.getGoldDeck() : game.getResourceDeck();
-        server.notifyDrawDeck(playerNickname, deck, game.getHand(playerNickname));
-        server.notifyOthersDrawDeck(playerNickname, fromGold, deck, null); // TODO
+        DeckPov deck = fromGold ? game.getGoldDeck().getPov() : game.getResourceDeck().getPov();
+        Player player = game.getPlayers().stream().filter(p -> p.getNickname().equals(playerNickname)).findFirst().get();
+        server.notifyDrawDeck(playerNickname, fromGold, deck, player.getHand());
+        server.notifyOthersDrawDeck(playerNickname, fromGold, deck, player.getHandPov());
     }
 
     /**
@@ -300,9 +354,10 @@ public class Controller {
         game.drawVisible(playerNickname, visible);
 
         boolean isGold = visible.getId() > 40;
-        Deck deck = visible.getId() > 40 ? game.getGoldDeck() : game.getResourceDeck();
-        server.notifyDrawVisible(playerNickname, deck, game.getHand(playerNickname));
-        server.notifyOthersDrawVisible(playerNickname, isGold, deck, null); // TODO
+        DeckPov deck = isGold ? game.getGoldDeck().getPov() : game.getResourceDeck().getPov();
+        Player player = game.getPlayers().stream().filter(p -> p.getNickname().equals(playerNickname)).findFirst().get();
+        server.notifyDrawVisible(playerNickname, isGold, deck, player.getHand());
+        server.notifyOthersDrawVisible(playerNickname, isGold, deck, player.getHandPov());
     }
 
     /**

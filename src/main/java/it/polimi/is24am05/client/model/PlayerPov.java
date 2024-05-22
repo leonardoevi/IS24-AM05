@@ -1,6 +1,6 @@
 package it.polimi.is24am05.client.model;
 
-import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.enums.element.Resource;
@@ -18,6 +18,11 @@ public class PlayerPov {
     final String nickname;
 
     /**
+     * State of this player.
+     */
+    PlayerState state;
+
+    /**
      * Turn of this player.
      */
     final int turn;
@@ -33,11 +38,6 @@ public class PlayerPov {
     final StarterCard starterCard;
 
     /**
-     * State of this player.
-     */
-    PlayerState state;
-
-    /**
      * Hand of this player.
      */
     List<Resource> hand;
@@ -45,7 +45,7 @@ public class PlayerPov {
     /**
      * Play area of this player.
      */
-    Side[][] playArea;
+    PlacedSide[][] playArea;
 
     /**
      * Points of this player.
@@ -58,33 +58,35 @@ public class PlayerPov {
      * @param turn the turn.
      * @param color the color.
      * @param starterCard the starter card.
-     * @param state the state.
      */
-    public PlayerPov(String nickname, int turn, Color color, StarterCard starterCard, PlayerState state) {
+    public PlayerPov(String nickname, int turn, Color color, StarterCard starterCard) {
         this.nickname = nickname;
+        this.state = PlayerState.PLACE_STARTER_CARD;
         this.turn = turn;
         this.color = color;
         this.starterCard = starterCard;
-        this.state = state;
     }
 
     /**
      * Constructor for a resumed game.
      * @param nickname the nickname.
+     * @param state the state.
      * @param turn the turn.
      * @param color the color.
      * @param starterCard the starter card.
-     * @param state the state.
      * @param hand the hand.
      * @param playArea the play area.
      * @param points the points.
      */
-    public PlayerPov(String nickname, int turn, Color color, StarterCard starterCard, PlayerState state, List<Resource> hand, Side[][] playArea, int points) {
+    public PlayerPov(String nickname, PlayerState state, int turn, Color color, StarterCard starterCard, List<Resource> hand, PlacedSide[][] playArea, int points) {
         this.nickname = nickname;
+        this.state = state;
         this.turn = turn;
         this.color = color;
         this.starterCard = starterCard;
-        this.state = state;
+        this.hand = hand;
+        this.playArea = playArea;
+        this.points = points;
     }
 
     /**
@@ -107,7 +109,7 @@ public class PlayerPov {
      * Sets the play area of this player.
      * @param playArea the play area to set.
      */
-    public void setPlayArea(Side[][] playArea) {
+    public void setPlayArea(PlacedSide[][] playArea) {
         this.playArea = playArea;
     }
 

@@ -6,7 +6,7 @@ import it.polimi.is24am05.client.model.PlayerPov;
 import it.polimi.is24am05.client.view.TUI;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.enums.element.Resource;
@@ -97,6 +97,7 @@ public abstract class ServerHandler implements VirtualServer {
      */
     public void setConnected(boolean connected) {
         isConnected = connected;
+        
         view.joinedServer();
     }
 
@@ -106,6 +107,7 @@ public abstract class ServerHandler implements VirtualServer {
      */
     public void addLog(String log) {
         logs.add(log);
+
         view.addedLog();
     }
 
@@ -130,8 +132,7 @@ public abstract class ServerHandler implements VirtualServer {
                     (String) player.get("nickname"),
                     (int) player.get("turn"),
                     (Color) player.get("color"),
-                    (StarterCard) player.get("starterCard"),
-                    PlayerState.PLACE_STARTER_CARD
+                    (StarterCard) player.get("starterCard")
             ));
         }
 
@@ -144,7 +145,7 @@ public abstract class ServerHandler implements VirtualServer {
      * Sets the local model after this player placed a starter side.
      * @param playArea the play area.
      */
-    public void setPlacedStarterSide(Side[][] playArea) {
+    public void setPlacedStarterSide(PlacedSide[][] playArea) {
         gamePov.setPlayArea(playArea);
 
         gamePov.setPlayerState(PlayerState.CHOOSE_OBJECTIVE);
@@ -157,7 +158,7 @@ public abstract class ServerHandler implements VirtualServer {
      * @param nickname the nickname of the other player.
      * @param playArea the play area of the other player.
      */
-    public void setOtherPlacedStarterSide(String nickname, Side[][] playArea) {
+    public void setOtherPlacedStarterSide(String nickname, PlacedSide[][] playArea) {
         PlayerPov playerPov = gamePov.getPlayerPov(nickname);
         playerPov.setPlayArea(playArea);
 
@@ -221,7 +222,7 @@ public abstract class ServerHandler implements VirtualServer {
      * @param playArea the play area of this player.
      * @param points the points of this player.
      */
-    public void setPlacedSide(Side[][] playArea, int points) {
+    public void setPlacedSide(PlacedSide[][] playArea, int points) {
         gamePov.setPlayArea(playArea);
         gamePov.setPoints(points);
 
@@ -236,7 +237,7 @@ public abstract class ServerHandler implements VirtualServer {
      * @param playArea the play area of the other player.
      * @param points the points of the other player.
      */
-    public void setOtherPlacedSide(String nickname, Side[][] playArea, int points) {
+    public void setOtherPlacedSide(String nickname, PlacedSide[][] playArea, int points) {
         PlayerPov playerPov = gamePov.getPlayerPov(nickname);
         playerPov.setPlayArea(playArea);
         playerPov.setPoints(points);
@@ -336,7 +337,7 @@ public abstract class ServerHandler implements VirtualServer {
      */
     public void setGameResumed(
             GameState state, int turn, DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives,
-            int playerTurn, Color color, StarterCard starterCard, List<Objective> playerObjectives, List<Card> hand, Side[][] playArea, int points,
+            PlayerState playerState, int playerTurn, Color color, StarterCard starterCard, List<Objective> playerObjectives, List<Card> hand, PlacedSide[][] playArea, int points,
             List<Map<String, Object>> players
     ) {
         gamePov.setState(state);
@@ -346,6 +347,7 @@ public abstract class ServerHandler implements VirtualServer {
         gamePov.setObjectives(objectives);
 
         gamePov.setPlayerTurn(playerTurn);
+        gamePov.setPlayerState(playerState);
         gamePov.setColor(color);
         gamePov.setStarterCard(starterCard);
         gamePov.setPlayerObjectives(playerObjectives);
@@ -356,12 +358,12 @@ public abstract class ServerHandler implements VirtualServer {
         for (Map<String, Object> player : players)
             gamePov.addPlayerPov(new PlayerPov(
                     (String) player.get("nickname"),
+                    (PlayerState) player.get("state"),
                     (int) player.get("turn"),
                     (Color) player.get("color"),
                     (StarterCard) player.get("starterCard"),
-                    PlayerState.PLACE_STARTER_CARD,
                     (List<Resource>) player.get("hand"),
-                    (Side[][]) player.get("playArea"),
+                    (PlacedSide[][]) player.get("playArea"),
                     (int) player.get("points")
             ));
 

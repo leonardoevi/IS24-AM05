@@ -1,6 +1,6 @@
 package it.polimi.is24am05.client.model;
 
-import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.enums.state.GameState;
@@ -78,7 +78,7 @@ public class GamePov {
     /**
      * Play area of the player.
      */
-    Side[][] playArea;
+    PlacedSide[][] playArea;
 
     /**
      * Points of the player.
@@ -204,7 +204,7 @@ public class GamePov {
      * Sets the play area of the player.
      * @param playArea the play area of the player.
      */
-    public void setPlayArea(Side[][] playArea) {
+    public void setPlayArea(PlacedSide[][] playArea) {
         this.playArea = playArea;
     }
 

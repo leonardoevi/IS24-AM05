@@ -8,7 +8,6 @@ import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.Color;
-import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;

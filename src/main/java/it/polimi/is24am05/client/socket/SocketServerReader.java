@@ -3,11 +3,12 @@ package it.polimi.is24am05.client.socket;
 import it.polimi.is24am05.client.model.DeckPov;
 import it.polimi.is24am05.controller.server.socket.Message;
 import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.state.GameState;
+import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.ObjectInputStream;
@@ -114,13 +115,13 @@ public class SocketServerReader implements Runnable {
                 break;
             case "placedStarterSide":
                 socketServerHandler.setPlacedStarterSide(
-                        (Side[][]) message.arguments().get("playArea")
+                        (PlacedSide[][]) message.arguments().get("playArea")
                 );
                 break;
             case "otherPlacedStarterSide":
                 socketServerHandler.setOtherPlacedStarterSide(
                         (String) message.arguments().get("nickname"),
-                        (Side[][]) message.arguments().get("playArea")
+                        (PlacedSide[][]) message.arguments().get("playArea")
                 );
                 break;
             case "handsAndObjectivesDealt":
@@ -143,14 +144,14 @@ public class SocketServerReader implements Runnable {
                 break;
             case "placedSide":
                 socketServerHandler.setPlacedSide(
-                        (Side[][]) message.arguments().get("playArea"),
+                        (PlacedSide[][]) message.arguments().get("playArea"),
                         (int) message.arguments().get("points")
                 );
                 break;
             case "otherPlacedSide":
                 socketServerHandler.setOtherPlacedSide(
                         (String) message.arguments().get("nickname"),
-                        (Side[][]) message.arguments().get("playArea"),
+                        (PlacedSide[][]) message.arguments().get("playArea"),
                         (int) message.arguments().get("points")
                 );
                 break;
@@ -191,12 +192,13 @@ public class SocketServerReader implements Runnable {
                         (DeckPov) message.arguments().get("resourceDeck"),
                         (DeckPov) message.arguments().get("goldDeck"),
                         (List<Objective>) message.arguments().get("objectives"),
+                        (PlayerState) message.arguments().get("playerState"),
                         (int) message.arguments().get("playerTurn"),
                         (Color) message.arguments().get("color"),
                         (StarterCard) message.arguments().get("starterCard"),
                         (List<Objective>) message.arguments().get("playerObjectives"),
                         (List<Card>) message.arguments().get("hand"),
-                        (Side[][]) message.arguments().get("playArea"),
+                        (PlacedSide[][]) message.arguments().get("playArea"),
                         (int) message.arguments().get("points"),
                         (List<Map<String, Object>>) message.arguments().get("players")
                 );

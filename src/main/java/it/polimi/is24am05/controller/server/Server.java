@@ -6,13 +6,14 @@ import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
 import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.card.Card;
-import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
-import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.Color;
+import it.polimi.is24am05.model.enums.element.Resource;
+import it.polimi.is24am05.model.enums.state.GameState;
+import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
-import it.polimi.is24am05.model.game.Game;
-import it.polimi.is24am05.model.playArea.PlayArea;
+import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -123,14 +124,14 @@ public class Server {
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyPlaceStarterSide(String client, Side[][] playArea) {
+    public void notifyPlaceStarterSide(String client, PlacedSide[][] playArea) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
             clientHandler.notifyPlaceStarterSide(playArea);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersPlaceStarterSide(String client, PlayArea playArea) {
+    public void notifyOthersPlaceStarterSide(String client, PlacedSide[][] playArea) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
@@ -140,17 +141,17 @@ public class Server {
             c.notifyOthersPlaceStarterSide(client, playArea);
     }
 
-    public void notifyHandsAndObjectivesDealt(String client, Game pov) {
+    public void notifyHandsAndObjectivesDealt(String client, DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives, List<Card> hand, List<Objective> playerObjectives, List<Map<String, Object>> players) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyHandsAndObjectivesDealt(pov);
+            clientHandler.notifyHandsAndObjectivesDealt(resourceDeck, goldDeck, objectives, hand, playerObjectives, players);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyChooseObjective(String client) {
+    public void notifyChooseObjective(String client, Objective objective) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyChooseObjective();
+            clientHandler.notifyChooseObjective(objective);
         } catch (NoSuchPlayerException ignored) {}
     }
 
@@ -163,14 +164,14 @@ public class Server {
             c.notifyAllGameStarted();
     }
 
-    public void notifyPlaceSide(String client, PlayArea playArea, int points) {
+    public void notifyPlaceSide(String client, PlacedSide[][] playArea, int points) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
             clientHandler.notifyPlaceSide(playArea, points);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersPlaceSide(String client, PlayArea playArea, int points) {
+    public void notifyOthersPlaceSide(String client,PlacedSide[][] playArea, int points) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
@@ -180,14 +181,14 @@ public class Server {
             c.notifyOthersPlaceSide(client, playArea, points);
     }
 
-    public void notifyDrawVisible(String client, Deck deck, List<Card> hand) {
+    public void notifyDrawVisible(String client, boolean isGold, DeckPov deck, List<Card> hand) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyDrawVisible(deck, hand);
+            clientHandler.notifyDrawVisible(isGold, deck, hand);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersDrawVisible(String client, boolean isGold, Deck deck, List<Card> hand) {
+    public void notifyOthersDrawVisible(String client, boolean isGold, DeckPov deck, List<Resource> hand) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
@@ -197,14 +198,14 @@ public class Server {
             c.notifyOthersDrawVisible(client, isGold, deck, hand);
     }
 
-    public void notifyDrawDeck(String client, Deck deck, List<Card> hand) {
+    public void notifyDrawDeck(String client, boolean isGold, DeckPov deck, List<Card> hand) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyDrawDeck(deck, hand);
+            clientHandler.notifyDrawDeck(isGold, deck, hand);
         } catch (NoSuchPlayerException ignored) {}
     }
 
-    public void notifyOthersDrawDeck(String client, boolean isGold, Deck deck, List<Card> hand) {
+    public void notifyOthersDrawDeck(String client, boolean isGold, DeckPov deck, List<Resource> hand) {
         List<ClientHandler> copy;
         synchronized (this){
             copy = new ArrayList<>(clientHandlers.stream()
@@ -214,10 +215,19 @@ public class Server {
             c.notifyOthersDrawDeck(client, isGold, deck, hand);
     }
 
-    public void notifyGameResumed(String client, Game pov) {
+    public void notifyGameResumed(
+            String client,
+            GameState state, int turn, DeckPov resourceDeck, DeckPov goldDeck, List<Objective> objectives,
+            PlayerState playerState, int playerTurn, Color color, StarterCard starterCard, List<Objective> playerObjectives, List<Card> hand, PlacedSide[][] playArea, int points,
+            List<Map<String, Object>> players
+    ) {
         try {
             ClientHandler clientHandler = getClientHandler(client);
-            clientHandler.notifyGameResumed(pov);
+            clientHandler.notifyGameResumed(
+                    state, turn, resourceDeck, goldDeck, objectives,
+                    playerState, playerTurn, color, starterCard, playerObjectives, hand, playArea, points,
+                    players
+            );
         } catch (NoSuchPlayerException ignored) {}
     }
 
