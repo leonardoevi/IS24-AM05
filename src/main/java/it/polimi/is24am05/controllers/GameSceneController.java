@@ -154,21 +154,17 @@ public class GameSceneController  implements Initializable  {
         for (int row = 0; row < 20; row++) {
             for (int col = 0; col < 20; col++) {
 
-                if((row+col)%2==0)
-                {
-  /*
+                if((row+col)%2==0) {
+
                     ImageView card = new ImageView(new Image(imagePath));
 
-                    card.setPreserveRatio(false);  // Imposta la larghezza dell'immagine
 
-                    card.fitWidthProperty().bind(Bindings.divide(playArea.widthProperty(), 20)); // Larghezza dell'immagine
-                    card.fitHeightProperty().bind(Bindings.divide(playArea.heightProperty(), 20));
-                    ; // Sovrapposizione sugli angoli
+/*
 
 
-   */
 
-                    playArea.add(new Label("ciao"), col, row);
+
+                    playArea.add(card, col, row);
 
 
 
@@ -176,10 +172,19 @@ public class GameSceneController  implements Initializable  {
                 }
 
 
-                /*
+
 
 
                  */
+                    String imagePath2 = getClass().getResource("/assets/images/027.png").toExternalForm();
+                   StackPane region = new StackPane();
+                  region.setBackground(new Background(new BackgroundImage(new Image(imagePath2),  BackgroundRepeat.NO_REPEAT,
+                          BackgroundRepeat.NO_REPEAT,
+                          BackgroundPosition.CENTER,
+                          new BackgroundSize(1.0, 1.0, true, true, false, false))));
+                    playArea.add(region, col, row);
+
+                }
             }
         }
 
