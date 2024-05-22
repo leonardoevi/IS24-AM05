@@ -1,5 +1,9 @@
 package it.polimi.is24am05;
 
+import it.polimi.is24am05.client.ServerHandler;
+import it.polimi.is24am05.client.model.ClientModel;
+import it.polimi.is24am05.client.view.TUI;
+import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.controllers.ConnectionInfoSceneController;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -12,6 +16,9 @@ import java.io.IOException;
 
 public class GUIMain extends Application {
     private Stage primaryStage;
+
+
+
     @Override
     public void start(Stage stage) throws IOException {
         this.primaryStage = new Stage();
@@ -45,4 +52,6 @@ public class GUIMain extends Application {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
+
+
 }

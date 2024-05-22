@@ -1,5 +1,8 @@
 package it.polimi.is24am05;
 
+import it.polimi.is24am05.client.ServerHandler;
+import it.polimi.is24am05.client.model.ClientModel;
+import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.controllers.DealStarterCardsSceneController;
 import it.polimi.is24am05.controllers.GameSceneController;
 import it.polimi.is24am05.controllers.NicknameRequestSceneController;
@@ -14,7 +17,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
-public class GUI {
+public class GUI  {
 
 
 
@@ -39,7 +42,6 @@ public class GUI {
     public GUI (GUIMain guiMainReference) {
         this.guiMain = guiMainReference;
     }
-
 
 
 
