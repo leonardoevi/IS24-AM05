@@ -9,11 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SocketServerHandler extends ServerHandler {
-    private Socket socket;
+    private final Socket socket;
     private final ObjectOutputStream outputStream;
 
     public static void main(String[] args) {
@@ -31,7 +29,7 @@ public class SocketServerHandler extends ServerHandler {
             this.socket = new Socket(serverIP, Integer.parseInt(serverPort));
         } catch (IOException e) {
             notifyViewServerUnreachable();
-            throw e;
+            throw new IOException("Socket connection to server failed");
         }
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 

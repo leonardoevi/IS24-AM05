@@ -1,7 +1,6 @@
 package it.polimi.is24am05.client.rmi;
 
 import it.polimi.is24am05.client.ServerHandler;
-import it.polimi.is24am05.client.socket.SocketServerHandler;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiVirtualController;
 import it.polimi.is24am05.model.game.Game;
@@ -11,13 +10,19 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Set;
 
 public class RmiServerHandler extends ServerHandler {
     private RmiVirtualController virtualController;
     private final RmiVirtualClient rmiFromServer;
 
     public static void main(String[] args) throws Exception {
-        new RmiServerHandler("localhost", "9696");
+        try {
+            new RmiServerHandler("localhost", "9696");
+        } catch (RemoteException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public RmiServerHandler(String serverIP, String serverPort) throws RemoteException {
@@ -28,13 +33,25 @@ public class RmiServerHandler extends ServerHandler {
     }
 
 
-    public void startConnection() {
+    public void startConnection() throws RemoteException {
         // Try connecting to the server
         try {
             RmiHandlersProvider provider = (RmiHandlersProvider) Naming.lookup("rmi://" + serverIP + ":" + serverPort + "/RmiHandlerProvider");
             virtualController = provider.connect(rmiFromServer);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
+            throw new RemoteException("Rmi connection to server failed");
+        }
+    }
+
+    private static void killRmiReaper(){
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        for (Thread t : threadSet) {
+            if(t.getName().equals("RMI Reaper")){
+                //System.out.println("Killing RMI Reaper");
+                t.interrupt();
+                }
         }
     }
 
@@ -44,7 +61,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.joinServerRMI(this.getNickname());
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -53,7 +71,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.joinGameRMI();
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -62,7 +81,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.setNumberOfPlayersRMI(numberOfPlayers);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -71,7 +91,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.placeStarterSideRMI(isFront);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -80,7 +101,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.chooseObjectiveRMI(objectiveId);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -89,7 +111,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.placeSideRMI(cardId, isFront, i, j);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -98,7 +121,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.drawVisibleRMI(cardId);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -107,7 +131,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.drawDeckRMI(isGold);
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
@@ -116,7 +141,8 @@ public class RmiServerHandler extends ServerHandler {
         try {
             virtualController.disconnectRMI();
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            notifyViewServerUnreachable();
+            killRmiReaper();
         }
     }
 
