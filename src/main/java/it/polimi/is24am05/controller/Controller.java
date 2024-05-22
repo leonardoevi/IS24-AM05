@@ -168,7 +168,7 @@ public class Controller {
                     "turn", game.getPlayerTurn(p),
                     "color", player.getColor(),
                     "starterCard", p.getStarterCard(),
-                    "hand", p.getHand(),
+                    "hand", p.getHandPov(),
                     "playArea", p.getPlayArea().getMatrixPlayArea(),
                     "points", p.getPoints()
             ));
@@ -239,9 +239,8 @@ public class Controller {
 
         // If the game state changed, i.e. all players placed their starter card, update the clients
         if (game.getGameState().equals(GameState.CHOOSE_OBJECTIVE)) {
-            for (Player player : game.getPlayers()) {
+            for (Player player : game.getPlayers())
                 notifyHandsAndObjectivesDealt(player);
-            }
         }
     }
 
@@ -252,7 +251,7 @@ public class Controller {
                 continue;
             players.add(Map.of(
                     "nickname", p.getNickname(),
-                    "hand", p.getHand()
+                    "hand", p.getHandPov()
             ));
         }
         server.notifyHandsAndObjectivesDealt(
