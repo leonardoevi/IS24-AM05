@@ -117,10 +117,10 @@ public class GUI {
     {
         if(waitingRoomSceneController!=null)
             Platform.runLater(()-> {waitingRoomSceneController.showPlayers(gameCloned.getNicknames());});
-        if(
-               gameSceneController!=null
-        )
-            Platform.runLater(()-> {gameSceneController.showPlayers(gameCloned.getNicknames());});
+      //  if(
+             //  gameSceneController!=null
+     //   )
+            //Platform.runLater(()-> {gameSceneController.showPlayers(gameCloned.getNicknames());});
 
     }
 

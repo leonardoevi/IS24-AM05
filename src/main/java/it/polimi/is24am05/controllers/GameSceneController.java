@@ -1,6 +1,8 @@
 package it.polimi.is24am05.controllers;
 
 import it.polimi.is24am05.GUI;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -104,9 +106,15 @@ public class GameSceneController  implements Initializable  {
 
         String imageBackPath = getClass().getResource("/assets/images/playAreaBackground.png").toExternalForm();
         AnchorPane.setTopAnchor(backgroundPlayArea, 50.0);
-        AnchorPane.setBottomAnchor(backgroundPlayArea, 50.0);
         AnchorPane.setLeftAnchor(backgroundPlayArea, 300.0);
-        backgroundPlayArea.setPrefSize(900, 900);
+        AnchorPane.setBottomAnchor(backgroundPlayArea, 50.0);
+        AnchorPane.setRightAnchor(backgroundPlayArea, 300.0);
+
+
+
+
+
+
         Image backgroundImage = new Image(imageBackPath); // Sostituisci con il percorso della tua immagine
 
         // Crea un BackgroundImage
@@ -120,7 +128,7 @@ public class GameSceneController  implements Initializable  {
 
         // Imposta il Background al AnchorPane
         backgroundPlayArea.setBackground(new Background(backgroundImg));
-        StackPane.setMargin(playArea, new Insets(50));
+
         String imagePath = getClass().getResource("/assets/images/027.png").toExternalForm();
         for (int i = 0; i < 20; i++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
@@ -131,31 +139,45 @@ public class GameSceneController  implements Initializable  {
             rowConstraints.setPercentHeight(100 / 20.0);
             playArea.getRowConstraints().add(rowConstraints);
         }
+        StackPane.setMargin(playArea, new Insets(50));
+        playArea.widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            for (int i = 0; i < 20; i++) {
+                playArea.getColumnConstraints().get(i).setPrefWidth(newValue.doubleValue() / 20);
+            }
+        });
 
-        for (int row = 0; row < 15; row++) {
-            for (int col = 0; col < 15; col++) {
+        playArea.heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            for (int i = 0; i < 20; i++) {
+                playArea.getRowConstraints().get(i).setPrefHeight(newValue.doubleValue() / 20);
+            }
+        });
+        for (int row = 0; row < 20; row++) {
+            for (int col = 0; col < 20; col++) {
 
                 if((row+col)%2==0)
                 {
-
+  /*
                     ImageView card = new ImageView(new Image(imagePath));
-                    card.setFitHeight(60);
-                    card.setFitWidth(90);
+
                     card.setPreserveRatio(false);  // Imposta la larghezza dell'immagine
 
-
+                    card.fitWidthProperty().bind(Bindings.divide(playArea.widthProperty(), 20)); // Larghezza dell'immagine
+                    card.fitHeightProperty().bind(Bindings.divide(playArea.heightProperty(), 20));
                     ; // Sovrapposizione sugli angoli
 
 
-                    playArea.add(card, col, row);
+   */
+
+                    playArea.add(new Label("ciao"), col, row);
+
+
+
+
                 }
 
 
                 /*
-                Label label = new Label("R" + row + ", C" + col);
 
-                // Aggiungi la Label alla cella corrispondente nel GridPane
-                playArea.add(label, col, row);
 
                  */
             }
