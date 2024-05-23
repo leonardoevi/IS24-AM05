@@ -13,9 +13,30 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 public class GUIMain extends Application {
     private Stage primaryStage;
+    private static GUIMain instance;
+    private static final CountDownLatch latch = new CountDownLatch(1);
+
+
+    public GUIMain() {
+        instance = this;
+        latch.countDown();
+    }
+
+    public static GUIMain getInstance() {
+        return instance;
+    }
+
+    public static void waitForStart(){
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
 
 

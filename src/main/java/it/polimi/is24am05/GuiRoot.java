@@ -21,9 +21,10 @@ public class GuiRoot extends View {
     }
     public GuiRoot(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
-         this.guiMain=new GUIMain();
-
         new Thread(() -> Application.launch(GUIMain.class)).start();
+        // Attendi fino a quando l'istanza di MyJavaFXApp è disponibile
+        GUIMain.waitForStart();
+        this.guiMain = GUIMain.getInstance();
     }
 
 }

@@ -1,5 +1,6 @@
 package it.polimi.is24am05.client;
 
+import it.polimi.is24am05.GuiRoot;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.TUI;
 import it.polimi.is24am05.client.view.View;
@@ -16,7 +17,7 @@ public abstract class ServerHandler implements VirtualServer{
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         clientModel = new ClientModel();
-        new TUI(clientModel, this);
+        new GuiRoot(clientModel, this);
     }
 
     public void setNickname(String nickname) {
