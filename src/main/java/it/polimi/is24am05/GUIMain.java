@@ -4,8 +4,7 @@ import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.TUI;
 import it.polimi.is24am05.client.view.View;
-import it.polimi.is24am05.controllers.ConnectionInfoSceneController;
-import it.polimi.is24am05.controllers.NicknameRequestSceneController;
+import it.polimi.is24am05.controllers.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +13,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class GUIMain extends Application {
@@ -21,6 +22,7 @@ public class GUIMain extends Application {
     private static GUIMain instance;
     private static final CountDownLatch latch = new CountDownLatch(1);
     private static GUIRoot guiRoot;
+    public Map<Scene, Object> sceneControllerMap = new HashMap<>();
 
 
     public GUIMain() {
@@ -51,10 +53,19 @@ public class GUIMain extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
         guiRoot.seGuiMain(this);
         this.primaryStage = new Stage();
         guiRoot.askNickname();
 
+    }
+    public void loadScene(Scene scene, Object controller) throws IOException {
+
+        sceneControllerMap.put(scene, controller);
+
+    }
+    public Object getControllerForScene(Scene scene) {
+        return sceneControllerMap.get(scene);
     }
 
     public static void main(String[] args) {
@@ -72,8 +83,6 @@ public class GUIMain extends Application {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
-    public Scene getScene() {
-        return primaryStage != null ? primaryStage.getScene() : null;
-    }
+
 
 }

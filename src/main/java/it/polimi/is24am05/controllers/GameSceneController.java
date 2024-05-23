@@ -1,6 +1,8 @@
 package it.polimi.is24am05.controllers;
 
 import it.polimi.is24am05.GUIRoot;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 
 import java.net.URL;
@@ -71,6 +74,11 @@ public class GameSceneController  implements Initializable  {
     @FXML
 
     private Label myPoints;
+
+    @FXML
+
+    private Label logField;
+
 
 
 
@@ -186,8 +194,11 @@ public class GameSceneController  implements Initializable  {
                 }
             }
         }
+        AnchorPane.setTopAnchor(logField, 10.0);
+        AnchorPane.setLeftAnchor(logField, 600.0);
+        logField.setText("");
 
-       resourceDeckTop.setPreserveRatio(false);
+        resourceDeckTop.setPreserveRatio(false);
         resourceDeckTop.setImage(new Image(imageBackPath));
         resourceDeckTop.setFitWidth(120);
         resourceDeckTop.setFitHeight(90);
@@ -312,8 +323,15 @@ public class GameSceneController  implements Initializable  {
 
 
     }
-    public void update()
+    public void showLog(String log)
     {
+       logField.setText(log);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(3),
+                event ->logField.setText("")
+        ));
+        timeline.setCycleCount(1);
+        timeline.play();
 
     }
 

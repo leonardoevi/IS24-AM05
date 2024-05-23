@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"  xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.controllers.GameSceneController">
+<AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.controllers.GameSceneController">
    <children>
       <StackPane fx:id="backgroundPlayArea">
          <children>
@@ -24,7 +24,10 @@
          </children>
       </StackPane>
 
-
+      <Label fx:id="logField" textFill="#151ce1">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font></Label>
       <ImageView fx:id="resourceDeckTop" />
       <ImageView fx:id="resourceVisible1" />
       <ImageView fx:id="resourceVisible2" />
@@ -45,12 +48,12 @@
       <ImageView fx:id="commonObjective1" />
       <ImageView fx:id="commonObjective2" />
       <ImageView fx:id="myObjective" />
-      <Label AnchorPane.topAnchor="100.0" AnchorPane.rightAnchor="90.0" prefHeight="17.0" prefWidth="117.0" text="Common Objectives" textFill="#10a842">
+      <Label prefHeight="17.0" prefWidth="117.0" text="Common Objectives" textFill="#10a842" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="100.0">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Label AnchorPane.topAnchor="250" AnchorPane.rightAnchor="90.0" prefHeight="17.0" prefWidth="117.0" text="My Objective" textFill="#18b225">
+      <Label prefHeight="17.0" prefWidth="117.0" text="My Objective" textFill="#18b225" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="250">
          <font>
             <Font size="17.0" />
          </font>
