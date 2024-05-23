@@ -22,6 +22,8 @@ import it.polimi.is24am05.model.exceptions.player.InvalidSideException;
 import it.polimi.is24am05.model.exceptions.player.InvalidStarterSideException;
 import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.objective.Objective;
+import it.polimi.is24am05.model.objective.ObjectiveDisplayer;
+import it.polimi.is24am05.model.objective.SharedObjectiveDisplayer;
 import it.polimi.is24am05.model.playArea.AreaDisplayer;
 import it.polimi.is24am05.model.playArea.PlayArea;
 
@@ -685,6 +687,10 @@ public class Game implements Serializable {
                 stringBuilder.append(handToString(List.of(p.getStarterCard()))).append("\n");
             }
 
+            if(this.gameState != GameState.PLACE_STARTER_CARDS && this.gameState != GameState.CHOOSE_OBJECTIVE){
+                stringBuilder.append(p.getObjective().toString()).append("\n");
+            }
+
             if(p.getHand() != null && !p.getHand().isEmpty()) {
                 stringBuilder.append("Hand: ").append("\n");
                 stringBuilder.append(handToString(p.getHand())).append("\n");
@@ -692,10 +698,9 @@ public class Game implements Serializable {
 
             if(this.gameState == GameState.CHOOSE_OBJECTIVE)
                 stringBuilder.append("\n")
-                        .append(p.getObjectivesHand()[0])
-                        .append("  ")
-                        .append(p.getObjectivesHand()[1])
+                        .append(new SharedObjectiveDisplayer(p.getObjectivesHand()))
                         .append("\n");
+
         }
 
         if(this.gameState == GameState.GAME || this.gameState == GameState.GAME_ENDING) {

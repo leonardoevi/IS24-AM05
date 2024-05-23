@@ -2,6 +2,8 @@ package it.polimi.is24am05.model.objective;
 
 import it.polimi.is24am05.model.playArea.PlayArea;
 
+import static it.polimi.is24am05.model.Player.HandDisplayer.matrixToString;
+
 public enum Objective {
     /**
      * The Objective enum declares the 16 objective cards needed for the game
@@ -59,5 +61,49 @@ public enum Objective {
 
     public ObjectiveMultiplier getMultiplier() {
         return multiplier;
+    }
+
+    public String[][] toMatrix(){
+        // TODO : add colors and display each objective
+        String[][] matrix = new String[5][3];
+
+        matrix[0][0] = " "; matrix[0][1] = "  ⌟" + getPoints() + "⌞  "; matrix[0][2] = " ";
+        matrix[1][0] = matrix[1][2] = matrix[3][0] = matrix[3][2] = "+";
+        matrix[2][0] = matrix[2][2] = "|";
+        matrix[4][0] = matrix[4][2] = " ";
+        matrix[4][1] = " " + this.name() + " ";
+
+        switch (this){
+            case O_087:
+                matrix[1][1] = " " + "-".repeat(5) + " ";
+                matrix[2][1] = " ".repeat(7);
+                matrix[3][1] = " " + "-".repeat(5) + " ";
+
+                break;
+            default:
+                matrix[1][1] = matrix[3][1] = "-".repeat(7);
+                matrix[2][1] = " ".repeat(3) + "?" + " ".repeat(3);
+
+                break;
+        }
+
+        return matrix;
+    }
+
+    public String[][] toMatrixNoName(){
+        // TODO : add colors and display each objective
+        String[][] matrixNoName = new String[4][3];
+
+        String[][] matrix = toMatrix();
+
+        for (int i = 0; i < matrixNoName.length; i++)
+            System.arraycopy(matrix[i], 0, matrixNoName[i], 0, matrixNoName[i].length);
+
+        return matrixNoName;
+    }
+
+    @Override
+    public String toString() {
+        return matrixToString(this.toMatrixNoName());
     }
 }

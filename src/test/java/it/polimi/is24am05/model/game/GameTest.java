@@ -234,6 +234,8 @@ class GameTest {
         // Game state should be PLACE_STARTER_CARDS
         assertEquals(GameState.PLACE_STARTER_CARDS, game.getGameState());
 
+        System.out.println(game);
+
         // No moves except for placeStarterSide() should be allowed
         // The exception is thrown regardless of the parameters
         assertThrows(MoveNotAllowedException.class, () -> game.chooseObjective(players.getFirst(), Objective.O_088));
@@ -251,6 +253,7 @@ class GameTest {
 
             try {
                 game.placeStarterSide(name, starterCard.getBackSide());
+                System.out.println(game);
             } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
         }
 
@@ -276,6 +279,7 @@ class GameTest {
 
             try {
                 game.chooseObjective(name, choice);
+                System.out.println(game);
             } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
         }
 
@@ -323,6 +327,7 @@ class GameTest {
                     throw new RuntimeException(ex);
                 }
             }
+            System.out.println(game);
 
             // If there is nothing to draw
             if (game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()) {
@@ -384,6 +389,7 @@ class GameTest {
                     randomDecision = 0;
                 }
             }
+            System.out.println(game);
 
             // Current player State should be PLACE
             assertEquals(PlayerState.PLACE, current.getState());

@@ -66,7 +66,12 @@ public class DeckDisplayer {
     }
 
     public static String deckToString(Deck deck1, boolean isGold1, Deck deck2, boolean isGold2){
-        return matrixToString(sideToSide(List.of(deckToMatrix(deck1, isGold1), deckToMatrix(deck2, isGold2) )));
+        String[][] middleSpacer = new String[11][1];
+        for (int i = 0; i < 11; i++) {
+            middleSpacer[i][0] = "   ";
+        }
+
+        return matrixToString(sideToSide(List.of(deckToMatrix(deck1, isGold1), middleSpacer, deckToMatrix(deck2, isGold2) )));
     }
 
     private static String[][] emptyDeckTopSide(){
