@@ -80,10 +80,12 @@ public class Server {
     }
 
     public synchronized void subscribe(ClientHandler clientHandler) {
+        System.out.println(clientHandler.getNickname() + " subscribed");
         clientHandlers.add(clientHandler);
     }
 
     public synchronized void unsubscribe(ClientHandler clientHandler) {
+        System.out.println(clientHandler.getNickname() + " unsubscribed");
         clientHandlers.remove(clientHandler);
     }
 

@@ -22,7 +22,7 @@ public class RmiClientHandler extends ClientHandler {
         this.virtualClient = virtualClient;
         this.rmiFromClient = new RmiFromClient();
 
-        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 0, 2, TimeUnit.SECONDS);
+        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 0, 1, TimeUnit.SECONDS);
     }
 
     // This getter is needed to give the Client an object that implements the RmiVirtualController interface
@@ -39,8 +39,7 @@ public class RmiClientHandler extends ClientHandler {
         try {
             virtualClient.setGameRMI(game);
         } catch (RemoteException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e);
+            System.out.println("Error sending game update to: " + getNickname());
         }
     }
 
@@ -49,8 +48,7 @@ public class RmiClientHandler extends ClientHandler {
         try {
             virtualClient.addLogRMI(log);
         } catch (RemoteException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e);
+            System.out.println("Error sending log: [" + log + "] to: " + getNickname());
         }
     }
 
@@ -107,6 +105,9 @@ public class RmiClientHandler extends ClientHandler {
         public void disconnectRMI() throws RemoteException {
             disconnect();
         }
+
+        @Override
+        public void pongRMI() throws RemoteException {}
     }
 
     private class ConnectionCheckRoutine implements Runnable {
@@ -116,7 +117,7 @@ public class RmiClientHandler extends ClientHandler {
                 virtualClient.pingRMI();
             } catch (RemoteException e) {
                 System.out.println(getNickname() + " is not responding!");
-                connectionDemon.shutdownNow();
+                connectionDemon.shutdown();
                 disconnect();
             }
         }

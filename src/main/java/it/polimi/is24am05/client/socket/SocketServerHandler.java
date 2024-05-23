@@ -121,7 +121,7 @@ public class SocketServerHandler extends ServerHandler {
                     handleServerInput(message);
                 }
             } catch (Exception e) {
-                System.out.println("Socket Reader exiting");
+                //System.out.println("Socket Reader exiting");
                 socketServerHandler.notifyViewServerUnreachable();
             }
         }

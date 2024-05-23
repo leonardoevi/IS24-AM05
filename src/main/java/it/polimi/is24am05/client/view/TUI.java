@@ -38,6 +38,7 @@ public class TUI extends View {
     }
 
     public void serverUnreachable() {
+        System.out.println("Connection to server unavailable, exiting.");
         inputReader.stopInputReader();
     }
 
@@ -47,7 +48,6 @@ public class TUI extends View {
 
         @Override
         public void run() {
-            // TODO : make sure this thread terminates
             while (!stdinClosed) {
                 try {
                     String line = stdin.nextLine();
@@ -59,7 +59,6 @@ public class TUI extends View {
                     break;
                 }
             }
-            System.out.println("Input reader exiting");
         }
 
         private void handleInput(String input){
@@ -115,7 +114,7 @@ public class TUI extends View {
                     default:
                         throw new NoSuchElementException();
                 }
-            } catch (NoSuchElementException e) {
+            } catch (Exception e) {
                 System.out.println("Invalid input");;
             }
         }

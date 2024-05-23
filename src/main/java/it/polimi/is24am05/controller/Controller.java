@@ -41,6 +41,8 @@ public class Controller {
     private final Server server = new Server(this);
     public Game game;
 
+    private final List<String> messageRecipents = new ArrayList<>();
+
     /**
      * Controller for a loaded game
      * @param game old game
@@ -49,6 +51,9 @@ public class Controller {
         this.game = game;
         this.numUsers = game.getNicknames().size();
         this.lobbyState = LobbyState.OLD;
+
+        this.messageRecipents.addAll(game.getNicknames().stream().toList());
+
         server.start();
     }
 
@@ -77,7 +82,7 @@ public class Controller {
             // Add the user to the list of reconnected users
             users.add(playerNickname);
             // Broadcast update
-            server.broadcastLog(users, playerNickname + "rejoined!");
+            server.broadcastLog(messageRecipents, playerNickname + "rejoined!");
             // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
                 for (String nickname : this.users) {
@@ -87,8 +92,8 @@ public class Controller {
                 }
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
-                server.broadcastLog(users, "Game restarted!");
-                server.broadcastGameUpdated(users);
+                server.broadcastLog(messageRecipents, "Game restarted!");
+                server.broadcastGameUpdated(messageRecipents);
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -105,8 +110,9 @@ public class Controller {
             if(this.users.size() == this.numUsers) {
                 try {
                     this.game = new Game(this.users);
+                    this.messageRecipents.addAll(users);
                     this.lobbyState = LobbyState.STARTED;
-                    server.broadcastGameUpdated(users);
+                    server.broadcastGameUpdated(messageRecipents);
                 } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {
                     // Should never happen
                     throw new RuntimeException(e);
@@ -127,10 +133,12 @@ public class Controller {
                 GameState stateAfterReconnection = game.getGameState();
 
                 server.gameUpdated(playerNickname);
-                server.broadcastLog(users, playerNickname + " reconnected!");
+                server.broadcastLog(messageRecipents.stream()
+                        .filter(s -> !s.equals(playerNickname))
+                        .toList(), playerNickname + " reconnected!");
 
                 if(stateBeforeReconnection != stateAfterReconnection)
-                    server.broadcastLog(users, "Game resumed!");
+                    server.broadcastLog(messageRecipents, "Game resumed!");
 
             } catch (NoSuchPlayerException ignored) {}
         }
@@ -178,7 +186,7 @@ public class Controller {
         else
             game.placeStarterSide(playerNickname, toPlay.getBackSide());
 
-        server.broadcastGameUpdated(users);
+        server.broadcastGameUpdated(messageRecipents);
     }
 
     /**
@@ -194,9 +202,18 @@ public class Controller {
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
         Objective objective = Objective.valueOf(objectiveId);
-        game.chooseObjective(playerNickname, objective);
 
-        server.broadcastGameUpdated(users);
+        game.chooseObjective(playerNickname, objective);
+        GameState stateAfterChoosing = game.getGameState();
+
+        server.broadcastLog(messageRecipents.stream()
+                .filter(s -> !s.equals(playerNickname))
+                .toList(), playerNickname + " has chosen the secret objective!");
+        server.broadcastLog(List.of(playerNickname), "Objective chosen!");
+
+        if(stateAfterChoosing != GameState.CHOOSE_OBJECTIVE)
+            server.broadcastGameUpdated(messageRecipents);
+
     }
 
     /**
@@ -228,7 +245,7 @@ public class Controller {
 
         game.placeSide(playerNickname, card, toPlay, i, j);
 
-        server.broadcastGameUpdated(users);
+        server.broadcastGameUpdated(messageRecipents);
     }
 
     /**
@@ -247,7 +264,7 @@ public class Controller {
 
         game.drawDeck(playerNickname, fromGold);
 
-        server.broadcastGameUpdated(users);
+        server.broadcastGameUpdated(messageRecipents);
     }
 
     /**
@@ -266,7 +283,7 @@ public class Controller {
 
         game.drawVisible(playerNickname, visible);
 
-        server.broadcastGameUpdated(users);
+        server.broadcastGameUpdated(messageRecipents);
     }
 
     /**
@@ -318,6 +335,7 @@ public class Controller {
      * @param nickname of the player disconnected
      */
     public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
+        System.out.println("Disconnecting " + nickname);
         users.remove(nickname);
 
         if(this.game == null)
@@ -327,10 +345,11 @@ public class Controller {
         game.disconnect(nickname);
         GameState stateAfterDisconnection = game.getGameState();
 
-        server.broadcastLog(users, nickname + " disconnected!");
+        server.broadcastLog(messageRecipents, nickname + " disconnected!");
+
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
-            server.broadcastLog(users, "Game paused!");
+            server.broadcastLog(messageRecipents, "Game paused!");
         }
     }
 

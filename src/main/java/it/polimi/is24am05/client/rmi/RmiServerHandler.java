@@ -11,10 +11,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RmiServerHandler extends ServerHandler {
     private RmiVirtualController virtualController;
     private final RmiVirtualClient rmiFromServer;
+    private ScheduledExecutorService serverChecker = Executors.newSingleThreadScheduledExecutor();
 
     public static void main(String[] args) throws Exception {
         try {
@@ -38,6 +42,10 @@ public class RmiServerHandler extends ServerHandler {
         try {
             RmiHandlersProvider provider = (RmiHandlersProvider) Naming.lookup("rmi://" + serverIP + ":" + serverPort + "/RmiHandlerProvider");
             virtualController = provider.connect(rmiFromServer);
+
+            // Set up a demon thread to check if server is still up
+            serverChecker.scheduleAtFixedRate(new RmiServerChecker(), 0, 1, TimeUnit.SECONDS);
+
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             notifyViewServerUnreachable();
             killRmiReaper();
@@ -163,6 +171,19 @@ public class RmiServerHandler extends ServerHandler {
 
         @Override
         public void pingRMI() throws RemoteException {
+        }
+    }
+
+    class RmiServerChecker implements Runnable {
+        @Override
+        public void run() {
+            try {
+                virtualController.pongRMI();
+            } catch (RemoteException e) {
+                serverChecker.shutdown();
+                notifyViewServerUnreachable();
+                killRmiReaper();
+            }
         }
     }
 }
