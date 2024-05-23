@@ -1,7 +1,6 @@
 package it.polimi.is24am05.controllers;
 
-import it.polimi.is24am05.GUI;
-import javafx.beans.binding.Bindings;
+import it.polimi.is24am05.GUIRoot;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -81,8 +80,8 @@ public class GameSceneController  implements Initializable  {
     private StackPane leftSideBackground;
     @FXML
     private AnchorPane mainBackground;
-    private GUI gui;
-    public void setGUI(GUI gui)
+    private GUIRoot gui;
+    public void setGUI(GUIRoot gui)
     {
         this.gui=gui;
     }

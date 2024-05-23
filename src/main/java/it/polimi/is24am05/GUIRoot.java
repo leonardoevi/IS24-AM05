@@ -1,0 +1,142 @@
+package it.polimi.is24am05;
+
+import it.polimi.is24am05.client.ServerHandler;
+import it.polimi.is24am05.client.model.ClientModel;
+import it.polimi.is24am05.client.view.View;
+import it.polimi.is24am05.controllers.GameSceneController;
+import it.polimi.is24am05.controllers.NicknameRequestSceneController;
+import it.polimi.is24am05.controllers.WaitingRoomSceneController;
+import it.polimi.is24am05.model.game.Game;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Objects;
+
+public class GUIRoot extends View {
+
+    GUIMain guiMain;
+
+    public GUIRoot(ClientModel clientModel, ServerHandler server) {
+        super(clientModel, server);
+        GUIMain.launchApp(this);
+
+    }
+    public void seGuiMain(GUIMain guiMain)
+    {
+        this.guiMain=guiMain;
+    }
+    @Override
+    public void updateGame() {
+        Game toDisplay;
+        try {
+             toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
+
+        } catch (NullPointerException ignored) {
+            System.out.println("Game not found");
+        }
+
+
+
+    }
+
+    @Override
+    public void updateLogs() {
+        String log;
+        try {
+            log=clientModel.getLog().getLast();
+        } catch (NullPointerException ignored) {}
+    }
+    /** returns the current scene. */
+    public Scene getScene() {
+        return guiMain.getScene();
+    }
+
+    private WaitingRoomSceneController waitingRoomSceneController;
+    /** Nickname request's scene. */
+    private NicknameRequestSceneController nicknameRequestSceneController;
+
+    private GameSceneController gameSceneController;
+    /** Game's scene. */
+
+    private void changeScene(Scene scene) {
+        Platform.runLater(() -> {
+            Stage stage = guiMain.getPrimaryStage();
+            //   stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/Publisher material/Icon 50x50px.png"))));
+            stage.setTitle("My Shelfie");
+            stage.setScene(scene);
+
+            stage.setFullScreen(true);
+
+            stage.show();
+        });
+    }
+
+    public void askNickname() throws IOException {
+        // When the server requires the client nickname, switch to the Nickname Request scene.
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("nicknameRequestScene.fxml"));
+        Parent root = loader.load();
+
+        nicknameRequestSceneController = loader.getController();
+        nicknameRequestSceneController.setGUI(this);
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("NickNameRequestScene.css")).toExternalForm());
+        changeScene(scene);
+    }
+
+    public void switchToWaitingRoom() {
+
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("waitingRoomScene.fxml"));
+            Parent root = loader.load();
+
+            WaitingRoomSceneController controller = loader.getController();
+            controller.setGUI(this);
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("WaitingRoomScene.css")).toExternalForm());
+
+            changeScene(scene);
+            //TODO: DELETE THS
+            controller.changeScene();
+        } catch(IOException e) {
+            System.out.println("Error");
+        }
+    }
+    /**
+     * Updates the view after creating the game.
+     */
+    public void gameCreated() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("gameScene.fxml"));
+            Parent root = loader.load();
+
+            gameSceneController = loader.getController();
+            gameSceneController.setGUI(this);
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
+
+            changeScene(scene);
+            //controller.update();
+        } catch(IOException e) {
+            System.out.println("Error");
+        }
+    }
+    /**
+     * Updates the view after adding a log.
+     */
+
+
+
+
+
+}

@@ -1,6 +1,6 @@
 package it.polimi.is24am05.controllers;
 
-import it.polimi.is24am05.GUI;
+import it.polimi.is24am05.GUIRoot;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -15,11 +15,11 @@ public class WaitingRoomSceneController implements Initializable {
 
 
 
-    private GUI gui;
+    private GUIRoot gui;
 
     @FXML
     VBox playersList;
-    public void setGUI(GUI gui)
+    public void setGUI(GUIRoot gui)
     {
         this.gui=gui;
     }

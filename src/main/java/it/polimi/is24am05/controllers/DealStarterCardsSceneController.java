@@ -1,6 +1,6 @@
 package it.polimi.is24am05.controllers;
 
-import it.polimi.is24am05.GUI;
+import it.polimi.is24am05.GUIRoot;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
@@ -29,8 +29,8 @@ public class DealStarterCardsSceneController implements Initializable {
     private ImageView player3SCBackSide;
     @FXML
     private ImageView player3SCFrontSide;
-    private GUI gui;
-    public void setGUI(GUI gui)
+    private GUIRoot gui;
+    public void setGUI(GUIRoot gui)
     {
         this.gui=gui;
     }

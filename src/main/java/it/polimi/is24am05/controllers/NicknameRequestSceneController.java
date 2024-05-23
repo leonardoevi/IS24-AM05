@@ -1,6 +1,6 @@
 package it.polimi.is24am05.controllers;
 
-import it.polimi.is24am05.GUI;
+import it.polimi.is24am05.GUIRoot;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -14,13 +14,13 @@ public class NicknameRequestSceneController implements Initializable {
     @FXML
     private TextField playerNickname;
 
-    private GUI gui;
+    private GUIRoot gui;
     @FXML
     private Button confirButton;
 
 
 
-    public void setGUI(GUI gui)
+    public void setGUI(GUIRoot gui)
     {
         this.gui=gui;
     }

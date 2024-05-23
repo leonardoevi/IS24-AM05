@@ -1,7 +1,6 @@
 package it.polimi.is24am05.controllers;
 
-import it.polimi.is24am05.GUI;
-import it.polimi.is24am05.GUIMain;
+import it.polimi.is24am05.GUIRoot;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +16,7 @@ public class ConnectionInfoSceneController implements Initializable {
 
 
 
-  private GUI gui;
+  private GUIRoot gui;
 
     @FXML
     private TextField serverIpAddress;
@@ -31,7 +30,7 @@ public class ConnectionInfoSceneController implements Initializable {
     @FXML
     private Button confirmButton;
 
-    public void setGUI(GUI gui)
+    public void setGUI(GUIRoot gui)
     {
         this.gui=gui;
     }

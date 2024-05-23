@@ -5,6 +5,7 @@ import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.TUI;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.controllers.ConnectionInfoSceneController;
+import it.polimi.is24am05.controllers.NicknameRequestSceneController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -19,18 +20,24 @@ public class GUIMain extends Application {
     private Stage primaryStage;
     private static GUIMain instance;
     private static final CountDownLatch latch = new CountDownLatch(1);
+    private static GUIRoot guiRoot;
 
 
     public GUIMain() {
         instance = this;
-        latch.countDown();
     }
 
     public static GUIMain getInstance() {
         return instance;
     }
 
-    public static void waitForStart(){
+    public static void launchApp(GUIRoot guiRootInstance) {
+        guiRoot = guiRootInstance;
+        new Thread(() -> Application.launch(GUIMain.class)).start();
+        waitForStart();
+    }
+
+    public static void waitForStart() {
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -38,24 +45,16 @@ public class GUIMain extends Application {
         }
     }
 
-
+    public static GUIRoot getGuiRoot() {
+        return guiRoot;
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
+        guiRoot.seGuiMain(this);
         this.primaryStage = new Stage();
-        GUI guiInterface = new GUI(this);
-        FXMLLoader fxmlLoader = new FXMLLoader(GUIMain.class.getResource("connectionInfoScene.fxml"));
+        guiRoot.askNickname();
 
-        Parent root = (Parent)fxmlLoader.load();
-        Scene scene = new Scene(root);
-
-        scene.getStylesheets().add(GUIMain.class.getResource("ConnectionInfoScene.css").toExternalForm());
-        ConnectionInfoSceneController controller = (ConnectionInfoSceneController) fxmlLoader.getController();
-        controller.setGUI(guiInterface);
-        primaryStage.setTitle("Hello!");
-        primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
-        primaryStage.show();
     }
 
     public static void main(String[] args) {
@@ -73,6 +72,8 @@ public class GUIMain extends Application {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
-
+    public Scene getScene() {
+        return primaryStage != null ? primaryStage.getScene() : null;
+    }
 
 }
