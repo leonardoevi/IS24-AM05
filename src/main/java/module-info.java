@@ -7,7 +7,6 @@ module it.polimi.is24am05 {
         requires java.rmi;
 
         opens it.polimi.is24am05 to javafx.fxml;
-        exports it.polimi.is24am05;
         exports it.polimi.is24am05.client.view.gui.controllers;
         opens it.polimi.is24am05.client.view.gui.controllers to javafx.fxml;
         exports it.polimi.is24am05.client.view.gui;

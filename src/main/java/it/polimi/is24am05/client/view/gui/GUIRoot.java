@@ -137,7 +137,7 @@ public class GUIRoot extends View {
     public void goToFirstScene() throws IOException {
         // When the server requires the client nickname, switch to the Nickname Request scene.
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("nicknameRequestScene.fxml"));
+        loader.setLocation(getClass().getResource("/it/polimi/is24am05/nicknameRequestScene.fxml"));
         Parent root = loader.load();
 
         nicknameRequestSceneController = loader.getController();
@@ -147,13 +147,13 @@ public class GUIRoot extends View {
 
         scene.setUserData(nicknameRequestSceneController);
         guiMain.sceneControllerMap.put(scene, nicknameRequestSceneController);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("NickNameRequestScene.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
         changeScene(scene);
 
     }
     public void dealHandsAndObjectives() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("dealHandAndObjectivesScene.fxml"));
+        loader.setLocation(getClass().getResource("/it/polimi/is24am05/dealHandAndObjectivesScene.fxml"));
         Parent root = loader.load();
 
         dealHandAndObjectivesSceneController = loader.getController();
@@ -164,7 +164,7 @@ public class GUIRoot extends View {
         Scene scene = new Scene(root);
         scene.setUserData(dealHandAndObjectivesSceneController);
         guiMain.sceneControllerMap.put(scene, dealHandAndObjectivesSceneController);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
 
         changeScene(scene);
 
