@@ -7,6 +7,7 @@ import it.polimi.is24am05.controllers.DealStarterCardsSceneController;
 import it.polimi.is24am05.controllers.GameSceneController;
 import it.polimi.is24am05.controllers.NicknameRequestSceneController;
 import it.polimi.is24am05.controllers.WaitingRoomSceneController;
+import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -46,11 +47,12 @@ public class GUIRoot extends View {
         Game toDisplay;
         try {
              toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
+             if(toDisplay==null)
+                  return;
 
         } catch (NullPointerException ignored) {
             System.out.println("Game not found");
         }
-
 
 
     }
@@ -99,7 +101,7 @@ public class GUIRoot extends View {
                 //TODO: add DealHandsAndObjectives and OtherPlayers
                 else {
 
-                    //ìì
+
 
                 }
             }
@@ -149,12 +151,11 @@ public class GUIRoot extends View {
 
     public void nicknameChosen(String nickname)
     {
-        /*
-        server.setNickname(nickname);
-        server.joinServer();
 
-         */
-        updateLogs();
+      //  server.setNickname(nickname);
+        //  server.joinServer();
+
+      // updateLogs();
     }
 
     public void numberOfplayersChosen(int num)
@@ -228,8 +229,10 @@ public class GUIRoot extends View {
             Parent root = loader.load();
 
             dealStarterCardsSceneController = loader.getController();
-            dealStarterCardsSceneController.setGUI(this);
 
+
+            dealStarterCardsSceneController.setGUI(this);
+            dealStarterCardsSceneController.setClientModel(clientModel);
             Scene scene = new Scene(root);
             scene.setUserData(dealStarterCardsSceneController);
             guiMain.sceneControllerMap.put(scene, dealStarterCardsSceneController);

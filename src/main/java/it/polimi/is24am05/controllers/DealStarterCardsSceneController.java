@@ -1,6 +1,7 @@
 package it.polimi.is24am05.controllers;
 
 import it.polimi.is24am05.GUIRoot;
+import it.polimi.is24am05.client.model.ClientModel;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -37,9 +38,16 @@ public class DealStarterCardsSceneController implements Initializable {
     @FXML
     private Label logField;
     private GUIRoot gui;
+
+    private ClientModel client;
     public void setGUI(GUIRoot gui)
     {
         this.gui=gui;
+    }
+
+    public void setClientModel(ClientModel client)
+    {
+        this.client=client;
     }
 
     @Override
@@ -55,10 +63,29 @@ public class DealStarterCardsSceneController implements Initializable {
                 BackgroundPosition.CENTER,
                 new BackgroundSize(1.0, 1.0, true, true, false, false)
         );
-        String imagePath = getClass().getResource("/assets/images/027.png").toExternalForm();
+
         mainBackground.setBackground(new Background(leftSideBack));
 
 
+
+    }
+    public void showLog(String log)
+    {
+        logField.setText(log);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(3),
+                event ->logField.setText("")
+        ));
+        timeline.setCycleCount(1);
+        timeline.play();
+
+    }
+
+    public void update()
+
+    {
+
+        String imagePath = getClass().getResource("/assets/images/027.png").toExternalForm();
         mySCFrontSide.setPreserveRatio(false);
         mySCFrontSide.setImage(new Image(imagePath));
         mySCFrontSide.setFitWidth(120);
@@ -76,17 +103,5 @@ public class DealStarterCardsSceneController implements Initializable {
 
         AnchorPane.setTopAnchor(logField, 20.0); // Distanza dal bordo superiore
         AnchorPane.setLeftAnchor(logField, 600.0);
-
-    }
-    public void showLog(String log)
-    {
-        logField.setText(log);
-        Timeline timeline = new Timeline(new KeyFrame(
-                Duration.seconds(3),
-                event ->logField.setText("")
-        ));
-        timeline.setCycleCount(1);
-        timeline.play();
-
     }
 }
