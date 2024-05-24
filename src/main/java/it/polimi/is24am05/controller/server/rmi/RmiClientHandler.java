@@ -116,7 +116,7 @@ public class RmiClientHandler extends ClientHandler {
             try {
                 virtualClient.pingRMI();
             } catch (RemoteException e) {
-                System.out.println(getNickname() + " is not responding!");
+                //System.out.println(getNickname() + " is not responding!");
                 connectionDemon.shutdown();
                 disconnect();
             }

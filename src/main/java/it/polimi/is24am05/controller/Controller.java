@@ -335,8 +335,8 @@ public class Controller {
      * @param nickname of the player disconnected
      */
     public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
-        System.out.println("Disconnecting " + nickname);
-        users.remove(nickname);
+        if(users.remove(nickname))
+            System.out.println("Disconnecting " + nickname);
 
         if(this.game == null)
             return;
