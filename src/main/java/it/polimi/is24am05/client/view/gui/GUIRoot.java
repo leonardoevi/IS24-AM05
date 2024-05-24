@@ -1,9 +1,9 @@
-package it.polimi.is24am05;
+package it.polimi.is24am05.client.view.gui;
 
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.View;
-import it.polimi.is24am05.controllers.*;
+import it.polimi.is24am05.client.view.gui.controllers.*;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

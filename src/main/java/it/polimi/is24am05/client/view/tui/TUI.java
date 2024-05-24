@@ -1,7 +1,8 @@
-package it.polimi.is24am05.client.view;
+package it.polimi.is24am05.client.view.tui;
 
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
+import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.model.game.Game;
 
 import java.util.NoSuchElementException;

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.controllers.NicknameRequestSceneController">
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.NicknameRequestSceneController">
    <top>
       <Label id="title" prefHeight="60.0" prefWidth="604.0" text="CODEX NATURALIS" textAlignment="CENTER" BorderPane.alignment="CENTER">
          <BorderPane.margin>
