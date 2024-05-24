@@ -1,14 +1,7 @@
 package it.polimi.is24am05;
 
-import it.polimi.is24am05.client.ServerHandler;
-import it.polimi.is24am05.client.model.ClientModel;
-import it.polimi.is24am05.client.view.TUI;
-import it.polimi.is24am05.client.view.View;
-import it.polimi.is24am05.controllers.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -56,7 +49,7 @@ public class GUIMain extends Application {
 
         guiRoot.seGuiMain(this);
         this.primaryStage = new Stage();
-        guiRoot.askNickname();
+        guiRoot.goToFirstScene();
 
     }
     public void loadScene(Scene scene, Object controller) throws IOException {

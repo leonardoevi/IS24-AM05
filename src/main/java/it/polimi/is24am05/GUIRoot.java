@@ -3,15 +3,10 @@ package it.polimi.is24am05;
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.View;
-import it.polimi.is24am05.controllers.DealStarterCardsSceneController;
-import it.polimi.is24am05.controllers.GameSceneController;
-import it.polimi.is24am05.controllers.NicknameRequestSceneController;
-import it.polimi.is24am05.controllers.WaitingRoomSceneController;
-import it.polimi.is24am05.model.enums.state.GameState;
+import it.polimi.is24am05.controllers.*;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,6 +28,8 @@ public class GUIRoot extends View {
 
     private DealStarterCardsSceneController dealStarterCardsSceneController;
 
+    private DealHandAndObjectivesSceneController dealHandAndObjectivesSceneController;
+
     public GUIRoot(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
         GUIMain.launchApp(this);
@@ -44,6 +41,7 @@ public class GUIRoot extends View {
     }
     @Override
     public void updateGame() {
+
         Game toDisplay;
         try {
              toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
@@ -53,7 +51,6 @@ public class GUIRoot extends View {
         } catch (NullPointerException ignored) {
             System.out.println("Game not found");
         }
-
 
     }
     @Override
@@ -69,8 +66,6 @@ public class GUIRoot extends View {
             Scene currentScene = this.getScene();
 
             if (currentScene != null && guiMain != null) {
-
-
                 Object controller = guiMain.getControllerForScene(currentScene);
 
                 if (controller instanceof NicknameRequestSceneController) {
@@ -83,30 +78,32 @@ public class GUIRoot extends View {
                         });
                     }
 
-                } else if (controller instanceof WaitingRoomSceneController) {
-
-                } else if (controller instanceof GameSceneController) {
+                }  else if (controller instanceof GameSceneController) {
+                    if(gameSceneController!=null)
                     Platform.runLater(() -> {
                         gameSceneController.showLog(log);
                         // nicknameRequestSceneController.resetPlayerNickname();
                     });
 
                 } else if (controller instanceof DealStarterCardsSceneController) {
+                    if(dealStarterCardsSceneController!=null)
                     Platform.runLater(() -> {
                         dealStarterCardsSceneController.showLog(log);
                         // nicknameRequestSceneController.resetPlayerNickname();
                     });
+                }
+
+                else if (controller instanceof DealHandAndObjectivesSceneController)
+                {
+                    if(dealHandAndObjectivesSceneController!=null)
+                    Platform.runLater(() -> {
+                        dealHandAndObjectivesSceneController.showLog(log);
+                        // nicknameRequestSceneController.resetPlayerNickname();
+                    });
 
                 }
-                //TODO: add DealHandsAndObjectives and OtherPlayers
-                else {
-
-
-
-                }
+                else return;
             }
-
-
 
 
     }
@@ -131,7 +128,7 @@ public class GUIRoot extends View {
         });
     }
 
-    public void askNickname() throws IOException {
+    public void goToFirstScene() throws IOException {
         // When the server requires the client nickname, switch to the Nickname Request scene.
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("nicknameRequestScene.fxml"));
@@ -148,6 +145,24 @@ public class GUIRoot extends View {
         changeScene(scene);
 
     }
+    public void dealHandsAndObjectives() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("dealHandAndObjectivesScene.fxml"));
+        Parent root = loader.load();
+
+        dealHandAndObjectivesSceneController = loader.getController();
+
+
+        dealHandAndObjectivesSceneController.setGUI(this);
+
+        Scene scene = new Scene(root);
+        scene.setUserData(dealHandAndObjectivesSceneController);
+        guiMain.sceneControllerMap.put(scene, dealHandAndObjectivesSceneController);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
+
+        changeScene(scene);
+
+    }
 
     public void nicknameChosen(String nickname)
     {
@@ -156,18 +171,28 @@ public class GUIRoot extends View {
         //  server.joinServer();
 
       // updateLogs();
+        System.out.println("2");
+        //server.setNickname(nickname);
+        // server.joinServer();
+
     }
 
     public void numberOfplayersChosen(int num)
     {
         /*
-        server.setNumberOfPlayers(num);
-
-         */
 
         updateLogs();
 
         dealStarterCards();
+        */
+        System.out.println("1");
+       // server.setNumberOfPlayers(num);
+      updateLogs();
+        try {
+            dealHandsAndObjectives();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

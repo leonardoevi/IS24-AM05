@@ -18,13 +18,18 @@ public class NicknameRequestSceneController implements Initializable {
     @FXML
     private TextField playerNickname;
 
+    @FXML
+    private TextField numOfPlayers;
+
     private GUIRoot gui;
     @FXML
     private Button confirButton;
+
+    @FXML
+    private Button confirmNumOfPlayers;
     @FXML
     private Label logField;
-    @FXML
-    private Label questionLabel;
+
 
 
     boolean askNumOfPlayers=false;
@@ -39,9 +44,10 @@ public class NicknameRequestSceneController implements Initializable {
 
     @Override
     public void initialize (URL url, ResourceBundle resources) {
-        questionLabel.setText("Nickname");
+
         logField.setText("");
         playerNickname.setPromptText("enter your nickname");
+        numOfPlayers.setPromptText("enter your nickname");
 
     }
 
@@ -49,7 +55,7 @@ public class NicknameRequestSceneController implements Initializable {
         return playerNickname.getText();
     }
 
-    public int getNumPlayers(){return Integer.parseInt(playerNickname.getText().toString()); }
+    public int getNumPlayers(){return Integer.parseInt(numOfPlayers.getText()); }
 
     /**
      * Fills the player nickname text field with an empty string.
@@ -57,26 +63,14 @@ public class NicknameRequestSceneController implements Initializable {
     public void resetPlayerNickname () {
         playerNickname.setText("");
     }
-
+   public void resetNumOfPlayers()
+   {
+       numOfPlayers.setText("");
+   }
     public void showLog(String log)
     {
         logField.setText(log);
-        if(log.equals("Nickname non valido"));
-            resetPlayerNickname();
-        if(log.equals("Devi inserire il numero dei giocatori"))
-           {
-               askNumOfPlayers=true;
-               questionLabel.setText("Num of players");
-               playerNickname.setText("");
-               playerNickname.setPromptText("enter the number of players");
-           }
-        if(log.equals("numero di giocatori errato"))
-        {
-            askNumOfPlayers=true;
-            questionLabel.setText("Num of players");
-            playerNickname.setText("");
-            playerNickname.setPromptText("enter the number of players");
-        }
+
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.seconds(3),
                 event ->logField.setText("")
@@ -88,24 +82,25 @@ public class NicknameRequestSceneController implements Initializable {
 
     @FXML
     public void onButtonClicked() {
-        if(askNumOfPlayers==false)
-        {
-        String nickname = getPlayerNickname();
 
-           gui.nicknameChosen(nickname);
-        }
+        //for join server
 
-        else{
+            String nickname = getPlayerNickname();
 
-            int numPlayers=getNumPlayers();
+            gui.nicknameChosen(nickname);
+
+    }
+
+        @FXML
+        public void numOfPlayersConfirmed() {
+
+            //for join server
+            int numPlayers = getNumPlayers();
 
             gui.numberOfplayersChosen(numPlayers);
 
-        }
 
-
-
-        //  gui.gameCreated();
+            //  gui.gameCreated();
 
         }
     }
