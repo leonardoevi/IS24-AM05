@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane stylesheets="@WaitingRoomScene.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.controllers.WaitingRoomSceneController">
+<BorderPane stylesheets="@WaitingRoomScene.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.WaitingRoomSceneController">
    <center>
       <StackPane BorderPane.alignment="CENTER">
          <children>

@@ -1,7 +1,7 @@
 package it.polimi.is24am05.client;
 
 import it.polimi.is24am05.client.model.ClientModel;
-import it.polimi.is24am05.client.view.TUI;
+import it.polimi.is24am05.client.view.tui.TUI;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.model.game.Game;
 

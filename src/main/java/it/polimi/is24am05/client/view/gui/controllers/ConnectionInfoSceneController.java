@@ -1,6 +1,6 @@
-package it.polimi.is24am05.controllers;
+package it.polimi.is24am05.client.view.gui.controllers;
 
-import it.polimi.is24am05.GUIRoot;
+import it.polimi.is24am05.client.view.gui.GUIRoot;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

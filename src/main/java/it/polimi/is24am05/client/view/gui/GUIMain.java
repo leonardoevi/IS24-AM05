@@ -1,4 +1,4 @@
-package it.polimi.is24am05;
+package it.polimi.is24am05.client.view.gui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
