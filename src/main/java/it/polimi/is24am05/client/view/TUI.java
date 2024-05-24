@@ -106,7 +106,7 @@ public class TUI extends View {
                         server.drawVisible(scanner.next());
                         break;
 
-                    case "10":
+                    case "11": // Quitting
                         server.disconnect();
                         stopInputReader();
                         break;

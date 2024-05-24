@@ -44,7 +44,8 @@ public class RmiServerHandler extends ServerHandler {
             virtualController = provider.connect(rmiFromServer);
 
             // Set up a demon thread to check if server is still up
-            serverChecker.scheduleAtFixedRate(new RmiServerChecker(), 0, 1, TimeUnit.SECONDS);
+            Thread demon = new Thread(new RmiServerChecker()); demon.setDaemon(true);
+            serverChecker.scheduleAtFixedRate(demon, 0, 1, TimeUnit.SECONDS);
 
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             notifyViewServerUnreachable();
@@ -150,8 +151,10 @@ public class RmiServerHandler extends ServerHandler {
             virtualController.disconnectRMI();
         } catch (RemoteException e) {
             notifyViewServerUnreachable();
-            killRmiReaper();
         }
+        serverChecker.shutdownNow();
+        killRmiReaper();
+        notifyViewServerUnreachable();
     }
 
     class RmiFromServer extends UnicastRemoteObject implements RmiVirtualClient {

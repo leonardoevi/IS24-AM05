@@ -35,6 +35,11 @@ public abstract class ClientHandler implements VirtualClient {
             return;
         }
 
+        if(this.nickname != null) {
+            addLog("Already logged in as " + this.nickname);
+            return;
+        }
+
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {
                 addLog(new AlreadyUsedNicknameException(server.getNicknames()).getMessage());
