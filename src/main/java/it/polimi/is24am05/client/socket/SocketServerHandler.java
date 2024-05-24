@@ -16,14 +16,14 @@ public class SocketServerHandler extends ServerHandler {
 
     public static void main(String[] args) {
         try {
-            new SocketServerHandler("localhost", "6969");
+            new SocketServerHandler("localhost", "6969", "TUI");
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public SocketServerHandler(String serverIP, String serverPort) throws IOException {
-        super(serverIP, serverPort);
+    public SocketServerHandler(String serverIP, String serverPort, String viewType) throws IOException {
+        super(serverIP, serverPort, viewType);
 
         try {
             this.socket = new Socket(serverIP, Integer.parseInt(serverPort));

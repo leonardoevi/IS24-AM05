@@ -1,6 +1,7 @@
 package it.polimi.is24am05.client.rmi;
 
 import it.polimi.is24am05.client.ServerHandler;
+import it.polimi.is24am05.client.view.tui.TUI;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiVirtualController;
 import it.polimi.is24am05.model.game.Game;
@@ -22,15 +23,15 @@ public class RmiServerHandler extends ServerHandler {
 
     public static void main(String[] args) throws Exception {
         try {
-            new RmiServerHandler("localhost", "9696");
+            new RmiServerHandler("localhost", "9696", "TUI");
         } catch (RemoteException e) {
             System.out.println(e.getMessage());
         }
 
     }
 
-    public RmiServerHandler(String serverIP, String serverPort) throws RemoteException {
-        super(serverIP, serverPort);
+    public RmiServerHandler(String serverIP, String serverPort, String viewType) throws RemoteException {
+        super(serverIP, serverPort, viewType);
         rmiFromServer = new RmiFromServer();
 
         startConnection();

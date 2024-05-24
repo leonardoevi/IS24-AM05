@@ -1,6 +1,7 @@
 package it.polimi.is24am05.client;
 
 import it.polimi.is24am05.client.model.ClientModel;
+import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.client.view.tui.TUI;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.model.game.Game;
@@ -13,11 +14,15 @@ public abstract class ServerHandler implements VirtualServer{
     protected final String serverIP;
     protected final String serverPort;
 
-    protected ServerHandler(String serverIP, String serverPort) {
+    protected ServerHandler(String serverIP, String serverPort, String viewType) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         clientModel = new ClientModel();
-        view = new TUI(clientModel, this);
+
+        if(viewType.equals("GUI"))
+            view = new GUIRoot(clientModel, this);
+        else
+            view = new TUI(clientModel, this);
     }
 
     public void setNickname(String nickname) {
