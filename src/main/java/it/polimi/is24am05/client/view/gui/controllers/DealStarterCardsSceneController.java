@@ -4,6 +4,7 @@ import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.side.Side;
+import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -16,6 +17,8 @@ import javafx.util.Duration;
 
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class DealStarterCardsSceneController implements Initializable {
@@ -125,6 +128,9 @@ public class DealStarterCardsSceneController implements Initializable {
         player3SCBackSide.setFitHeight(90);
 
 
+        String imagePath = getClass().getResource("/assets/images/front/027.png").toExternalForm();
+        player1SCBackSide.setImage(new Image(imagePath));
+
 
     }
     public void showLog(String log)
@@ -145,7 +151,8 @@ public class DealStarterCardsSceneController implements Initializable {
 
     {
 
-            String imagePath = getClass().getResource("/assets/images/027.png").toExternalForm();
+            String imagePath = getClass().getResource("/assets/images/front/027.png").toExternalForm();
+      //  player1SCBackSide.setImage(new Image(imagePath));
             /*
             player1SCBackSide.setImage(new Image(imagePath));
         player1SCFrontSide.setImage(new Image(imagePath));
@@ -156,13 +163,51 @@ public class DealStarterCardsSceneController implements Initializable {
         player2SCFrontSide.setImage(new Image(imagePath));
         player3SCFrontSide.setImage(new Image(imagePath));
         player3SCFrontSide.setImage(new Image(imagePath));
-        */
 
-            for(Player p: client.getGame().get().getPlayers())
-            {
-                 p.getStarterCard().getFrontSide().toString();
 
-            }
+
+         SC_081(StarterFrontSide.SFS_081, StarterBackSide.SBS_081),
+    SC_082(StarterFrontSide.SFS_082, StarterBackSide.SBS_082),
+    SC_083(StarterFrontSide.SFS_083, StarterBackSide.SBS_083),
+    SC_084(StarterFrontSide.SFS_084, StarterBackSide.SBS_084),
+    SC_085(StarterFrontSide.SFS_085, StarterBackSide.SBS_085),
+    SC_086(StarterFrontSide.SFS_086, StarterBackSide.SBS_086);
+
+
+            */
+       int id= StarterCard.SC_081.getId();
+       System.out.println(id);
+
+        List<ImageView> listImageView=new ArrayList<>();
+        listImageView.add(mySCFrontSide);
+        listImageView.add(mySCBackSide);
+        listImageView.add(player1SCFrontSide);
+        listImageView.add(player1SCBackSide);
+        listImageView.add(player2SCFrontSide);
+        listImageView.add(player2SCBackSide);
+        listImageView.add(player3SCFrontSide);
+        listImageView.add(player3SCBackSide);
+
+        for(Player p: client.getGame().get().getPlayers())
+        {
+            int idCard=p.getStarterCard().getId();
+            String pathcardfront = "/assets/images/front/0" + id + ".png";
+            String path = getClass().getResource(pathcardfront).toExternalForm();
+            ImageView curr=listImageView.getFirst();
+            curr.setImage(new Image(path));
+            listImageView.removeFirst();
+
+            String pathcardback = "/assets/images/back/0" + id + ".png";
+            path = getClass().getResource(pathcardback).toExternalForm();
+            curr=listImageView.getFirst();
+            curr.setImage(new Image(path));
+            listImageView.removeFirst();
+
+
+        }
+
+
+
 
 
     }

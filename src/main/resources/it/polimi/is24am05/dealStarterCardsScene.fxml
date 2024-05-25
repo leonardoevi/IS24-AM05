@@ -18,6 +18,10 @@
       <Label fx:id="logField"  prefHeight="66.0" prefWidth="589.0" textFill="#083aff">
          <font>
             <Font name="System Bold" size="24.0" />
+         </font> </Label>
+      <Label fx:id="playSC"  prefHeight="66.0" prefWidth="589.0" textFill="#083aff">
+         <font>
+            <Font name="System Bold" size="24.0" />
          </font>
       </Label>
    </children>

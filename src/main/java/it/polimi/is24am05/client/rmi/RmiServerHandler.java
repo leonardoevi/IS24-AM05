@@ -23,7 +23,7 @@ public class RmiServerHandler extends ServerHandler {
 
     public static void main(String[] args) throws Exception {
         try {
-            new RmiServerHandler("localhost", "9696", "TUI");
+            new RmiServerHandler("localhost", "9696", "GUI");
         } catch (RemoteException e) {
             System.out.println(e.getMessage());
         }

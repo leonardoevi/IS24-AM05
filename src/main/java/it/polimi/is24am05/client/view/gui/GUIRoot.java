@@ -4,6 +4,7 @@ import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.client.view.gui.controllers.*;
+import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -47,28 +48,49 @@ public class GUIRoot extends View {
     }
     @Override
     public void updateGame() {
+        /*
 
         Game toDisplay;
         try {
+            System.out.println("eccmi");
              toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
-             if(toDisplay==null)
-                  return;
+            System.out.println("son qui");
+
+             if(toDisplay!=null)
+                 System.out.println(toDisplay.getGameState());
+                 if(toDisplay.getGameState()== GameState.PLACE_STARTER_CARDS) {
+                     if(dealStarterCardsSceneController==null)
+                     {
+                         dealStarterCards();
+                     }
+                     else{
+                         dealStarterCardsSceneController.update();
+                     }
+
+                 }
+
+
+
+
+
+
 
         } catch (NullPointerException ignored) {
             System.out.println("Game not found");
         }
 
+         */
+
     }
     @Override
     public void updateLogs() {
 
-            String log = "Devi inserire il numero dei giocatori";
-        /*
+
+
         try {
-            log=clientModel.getLog().getLast();
-        } catch (NullPointerException ignored) {}
-        *
-         */
+            System.out.println("loggggg");
+            String log=clientModel.getLog().getLast().toString();
+            System.out.println(log);
             Scene currentScene = this.getScene();
 
             if (currentScene != null && guiMain != null) {
@@ -86,30 +108,32 @@ public class GUIRoot extends View {
 
                 }  else if (controller instanceof GameSceneController) {
                     if(gameSceneController!=null)
-                    Platform.runLater(() -> {
-                        gameSceneController.showLog(log);
-                        // nicknameRequestSceneController.resetPlayerNickname();
-                    });
+                        Platform.runLater(() -> {
+                            gameSceneController.showLog(log);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
 
                 } else if (controller instanceof DealStarterCardsSceneController) {
                     if(dealStarterCardsSceneController!=null)
-                    Platform.runLater(() -> {
-                        dealStarterCardsSceneController.showLog(log);
-                        // nicknameRequestSceneController.resetPlayerNickname();
-                    });
+                        Platform.runLater(() -> {
+                            dealStarterCardsSceneController.showLog(log);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
                 }
 
                 else if (controller instanceof DealHandAndObjectivesSceneController)
                 {
                     if(dealHandAndObjectivesSceneController!=null)
-                    Platform.runLater(() -> {
-                        dealHandAndObjectivesSceneController.showLog(log);
-                        // nicknameRequestSceneController.resetPlayerNickname();
-                    });
+                        Platform.runLater(() -> {
+                            dealHandAndObjectivesSceneController.showLog(log);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
 
                 }
                 else return;
             }
+        } catch (NullPointerException ignored) {}
+
 
 
     }
@@ -173,13 +197,12 @@ public class GUIRoot extends View {
     public void nicknameChosen(String nickname)
     {
 
-      //  server.setNickname(nickname);
-        //  server.joinServer();
 
-      // updateLogs();
-        System.out.println("2");
-        //server.setNickname(nickname);
-        // server.joinServer();
+      server.setNickname(nickname);
+        System.out.println(server.getNickname());
+
+     // server.joinServer();
+        System.out.println("DOPO");
 
     }
 
@@ -191,14 +214,13 @@ public class GUIRoot extends View {
 
         dealStarterCards();
         */
-        System.out.println("1");
-       // server.setNumberOfPlayers(num);
-      updateLogs();
-        try {
-            dealHandsAndObjectives();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        System.out.println("PRIMA NUM");
+        server.setNumberOfPlayers(num);
+        System.out.println("DOPO NUM");
+
+
+
+
 
     }
 
@@ -206,7 +228,7 @@ public class GUIRoot extends View {
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("waitingRoomScene.fxml"));
+            loader.setLocation(getClass().getResource("/it/polimi/is24am05/waitingRoomScene.fxml"));
             Parent root = loader.load();
 
             WaitingRoomSceneController controller = loader.getController();
@@ -214,7 +236,7 @@ public class GUIRoot extends View {
 
             Scene scene = new Scene(root);
 
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("WaitingRoomScene.css")).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/WaitingRoomScene.css")).toExternalForm());
 
             changeScene(scene);
             //TODO: DELETE THS
@@ -229,7 +251,7 @@ public class GUIRoot extends View {
     public void gameCreated() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("gameScene.fxml"));
+            loader.setLocation(getClass().getResource("/it/polimi/is24am05/gameScene.fxml"));
             Parent root = loader.load();
 
             gameSceneController = loader.getController();
@@ -238,7 +260,7 @@ public class GUIRoot extends View {
             Scene scene = new Scene(root);
             scene.setUserData(gameSceneController);
             guiMain.sceneControllerMap.put(scene, gameSceneController);
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
 
             changeScene(scene);
             Timeline timeline = new Timeline(new KeyFrame(
@@ -256,27 +278,20 @@ public class GUIRoot extends View {
     public void dealStarterCards() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("dealStarterCardsScene.fxml"));
+            loader.setLocation(getClass().getResource("/it/polimi/is24am05/dealStarterCardsScene.fxml"));
             Parent root = loader.load();
 
             dealStarterCardsSceneController = loader.getController();
-
-
             dealStarterCardsSceneController.setGUI(this);
-            dealStarterCardsSceneController.setClientModel(clientModel);
+
             Scene scene = new Scene(root);
+
             scene.setUserData(dealStarterCardsSceneController);
             guiMain.sceneControllerMap.put(scene, dealStarterCardsSceneController);
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("gameScene.css")).toExternalForm());
-
+           // scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
             changeScene(scene);
-            Timeline timeline = new Timeline(new KeyFrame(
-                    Duration.seconds(3),
-                    event -> updateLogs()
-            ));
-            timeline.setCycleCount(1);
-            timeline.play();
-            //controller.update();
+
+            dealStarterCardsSceneController.update();
         } catch(IOException e) {
             System.out.println("Error");
         }

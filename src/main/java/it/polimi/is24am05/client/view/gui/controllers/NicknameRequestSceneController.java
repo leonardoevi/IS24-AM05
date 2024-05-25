@@ -47,7 +47,7 @@ public class NicknameRequestSceneController implements Initializable {
 
         logField.setText("");
         playerNickname.setPromptText("enter your nickname");
-        numOfPlayers.setPromptText("enter your nickname");
+        numOfPlayers.setPromptText("enter num of players");
 
     }
 
