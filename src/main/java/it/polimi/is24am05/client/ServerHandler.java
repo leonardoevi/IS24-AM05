@@ -33,6 +33,11 @@ public abstract class ServerHandler implements VirtualServer{
         return nickname;
     }
 
+    public View getView()
+    {
+        return this.view;
+    }
+
     // Methods invoked by the SERVER from the network (better be protected)
     protected void setGame(Game game){
         this.clientModel.setGame(game);

@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 public class GUIMain extends Application {
     private Stage primaryStage;
     private static GUIMain instance;
-    private static final CountDownLatch latch = new CountDownLatch(1);
+
     private static GUIRoot guiRoot;
     public Map<Scene, Object> sceneControllerMap = new HashMap<>();
 
@@ -28,17 +28,10 @@ public class GUIMain extends Application {
 
     public static void launchApp(GUIRoot guiRootInstance) {
         guiRoot = guiRootInstance;
-        new Thread(() -> Application.launch(GUIMain.class)).start();
-        waitForStart();
+        Application.launch(GUIMain.class);
+
     }
 
-    public static void waitForStart() {
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 
     public static GUIRoot getGuiRoot() {
         return guiRoot;
@@ -46,9 +39,9 @@ public class GUIMain extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-
-        guiRoot.seGuiMain(this);
         this.primaryStage = new Stage();
+        guiRoot.seGuiMain(this);
+
         guiRoot.goToFirstScene();
 
     }

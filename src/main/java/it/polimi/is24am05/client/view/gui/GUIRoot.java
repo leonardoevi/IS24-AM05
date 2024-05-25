@@ -1,9 +1,11 @@
 package it.polimi.is24am05.client.view.gui;
 
+
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.client.view.gui.controllers.*;
+
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
@@ -21,6 +23,10 @@ import java.util.Objects;
 public class GUIRoot extends View {
 
     GUIMain guiMain;
+
+    private String clientNickname;
+
+
     private WaitingRoomSceneController waitingRoomSceneController;
 
     private NicknameRequestSceneController nicknameRequestSceneController;
@@ -33,8 +39,11 @@ public class GUIRoot extends View {
 
     public GUIRoot(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
-        GUIMain.launchApp(this);
+        //GUIMain.launchApp(this);
 
+    }
+    public void launch(){
+        GUIMain.launchApp(this);
     }
 
     @Override
@@ -48,26 +57,53 @@ public class GUIRoot extends View {
     }
     @Override
     public void updateGame() {
-        /*
+        System.out.println("there i am");
 
-        Game toDisplay;
         try {
-            System.out.println("eccmi");
-             toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
-            System.out.println("son qui");
 
-             if(toDisplay!=null)
+            Game toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
+
+
+             if(toDisplay!=null) {
                  System.out.println(toDisplay.getGameState());
-                 if(toDisplay.getGameState()== GameState.PLACE_STARTER_CARDS) {
-                     if(dealStarterCardsSceneController==null)
-                     {
+                 if (toDisplay.getGameState() == GameState.PLACE_STARTER_CARDS) {
+                     if (dealStarterCardsSceneController == null) {
                          dealStarterCards();
-                     }
-                     else{
-                         dealStarterCardsSceneController.update();
+                         Platform.runLater(() -> {
+                             dealStarterCardsSceneController.update(toDisplay);
+                             // nicknameRequestSceneController.resetPlayerNickname();
+                         });
+
+                     } else {
+                         Platform.runLater(() -> {
+                             dealStarterCardsSceneController.update(toDisplay);
+                             // nicknameRequestSceneController.resetPlayerNickname();
+                         });
+
+
                      }
 
+                        }
+                 else if(toDisplay.getGameState() == GameState.CHOOSE_OBJECTIVE)
+                 {
+                     if (dealHandAndObjectivesSceneController == null) {
+                         dealHandsAndObjectives();
+                         Platform.runLater(() -> {
+                             dealHandAndObjectivesSceneController.update(toDisplay);
+                             // nicknameRequestSceneController.resetPlayerNickname();
+                         });
+
+                     } else {
+
+                         Platform.runLater(() -> {
+                             dealHandAndObjectivesSceneController.update(toDisplay);
+                             // nicknameRequestSceneController.resetPlayerNickname();
+                         });
+
+                     }
                  }
+
+             }
 
 
 
@@ -77,9 +113,10 @@ public class GUIRoot extends View {
 
         } catch (NullPointerException ignored) {
             System.out.println("Game not found");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-         */
 
     }
     @Override
@@ -158,6 +195,11 @@ public class GUIRoot extends View {
         });
     }
 
+    public void chooseObjective(String objectiveId)
+    {
+        server.chooseObjective(objectiveId);
+    }
+
     public void goToFirstScene() throws IOException {
         // When the server requires the client nickname, switch to the Nickname Request scene.
         FXMLLoader loader = new FXMLLoader();
@@ -166,6 +208,7 @@ public class GUIRoot extends View {
 
         nicknameRequestSceneController = loader.getController();
         nicknameRequestSceneController.setGUI(this);
+
 
         Scene scene = new Scene(root);
 
@@ -181,15 +224,14 @@ public class GUIRoot extends View {
         Parent root = loader.load();
 
         dealHandAndObjectivesSceneController = loader.getController();
-
-
         dealHandAndObjectivesSceneController.setGUI(this);
+        dealHandAndObjectivesSceneController.setClientNickname(clientNickname);
 
         Scene scene = new Scene(root);
+
         scene.setUserData(dealHandAndObjectivesSceneController);
         guiMain.sceneControllerMap.put(scene, dealHandAndObjectivesSceneController);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
-
+        // scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
         changeScene(scene);
 
     }
@@ -197,30 +239,32 @@ public class GUIRoot extends View {
     public void nicknameChosen(String nickname)
     {
 
-
+   this.clientNickname=nickname;
       server.setNickname(nickname);
         System.out.println(server.getNickname());
 
      // server.joinServer();
-        System.out.println("DOPO");
+        server.setNickname(nickname);
+        server.joinServer();
+        server.joinGame();
+
+
 
     }
+    public void placeStarterSide (boolean isFront)
+    {
+
+        server.placeStarterSide(isFront);
+    }
+
+
 
     public void numberOfplayersChosen(int num)
     {
-        /*
 
-        updateLogs();
 
-        dealStarterCards();
-        */
-        System.out.println("PRIMA NUM");
         server.setNumberOfPlayers(num);
-        System.out.println("DOPO NUM");
-
-
-
-
+        server.joinGame();
 
     }
 
@@ -283,6 +327,7 @@ public class GUIRoot extends View {
 
             dealStarterCardsSceneController = loader.getController();
             dealStarterCardsSceneController.setGUI(this);
+            dealStarterCardsSceneController.setNickname(clientNickname);
 
             Scene scene = new Scene(root);
 
@@ -291,7 +336,7 @@ public class GUIRoot extends View {
            // scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
             changeScene(scene);
 
-            dealStarterCardsSceneController.update();
+           // dealStarterCardsSceneController.update();
         } catch(IOException e) {
             System.out.println("Error");
         }

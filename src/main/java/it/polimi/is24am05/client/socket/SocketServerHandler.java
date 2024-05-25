@@ -1,6 +1,7 @@
 package it.polimi.is24am05.client.socket;
 
 import it.polimi.is24am05.client.ServerHandler;
+import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.controller.server.socket.Message;
 import it.polimi.is24am05.model.game.Game;
 
@@ -34,6 +35,12 @@ public class SocketServerHandler extends ServerHandler {
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
         new Thread(new SocketServerReader(this, socket)).start();
+        if (viewType == "GUI"){
+            if(getView() instanceof GUIRoot)
+            {
+                ((GUIRoot) getView()).launch();
+            }
+        }
     }
 
     @Override
@@ -93,6 +100,7 @@ public class SocketServerHandler extends ServerHandler {
 
     public synchronized void send(Message message) {
         try {
+
             outputStream.writeObject(message);
             outputStream.flush();
         } catch (IOException e) {

@@ -12,6 +12,7 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class NicknameRequestSceneController implements Initializable {
 
@@ -81,18 +82,20 @@ public class NicknameRequestSceneController implements Initializable {
     }
 
     @FXML
-    public void onButtonClicked() {
+    public void onButtonClicked(javafx.event.ActionEvent event) {
 
         //for join server
 
             String nickname = getPlayerNickname();
+       gui.nicknameChosen(nickname);
 
-            gui.nicknameChosen(nickname);
+
 
     }
 
+
         @FXML
-        public void numOfPlayersConfirmed() {
+        public void numOfPlayersConfirmed(javafx.event.ActionEvent event) {
 
             //for join server
             int numPlayers = getNumPlayers();

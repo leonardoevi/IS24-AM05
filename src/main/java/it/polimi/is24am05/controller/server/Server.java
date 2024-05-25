@@ -55,6 +55,7 @@ public class Server {
                 // Let the thread pool handle the communication with the client
                 threadPool.submit(new SocketClientHandler(controller,this, socket));
             } catch (IOException ignored) {
+                System.out.println("ERRORE ");
                 break;
             }
         }

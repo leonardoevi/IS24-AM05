@@ -5,6 +5,7 @@ import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
+import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -12,6 +13,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
@@ -46,6 +49,8 @@ public class DealStarterCardsSceneController implements Initializable {
     @FXML
     private Label playSC;
 
+    private String clientNickname;
+
     private GUIRoot gui;
 
     private ClientModel client;
@@ -57,6 +62,11 @@ public class DealStarterCardsSceneController implements Initializable {
     public void setClientModel(ClientModel client)
     {
         this.client=client;
+    }
+
+    public void setNickname(String nickname)
+    {
+        this.clientNickname=nickname;
     }
 
     @Override
@@ -71,12 +81,13 @@ public class DealStarterCardsSceneController implements Initializable {
                 BackgroundPosition.CENTER,
                 new BackgroundSize(1.0, 1.0, true, true, false, false)
         );
-        playSC.setText("choose the side of the SC you want to play ");
+        playSC.setText("choose the side of the SC you want to play from the two below ");
         AnchorPane.setBottomAnchor(playSC, 100.0); // Distanza dal bordo superiore
         AnchorPane.setLeftAnchor(playSC, 600.0);
 
         mainBackground.setBackground(new Background(leftSideBack));
         mySCFrontSide.setPreserveRatio(false);
+
         AnchorPane.setBottomAnchor(mySCFrontSide, 400.0); // Distanza dal bordo superiore
         AnchorPane.setLeftAnchor(mySCFrontSide, 600.0);
         mySCFrontSide.setFitWidth(120);
@@ -128,8 +139,7 @@ public class DealStarterCardsSceneController implements Initializable {
         player3SCBackSide.setFitHeight(90);
 
 
-        String imagePath = getClass().getResource("/assets/images/front/027.png").toExternalForm();
-        player1SCBackSide.setImage(new Image(imagePath));
+
 
 
     }
@@ -147,11 +157,11 @@ public class DealStarterCardsSceneController implements Initializable {
 
     //if the currentScene is DealStarterCardsSceneController-> update it
 
-    public void update()
+    public void update(Game toDisplay)
 
     {
 
-            String imagePath = getClass().getResource("/assets/images/front/027.png").toExternalForm();
+
       //  player1SCBackSide.setImage(new Image(imagePath));
             /*
             player1SCBackSide.setImage(new Image(imagePath));
@@ -175,12 +185,10 @@ public class DealStarterCardsSceneController implements Initializable {
 
 
             */
-       int id= StarterCard.SC_081.getId();
-       System.out.println(id);
+
 
         List<ImageView> listImageView=new ArrayList<>();
-        listImageView.add(mySCFrontSide);
-        listImageView.add(mySCBackSide);
+
         listImageView.add(player1SCFrontSide);
         listImageView.add(player1SCBackSide);
         listImageView.add(player2SCFrontSide);
@@ -188,16 +196,38 @@ public class DealStarterCardsSceneController implements Initializable {
         listImageView.add(player3SCFrontSide);
         listImageView.add(player3SCBackSide);
 
-        for(Player p: client.getGame().get().getPlayers())
+
+        for(Player p: toDisplay.getPlayers())
         {
-            int idCard=p.getStarterCard().getId();
-            String pathcardfront = "/assets/images/front/0" + id + ".png";
-            String path = getClass().getResource(pathcardfront).toExternalForm();
+            int idCard;
+            String pathcardfront;
+            String pathcardback;
+            String path;
+            if(p.getNickname().equals(clientNickname))
+            {
+                idCard=p.getStarterCard().getId();
+
+                 pathcardfront = "/assets/images/front/0" + idCard + ".png";
+                 path = getClass().getResource(pathcardfront).toExternalForm();
+                mySCFrontSide.setImage(new Image(path));
+
+
+
+                 pathcardback = "/assets/images/back/0" + idCard + ".png";
+                 path = getClass().getResource(pathcardback).toExternalForm();
+                mySCBackSide.setImage(new Image(path));
+
+                continue;
+            }
+             idCard=p.getStarterCard().getId();
+
+             pathcardfront = "/assets/images/front/0" + idCard + ".png";
+             path = getClass().getResource(pathcardfront).toExternalForm();
             ImageView curr=listImageView.getFirst();
             curr.setImage(new Image(path));
             listImageView.removeFirst();
 
-            String pathcardback = "/assets/images/back/0" + id + ".png";
+             pathcardback = "/assets/images/back/0" + idCard + ".png";
             path = getClass().getResource(pathcardback).toExternalForm();
             curr=listImageView.getFirst();
             curr.setImage(new Image(path));
@@ -210,5 +240,28 @@ public class DealStarterCardsSceneController implements Initializable {
 
 
 
+    }
+
+    @FXML
+    public void onTouch(MouseEvent event)
+    {
+        ImageView source = (ImageView) event.getSource();
+
+        // Puoi usare l'ID del nodo per identificare quale ImageView è stata toccata
+        String id = source.getId();
+        System.out.println("eccomi quaaaaasdasdf");
+        // Fai qualcosa in base all'ID
+        switch (id) {
+            case "mySCFrontSide":
+              gui.placeStarterSide(true);
+                break;
+            case "mySCBackSide":
+                gui.placeStarterSide(false);
+                break;
+
+            default:
+                  showLog("not your SC");
+                break;
+        }
     }
 }
