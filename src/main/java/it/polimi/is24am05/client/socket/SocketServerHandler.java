@@ -16,7 +16,7 @@ public class SocketServerHandler extends ServerHandler {
 
     public static void main(String[] args) {
         try {
-            new SocketServerHandler("localhost", "6969", "TUI");
+            new SocketServerHandler("localhost", "6969", "GUI");
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

@@ -2,6 +2,8 @@ package it.polimi.is24am05.client.view.gui.controllers;
 
 import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.client.model.ClientModel;
+import it.polimi.is24am05.model.Player.Player;
+import it.polimi.is24am05.model.card.side.Side;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -37,6 +39,10 @@ public class DealStarterCardsSceneController implements Initializable {
     private ImageView player3SCFrontSide;
     @FXML
     private Label logField;
+
+    @FXML
+    private Label playSC;
+
     private GUIRoot gui;
 
     private ClientModel client;
@@ -52,9 +58,8 @@ public class DealStarterCardsSceneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         String leftSidebackPath = getClass().getResource("/assets/images/leftSideBackground.png").toExternalForm();
-
-
         Image leftSideBackgroundImage = new Image(leftSidebackPath);
         BackgroundImage leftSideBack = new BackgroundImage(
                 leftSideBackgroundImage,
@@ -63,8 +68,61 @@ public class DealStarterCardsSceneController implements Initializable {
                 BackgroundPosition.CENTER,
                 new BackgroundSize(1.0, 1.0, true, true, false, false)
         );
+        playSC.setText("choose the side of the SC you want to play ");
+        AnchorPane.setBottomAnchor(playSC, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(playSC, 600.0);
 
         mainBackground.setBackground(new Background(leftSideBack));
+        mySCFrontSide.setPreserveRatio(false);
+        AnchorPane.setBottomAnchor(mySCFrontSide, 400.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(mySCFrontSide, 600.0);
+        mySCFrontSide.setFitWidth(120);
+        mySCFrontSide.setFitHeight(90);
+
+
+        mySCBackSide.setPreserveRatio(false);
+        AnchorPane.setBottomAnchor(mySCBackSide, 400.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(mySCBackSide, 750.0);
+        mySCBackSide.setFitWidth(120);
+        mySCBackSide.setFitHeight(90);
+
+        player1SCFrontSide.setPreserveRatio(false);
+        AnchorPane.setTopAnchor(player1SCFrontSide, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(player1SCFrontSide, 30.0);
+       player1SCFrontSide.setFitWidth(120);
+        player1SCFrontSide.setFitHeight(90);
+
+        player1SCBackSide.setPreserveRatio(false);
+        AnchorPane.setTopAnchor(player1SCBackSide, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(player1SCBackSide, 180.0);
+        player1SCBackSide.setFitWidth(120);
+        player1SCBackSide.setFitHeight(90);
+
+        player2SCFrontSide.setPreserveRatio(false);
+        AnchorPane.setTopAnchor(player2SCFrontSide, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(player2SCFrontSide, 400.0);
+        player2SCFrontSide.setFitWidth(120);
+        player2SCFrontSide.setFitHeight(90);
+
+
+        player2SCBackSide.setPreserveRatio(false);
+        AnchorPane.setTopAnchor(player2SCBackSide, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(player2SCBackSide, 550.0);
+        player2SCBackSide.setFitWidth(120);
+        player2SCBackSide.setFitHeight(90);
+
+        player3SCFrontSide.setPreserveRatio(false);
+        AnchorPane.setTopAnchor(player3SCFrontSide, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(player3SCFrontSide, 770.0);
+        player3SCFrontSide.setFitWidth(120);
+        player3SCFrontSide.setFitHeight(90);
+
+
+        player3SCBackSide.setPreserveRatio(false);
+        AnchorPane.setTopAnchor(player3SCBackSide, 100.0); // Distanza dal bordo superiore
+        AnchorPane.setLeftAnchor(player3SCBackSide, 920.0);
+        player3SCBackSide.setFitWidth(120);
+        player3SCBackSide.setFitHeight(90);
 
 
 
@@ -81,27 +139,31 @@ public class DealStarterCardsSceneController implements Initializable {
 
     }
 
+    //if the currentScene is DealStarterCardsSceneController-> update it
+
     public void update()
 
     {
 
-        String imagePath = getClass().getResource("/assets/images/027.png").toExternalForm();
-        mySCFrontSide.setPreserveRatio(false);
+            String imagePath = getClass().getResource("/assets/images/027.png").toExternalForm();
+            /*
+            player1SCBackSide.setImage(new Image(imagePath));
+        player1SCFrontSide.setImage(new Image(imagePath));
         mySCFrontSide.setImage(new Image(imagePath));
-        mySCFrontSide.setFitWidth(120);
-        mySCFrontSide.setFitHeight(90);
-        AnchorPane.setBottomAnchor(mySCFrontSide, 20.0); // Distanza dal bordo superiore
-        AnchorPane.setLeftAnchor(mySCFrontSide, 200.0);
 
-
-        mySCBackSide.setPreserveRatio(false);
         mySCBackSide.setImage(new Image(imagePath));
-        mySCBackSide.setFitWidth(120);
-        mySCBackSide.setFitHeight(90);
-        AnchorPane.setBottomAnchor(mySCBackSide, 20.0); // Distanza dal bordo superiore
-        AnchorPane.setLeftAnchor(mySCBackSide, 350.0);
+        player2SCBackSide.setImage(new Image(imagePath));
+        player2SCFrontSide.setImage(new Image(imagePath));
+        player3SCFrontSide.setImage(new Image(imagePath));
+        player3SCFrontSide.setImage(new Image(imagePath));
+        */
 
-        AnchorPane.setTopAnchor(logField, 20.0); // Distanza dal bordo superiore
-        AnchorPane.setLeftAnchor(logField, 600.0);
+            for(Player p: client.getGame().get().getPlayers())
+            {
+                 p.getStarterCard().getFrontSide().toString();
+
+            }
+
+
     }
 }
