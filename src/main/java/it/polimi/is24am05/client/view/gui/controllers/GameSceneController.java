@@ -111,7 +111,12 @@ public class GameSceneController  implements Initializable  {
     private Map<ImageView, String> imageViewMap=new HashMap<>();
 
 
+    @FXML
+    private Label labelMyObjective;
 
+
+    @FXML
+    private Label labelCommonObjectives;
 
 
     @FXML
@@ -149,8 +154,18 @@ public class GameSceneController  implements Initializable  {
         String imageBackPath = getClass().getResource("/assets/images/playAreaBackground.png").toExternalForm();
         AnchorPane.setTopAnchor(backgroundPlayArea, 50.0);
         AnchorPane.setLeftAnchor(backgroundPlayArea, 300.0);
-        AnchorPane.setBottomAnchor(backgroundPlayArea, 50.0);
-        AnchorPane.setRightAnchor(backgroundPlayArea, 300.0);
+
+        backgroundPlayArea.setPrefHeight(900);
+        backgroundPlayArea.setPrefWidth(900);
+
+
+
+
+        AnchorPane.setTopAnchor(labelCommonObjectives, 100.0);
+        AnchorPane.setRightAnchor(labelCommonObjectives, 90.0);
+
+        AnchorPane.setTopAnchor(labelMyObjective, 250.0);
+        AnchorPane.setRightAnchor(labelMyObjective, 90.0);
 
 
 
@@ -171,7 +186,8 @@ public class GameSceneController  implements Initializable  {
         // Imposta il Background al AnchorPane
         backgroundPlayArea.setBackground(new Background(backgroundImg));
 
-        String imagePath = getClass().getResource("/assets/images/front/027.png").toExternalForm();
+
+
         /*
         for (int i = 0; i < 10; i++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
@@ -337,13 +353,13 @@ public class GameSceneController  implements Initializable  {
         AnchorPane.setBottomAnchor(buttonPlayer4, 140.0); // Distanza dal bordo superiore
         AnchorPane.setRightAnchor(buttonPlayer4, 20.0);
         buttonPlayer1.setPrefWidth(200); // Imposta la larghezza preferita del Button
-        buttonPlayer1.setAlignment(Pos.CENTER); // Cen
+       // Cen
         buttonPlayer2.setPrefWidth(200); // Imposta la larghezza preferita del Button
-        buttonPlayer2.setAlignment(Pos.CENTER); // Cen
+
         buttonPlayer3.setPrefWidth(200); // Imposta la larghezza preferita del Button
-        buttonPlayer3.setAlignment(Pos.CENTER); // Cen
+
         buttonPlayer4.setPrefWidth(200); // Imposta la larghezza preferita del Button
-        buttonPlayer4.setAlignment(Pos.CENTER);
+
 
         AnchorPane.setBottomAnchor(rowPlacer, 390.0); // Distanza dal bordo superiore
         AnchorPane.setLeftAnchor(rowPlacer, 20.0);
@@ -654,7 +670,7 @@ public class GameSceneController  implements Initializable  {
                 for (int row = 0; row < placedSides.length  ; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
 
-                        if ((row + col) % 2 == 0) {
+                        if ( (row + col) % 2 == 0) {
 
                             if (placedSides[row][col] != null && !(placedSides[row][col] instanceof EmptyPlacedSide)) {
 
@@ -683,13 +699,17 @@ public class GameSceneController  implements Initializable  {
                             else if(placedSides[row][col]!=null &&  placedSides[row][col] instanceof EmptyPlacedSide)
                             {
                                 StackPane region = new StackPane();
-                                region.getChildren().add(new Label(col + " " + row));
+                                int rowTrans=row-2;
+                                int columnTrans=col-2;
+                                 region.getChildren().clear();
+                                region.getChildren().add(new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j +")"));
                                 playArea.add(region, col, row);
 
                             }
                         }
                     }
                 }
+                break;
 
             }
         }
