@@ -44,7 +44,7 @@ public class WaitingRoomSceneController implements Initializable {
     public void changeScene()
     {
         System.out.println("i switching");
-       gui.gameCreated();
+       gui.loadGame();
     }
 
 

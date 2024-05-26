@@ -102,6 +102,24 @@ public class GUIRoot extends View {
 
                      }
                  }
+                 else if(toDisplay.getGameState() == GameState.GAME)
+                 {
+                     if (gameSceneController == null) {
+                         loadGame();
+                         Platform.runLater(() -> {
+                             gameSceneController.update(toDisplay);
+                             // nicknameRequestSceneController.resetPlayerNickname();
+                         });
+
+                     } else {
+
+                         Platform.runLater(() -> {
+                             gameSceneController.update(toDisplay);
+                             // nicknameRequestSceneController.resetPlayerNickname();
+                         });
+
+                     }
+                 }
 
              }
 
@@ -186,7 +204,7 @@ public class GUIRoot extends View {
         Platform.runLater(() -> {
             Stage stage = guiMain.getPrimaryStage();
             //   stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/Publisher material/Icon 50x50px.png"))));
-            stage.setTitle("My Shelfie");
+            stage.setTitle("Codex Naturalis");
             stage.setScene(scene);
 
             stage.setFullScreen(true);
@@ -292,7 +310,7 @@ public class GUIRoot extends View {
     /**
      * Updates the view after creating the game.
      */
-    public void gameCreated() {
+    public void loadGame() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/it/polimi/is24am05/gameScene.fxml"));
@@ -300,19 +318,15 @@ public class GUIRoot extends View {
 
             gameSceneController = loader.getController();
             gameSceneController.setGUI(this);
+            gameSceneController.setClientNickname(clientNickname);
 
             Scene scene = new Scene(root);
+
             scene.setUserData(gameSceneController);
             guiMain.sceneControllerMap.put(scene, gameSceneController);
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
-
+             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
             changeScene(scene);
-            Timeline timeline = new Timeline(new KeyFrame(
-                    Duration.seconds(3),
-                    event -> updateLogs()
-            ));
-            timeline.setCycleCount(1);
-            timeline.play();
+
             //controller.update();
         } catch(IOException e) {
             System.out.println("Error");
@@ -347,6 +361,9 @@ public class GUIRoot extends View {
 
 
 
-
+ public void placeCard(String cardId, boolean isFront, int i, int j)
+ {
+     server.placeSide(cardId, isFront,i, j);
+ }
 
 }

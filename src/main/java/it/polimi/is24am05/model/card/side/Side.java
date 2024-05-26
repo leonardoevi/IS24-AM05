@@ -67,4 +67,5 @@ public interface Side {
     default int getPoints(){
         return 0;
     }
+
 }

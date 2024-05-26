@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -34,12 +35,12 @@
       <ImageView fx:id="goldDeckTop" />
       <ImageView fx:id="goldVisible1" />
       <ImageView fx:id="goldVisible2" />
-      <ImageView fx:id="handFrontSide1" />
-      <ImageView fx:id="handBackSide1" />
-      <ImageView fx:id="handBackSide2" />
-      <ImageView fx:id="handFrontSide2" />
-      <ImageView fx:id="handBackSide3" />
-      <ImageView fx:id="handFrontSide3" />
+      <ImageView fx:id="handFrontSide1" onMousePressed="#onHandCardTouch" />
+      <ImageView fx:id="handBackSide1" onMousePressed="#onHandCardTouch" />
+      <ImageView fx:id="handBackSide2" onMousePressed="#onHandCardTouch" />
+      <ImageView fx:id="handFrontSide2" onMousePressed="#onHandCardTouch" />
+      <ImageView fx:id="handBackSide3" onMousePressed="#onHandCardTouch" />
+      <ImageView fx:id="handFrontSide3" onMousePressed="#onHandCardTouch" />
       <Button fx:id="buttonPlayer4" text="player4" />
       <Button fx:id="buttonPlayer3" text="player3" />
       <Button fx:id="buttonPlayer2" text="player2" />
@@ -58,6 +59,8 @@
             <Font size="17.0" />
          </font>
       </Label>
+      <TextField fx:id="rowPlacer"   />
+      <TextField fx:id="columnPlacer"  />
 
    </children>
 </AnchorPane>
