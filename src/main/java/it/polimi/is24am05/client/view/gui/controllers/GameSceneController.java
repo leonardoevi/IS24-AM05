@@ -374,6 +374,18 @@ public class GameSceneController  implements Initializable  {
         AnchorPane.setLeftAnchor(columnPlacer, 70.0);
         columnPlacer.setMaxWidth(50);
 
+        for (int i = 0; i < 10; i++) {
+            RowConstraints rowConstraints = new RowConstraints();
+            rowConstraints.setPercentHeight(100.0 / 10);
+            playArea.getRowConstraints().add(rowConstraints);
+        }
+
+        for (int j = 0; j < 10; j++) {
+            ColumnConstraints columnConstraints = new ColumnConstraints();
+            columnConstraints.setPercentWidth(100.0 / 10);
+            playArea.getColumnConstraints().add(columnConstraints);
+        }
+
     }
     public void showLog(String log)
     {
@@ -645,18 +657,6 @@ public class GameSceneController  implements Initializable  {
             if (p.getNickname().equals(clientNickname)) {
                 PlacedSide[][] placedSides = p.getPlayArea().getMatrixPlayArea();
 
-                for (int i = 0; i < placedSides.length; i++) {
-                    RowConstraints rowConstraints = new RowConstraints();
-                    rowConstraints.setPercentHeight(100 / placedSides.length);
-
-                    playArea.getRowConstraints().add(rowConstraints);
-                }
-                for (int i = 0; i < placedSides[0].length; i++) {
-                    ColumnConstraints columnConstraints = new ColumnConstraints();
-                    columnConstraints.setPercentWidth(100 / placedSides[0].length);
-
-                    playArea.getColumnConstraints().add(columnConstraints);
-                }
 
                 StackPane.setMargin(playArea, new Insets(50));
                 /*
@@ -814,6 +814,15 @@ public class GameSceneController  implements Initializable  {
     @FXML public void drawGoldDeck(MouseEvent event)
     {
         gui.drawDeck(true);
+
+    }
+
+    @FXML public void drawVisible(MouseEvent event)
+    {
+        ImageView source = (ImageView) event.getSource();
+
+
+
 
     }
 }

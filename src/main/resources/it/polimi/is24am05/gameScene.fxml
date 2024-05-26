@@ -30,11 +30,11 @@
             <Font name="System Bold" size="22.0" />
          </font></Label>
       <ImageView fx:id="resourceDeckTop" onMousePressed="#drawResourceDeck" />
-      <ImageView fx:id="resourceVisible1" />
-      <ImageView fx:id="resourceVisible2" />
+      <ImageView fx:id="resourceVisible1" onMousePressed="#drawVisible" />
+      <ImageView fx:id="resourceVisible2" onMousePressed="#drawVisible" />
       <ImageView fx:id="goldDeckTop" onMousePressed="#drawGoldDeck" />
-      <ImageView fx:id="goldVisible1" />
-      <ImageView fx:id="goldVisible2" />
+      <ImageView fx:id="goldVisible1" onMousePressed="#drawVisible" />
+      <ImageView fx:id="goldVisible2" onMousePressed="#drawVisible" />
       <ImageView fx:id="handFrontSide1" onMousePressed="#onHandCardTouch" />
       <ImageView fx:id="handBackSide1" onMousePressed="#onHandCardTouch" />
       <ImageView fx:id="handBackSide2" onMousePressed="#onHandCardTouch" />
