@@ -5,18 +5,13 @@ import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.client.view.gui.controllers.*;
-
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.game.Game;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-
 import java.io.IOException;
 import java.util.Objects;
 
@@ -207,7 +202,7 @@ public class GUIRoot extends View {
 
             stage.setScene(scene);
 
-            stage.setFullScreen(true);
+          //  stage.setFullScreen(true);
 
             stage.show();
         });
@@ -245,7 +240,7 @@ public class GUIRoot extends View {
         dealHandAndObjectivesSceneController.setGUI(this);
         dealHandAndObjectivesSceneController.setClientNickname(clientNickname);
 
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root,900, 900);
 
         scene.setUserData(dealHandAndObjectivesSceneController);
         guiMain.sceneControllerMap.put(scene, dealHandAndObjectivesSceneController);
@@ -333,6 +328,11 @@ public class GUIRoot extends View {
         }
     }
 
+    public void drawDeck(boolean isGold)
+    {
+        server.drawDeck(isGold);
+    }
+
     public void dealStarterCards() {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -343,7 +343,7 @@ public class GUIRoot extends View {
             dealStarterCardsSceneController.setGUI(this);
             dealStarterCardsSceneController.setNickname(clientNickname);
 
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 900, 900);
 
             scene.setUserData(dealStarterCardsSceneController);
             guiMain.sceneControllerMap.put(scene, dealStarterCardsSceneController);

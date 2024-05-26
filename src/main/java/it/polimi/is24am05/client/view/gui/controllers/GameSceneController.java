@@ -16,11 +16,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
@@ -152,9 +154,10 @@ public class GameSceneController  implements Initializable  {
         String imageBackPath = getClass().getResource("/assets/images/playAreaBackground.png").toExternalForm();
         AnchorPane.setTopAnchor(backgroundPlayArea, 50.0);
         AnchorPane.setLeftAnchor(backgroundPlayArea, 300.0);
+        AnchorPane.setBottomAnchor(backgroundPlayArea, 50.0);
+        AnchorPane.setRightAnchor(backgroundPlayArea, 300.0);
 
-        backgroundPlayArea.setPrefHeight(900);
-        backgroundPlayArea.setPrefWidth(900);
+
 
 
 
@@ -388,7 +391,7 @@ public class GameSceneController  implements Initializable  {
         try {
             Resource resourceTop = FUNGI;
 
-            if (game.getResourceDeck().peek() instanceof Resource) {
+            if ( game.getResourceDeck()!=null && game.getResourceDeck().peek() instanceof Resource) {
                 resourceTop = (Resource) game.getResourceDeck().peek();
             }
             String sidePath = "/assets/images/back/";
@@ -423,7 +426,7 @@ public class GameSceneController  implements Initializable  {
         try {
             Resource goldTop = FUNGI;
 
-            if (game.getGoldDeck().peek() instanceof Resource) {
+            if (game.getGoldDeck()!=null && game.getGoldDeck().peek() instanceof Resource) {
                 goldTop = (Resource) game.getGoldDeck().peek();
             }
 
@@ -454,178 +457,186 @@ public class GameSceneController  implements Initializable  {
         } catch (EmptyDeckException e) {
             // logField.setText("resource deck empty");
         }
+        int idCard;
+        String path="";
+       if(game.getResourceDeck()!=null && game.getResourceDeck().getVisible()!=null && !game.getResourceDeck().getVisible().isEmpty()) {
+           List<Card> resourceVisible = game.getResourceDeck().getVisible().stream().toList();
+           idCard = resourceVisible.get(0).getId();
 
-        List<Card> resourceVisible = game.getResourceDeck().getVisible().stream().toList();
-        int idCard = resourceVisible.get(0).getId();
+            path = "/assets/images/front/";
+           if (idCard >= 10) {
+               path += "0";
 
-        String path = "/assets/images/front/";
-        if (idCard >= 10) {
+           } else if (idCard < 10) {
+               path += "00";
+
+           }
+           path += idCard;
+           path += ".png";
+
+           path = getClass().getResource(path).toExternalForm();
+           resourceVisible1.setImage(new Image(path));
+
+
+           idCard = resourceVisible.get(1).getId();
+
+           path = "/assets/images/front/";
+           if (idCard >= 10) {
+               path += "0";
+
+           } else if (idCard < 10) {
+               path += "00";
+
+           }
+           path += idCard;
+           path += ".png";
+           path = getClass().getResource(path).toExternalForm();
+           resourceVisible2.setImage(new Image(path));
+       }
+        if(game.getGoldDeck()!=null && game.getGoldDeck().getVisible()!=null && !game.getGoldDeck().getVisible().isEmpty()) {
+            List<Card> goldVisible = new HashSet<>(game.getGoldDeck().getVisible()).stream().toList();
+            idCard = goldVisible.get(0).getId();
+
+            path = "/assets/images/front/";
+
             path += "0";
-
-        } else if (idCard < 10) {
-            path += "00";
-
-        }
-        path += idCard;
-        path += ".png";
-
-        path = getClass().getResource(path).toExternalForm();
-        resourceVisible1.setImage(new Image(path));
+            path += idCard;
+            path += ".png";
+            path = getClass().getResource(path).toExternalForm();
+            goldVisible1.setImage(new Image(path));
 
 
-        idCard = resourceVisible.get(1).getId();
+            idCard = goldVisible.get(1).getId();
 
-        path = "/assets/images/front/";
-        if (idCard >= 10) {
+            path = "/assets/images/front/";
+
             path += "0";
-
-        } else if (idCard < 10) {
-            path += "00";
-
+            path += idCard;
+            path += ".png";
+            path = getClass().getResource(path).toExternalForm();
+            goldVisible2.setImage(new Image(path));
         }
-        path += idCard;
-        path += ".png";
-        path = getClass().getResource(path).toExternalForm();
-        resourceVisible2.setImage(new Image(path));
+       if(game.getSharedObjectives()!=null) {
+           if(game.getSharedObjectives()[0]!=null) {
+               path = "/assets/images/front/";
+               path += game.getSharedObjectives()[0].name().substring(2);
+               path += ".png";
+               path = getClass().getResource(path).toExternalForm();
+               commonObjective1.setImage(new Image(path));
 
-
-        List<Card> goldVisible = new HashSet<>(game.getGoldDeck().getVisible()).stream().toList();
-        idCard = goldVisible.get(0).getId();
-
-        path = "/assets/images/front/";
-
-        path += "0";
-        path += idCard;
-        path += ".png";
-        path = getClass().getResource(path).toExternalForm();
-        goldVisible1.setImage(new Image(path));
-
-
-        idCard = goldVisible.get(1).getId();
-
-        path = "/assets/images/front/";
-
-        path += "0";
-        path += idCard;
-        path += ".png";
-        path = getClass().getResource(path).toExternalForm();
-        goldVisible2.setImage(new Image(path));
-
-
-        path = "/assets/images/front/";
-        path += game.getSharedObjectives()[0].name().substring(2);
-        path += ".png";
-        path = getClass().getResource(path).toExternalForm();
-        commonObjective1.setImage(new Image(path));
-
-        path = "/assets/images/front/";
-        path += game.getSharedObjectives()[1].name().substring(2);
-        path += ".png";
-        path = getClass().getResource(path).toExternalForm();
-        commonObjective2.setImage(new Image(path));
+               path = "/assets/images/front/";
+               path += game.getSharedObjectives()[1].name().substring(2);
+               path += ".png";
+               path = getClass().getResource(path).toExternalForm();
+               commonObjective2.setImage(new Image(path));
+           }
+       }
 
         for (Player p : game.getPlayers()) {
             if (p.getNickname().equals(clientNickname)) {
                 path = "/assets/images/front/";
-                path += p.getObjective().name().substring(2);
-                path += ".png";
+                if (p.getObjective() != null) {
+                    path += p.getObjective().name().substring(2);
+                    path += ".png";
 
-                path = getClass().getResource(path).toExternalForm();
-                myObjective.setImage(new Image(path));
-
+                    path = getClass().getResource(path).toExternalForm();
+                    myObjective.setImage(new Image(path));
+                }
                 String appendfront = "/assets/images/front/";
                 String appendback = "/assets/images/back/";
-
                 List<Card> cards = p.getHand();
                 String pathcardfront;
                 String pathcardback;
+                if (p.getHand() != null && !p.getHand().isEmpty())
+                {
+                    if (cards.size() > 0 && cards.get(0) != null) {
+                        Card c = cards.get(0);
+                        idCard = c.getId();
+                        // TODO parsing function
+                        if (idCard < 100 && idCard >= 10) {
+                            appendback += "0";
+                            appendfront += "0";
+                        } else if (idCard < 10) {
+                            appendback += "00";
+                            appendfront += "00";
+                        }
 
-                if(cards.size()>0 && cards.get(0)!=null) {
-                    Card c = cards.get(0);
-                    idCard = c.getId();
-                    // TODO parsing function
-                    if (idCard < 100 && idCard >= 10) {
-                        appendback += "0";
-                        appendfront += "0";
-                    } else if (idCard < 10) {
-                        appendback += "00";
-                        appendfront += "00";
+
+                        pathcardfront = appendfront + idCard + ".png";
+
+                        path = getClass().getResource(pathcardfront).toExternalForm();
+                        handFrontSide1.setImage(new Image(path));
+                        imageViewMap.put(handFrontSide1, pathcardfront);
+
+
+                        pathcardback = appendback + idCard + ".png";
+
+                        path = getClass().getResource(pathcardback).toExternalForm();
+                        handBackSide1.setImage(new Image(path));
+                        imageViewMap.put(handBackSide1, pathcardback);
+                        appendfront = "/assets/images/front/";
+                        appendback = "/assets/images/back/";
+                    }
+
+                    if (cards.size() > 1 && cards.get(1) != null) {
+                        Card c = cards.get(1);
+                        idCard = c.getId();
+
+                        if (idCard < 100 && idCard >= 10) {
+                            appendback += "0";
+                            appendfront += "0";
+                        } else if (idCard < 10) {
+                            appendback += "00";
+                            appendfront += "00";
+                        }
+                        pathcardfront = appendfront + idCard + ".png";
+
+                        path = getClass().getResource(pathcardfront).toExternalForm();
+                        handFrontSide2.setImage(new Image(path));
+                        imageViewMap.put(handFrontSide2, pathcardfront);
+
+
+                        pathcardback = appendback + idCard + ".png";
+
+                        path = getClass().getResource(pathcardback).toExternalForm();
+                        handBackSide2.setImage(new Image(path));
+                        imageViewMap.put(handBackSide2, pathcardback);
+
+                        appendfront = "/assets/images/front/";
+                        appendback = "/assets/images/back/";
                     }
 
 
-                    pathcardfront = appendfront + idCard + ".png";
+                    if (cards.size() > 2 && cards.get(2) != null) {
+                        Card c = cards.get(2);
+                        idCard = c.getId();
 
-                    path = getClass().getResource(pathcardfront).toExternalForm();
-                    handFrontSide1.setImage(new Image(path));
-                    imageViewMap.put(handFrontSide1, pathcardfront);
+                        if (idCard < 100 && idCard >= 10) {
+                            appendback += "0";
+                            appendfront += "0";
+                        } else if (idCard < 10) {
+                            appendback += "00";
+                            appendfront += "00";
+                        }
 
+                        pathcardfront = appendfront + idCard + ".png";
 
-                    pathcardback = appendback + idCard + ".png";
+                        path = getClass().getResource(pathcardfront).toExternalForm();
+                        handFrontSide3.setImage(new Image(path));
+                        imageViewMap.put(handFrontSide3, pathcardfront);
 
-                    path = getClass().getResource(pathcardback).toExternalForm();
-                    handBackSide1.setImage(new Image(path));
-                    imageViewMap.put(handBackSide1, pathcardback);
-                    appendfront = "/assets/images/front/";
-                    appendback = "/assets/images/back/";
-                }
+                        pathcardback = appendback + idCard + ".png";
 
-                if (cards.size()>1 && cards.get(1)!=null) {
-                   Card  c = cards.get(1);
-                    idCard = c.getId();
-
-                    if (idCard < 100 && idCard >= 10) {
-                        appendback += "0";
-                        appendfront += "0";
-                    } else if (idCard < 10) {
-                        appendback += "00";
-                        appendfront += "00";
+                        path = getClass().getResource(pathcardback).toExternalForm();
+                        handBackSide3.setImage(new Image(path));
+                        imageViewMap.put(handBackSide3, pathcardback);
                     }
-                    pathcardfront = appendfront + idCard + ".png";
-
-                    path = getClass().getResource(pathcardfront).toExternalForm();
-                    handFrontSide2.setImage(new Image(path));
-                    imageViewMap.put(handFrontSide2, pathcardfront);
-
-
-                    pathcardback = appendback + idCard + ".png";
-
-                    path = getClass().getResource(pathcardback).toExternalForm();
-                    handBackSide2.setImage(new Image(path));
-                    imageViewMap.put(handBackSide2, pathcardback);
-
-                    appendfront = "/assets/images/front/";
-                    appendback = "/assets/images/back/";
-                }
-
-
-                if (cards.size()>2 && cards.get(2)!=null) {
-                    Card c = cards.get(2);
-                    idCard = c.getId();
-
-                    if (idCard < 100 && idCard >= 10) {
-                        appendback += "0";
-                        appendfront += "0";
-                    } else if (idCard < 10) {
-                        appendback += "00";
-                        appendfront += "00";
+                    }
+                        break;
                     }
 
-                    pathcardfront = appendfront + idCard + ".png";
 
-                    path = getClass().getResource(pathcardfront).toExternalForm();
-                    handFrontSide3.setImage(new Image(path));
-                    imageViewMap.put(handFrontSide3, pathcardfront);
 
-                    pathcardback = appendback + idCard + ".png";
-
-                    path = getClass().getResource(pathcardback).toExternalForm();
-                    handBackSide3.setImage(new Image(path));
-                    imageViewMap.put(handBackSide3, pathcardback);
-
-                    break;
-                }
-
-            }
         }
 
         System.out.println("Displaying playarea");
@@ -637,11 +648,13 @@ public class GameSceneController  implements Initializable  {
                 for (int i = 0; i < placedSides.length; i++) {
                     RowConstraints rowConstraints = new RowConstraints();
                     rowConstraints.setPercentHeight(100 / placedSides.length);
+
                     playArea.getRowConstraints().add(rowConstraints);
                 }
                 for (int i = 0; i < placedSides[0].length; i++) {
                     ColumnConstraints columnConstraints = new ColumnConstraints();
                     columnConstraints.setPercentWidth(100 / placedSides[0].length);
+
                     playArea.getColumnConstraints().add(columnConstraints);
                 }
 
@@ -696,12 +709,19 @@ public class GameSceneController  implements Initializable  {
                             }
                             else if(placedSides[row][col]!=null &&  placedSides[row][col] instanceof EmptyPlacedSide)
                             {
-                                StackPane region = new StackPane();
-                                int rowTrans=row-2;
-                                int columnTrans=col-2;
-                                 region.getChildren().clear();
-                                region.getChildren().add(new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j +")"));
-                                playArea.add(region, col, row);
+
+                                List<Node> childrens = playArea.getChildren();
+                                for(Node node : childrens) {
+                                    if(node instanceof Label && playArea.getRowIndex(node) == row && playArea.getColumnIndex(node) == col) {
+                                        Label toRemove= (Label) node; // use what you want to remove
+                                        playArea.getChildren().remove(toRemove);
+                                        break;
+                                    }
+                                }
+
+
+
+                                playArea.add( new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j +")"), col, row);
 
                             }
                         }
@@ -718,23 +738,27 @@ public class GameSceneController  implements Initializable  {
 
         ImageView source = (ImageView) event.getSource();
 
-        /*
-        rowPlacer.textProperty().addListener((observable, oldValue, newValue) -> {
-            isTextField1Filled = !newValue.trim().isEmpty();
-            checkFields(source);
+
+        rowPlacer.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                checkFields(source);
+            }
         });
-        columnPlacer.textProperty().addListener((observable, oldValue, newValue) -> {
-            isTextField2Filled = !newValue.trim().isEmpty();
-            checkFields(source);
+
+
+        columnPlacer.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                checkFields(source);
+            }
         });
-*/
+
 
 
 
     }
 
     private void checkFields(ImageView source) {
-        if (isTextField1Filled && isTextField2Filled) {
+        if (rowPlacer.getText()!=null && rowPlacer.getText()!="" && columnPlacer.getText()!=null && columnPlacer.getText()!="") {
 
             int row =(Integer.parseInt(rowPlacer.getText()));
             int column=(Integer.parseInt(columnPlacer.getText()));
@@ -780,6 +804,17 @@ public class GameSceneController  implements Initializable  {
 
 
     }
+    }
+
+    @FXML public void drawResourceDeck(MouseEvent event)
+    {
+        gui.drawDeck(false);
+
+    }
+    @FXML public void drawGoldDeck(MouseEvent event)
+    {
+        gui.drawDeck(true);
+
     }
 }
 
