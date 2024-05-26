@@ -57,13 +57,12 @@ public class GUIRoot extends View {
     }
     @Override
     public void updateGame() {
-        System.out.println("there i am");
+
 
         try {
 
+
             Game toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
-
-
              if(toDisplay!=null) {
                  System.out.println(toDisplay.getGameState());
                  if (toDisplay.getGameState() == GameState.PLACE_STARTER_CARDS) {
@@ -205,6 +204,7 @@ public class GUIRoot extends View {
             Stage stage = guiMain.getPrimaryStage();
             //   stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/Publisher material/Icon 50x50px.png"))));
             stage.setTitle("Codex Naturalis");
+
             stage.setScene(scene);
 
             stage.setFullScreen(true);
@@ -320,7 +320,7 @@ public class GUIRoot extends View {
             gameSceneController.setGUI(this);
             gameSceneController.setClientNickname(clientNickname);
 
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 900, 900);
 
             scene.setUserData(gameSceneController);
             guiMain.sceneControllerMap.put(scene, gameSceneController);

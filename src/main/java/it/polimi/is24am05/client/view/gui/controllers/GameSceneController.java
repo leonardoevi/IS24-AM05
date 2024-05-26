@@ -5,15 +5,13 @@ import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
-import it.polimi.is24am05.model.card.side.Side;
-import it.polimi.is24am05.model.enums.element.Element;
+
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -720,6 +718,7 @@ public class GameSceneController  implements Initializable  {
 
         ImageView source = (ImageView) event.getSource();
 
+        /*
         rowPlacer.textProperty().addListener((observable, oldValue, newValue) -> {
             isTextField1Filled = !newValue.trim().isEmpty();
             checkFields(source);
@@ -728,7 +727,7 @@ public class GameSceneController  implements Initializable  {
             isTextField2Filled = !newValue.trim().isEmpty();
             checkFields(source);
         });
-
+*/
 
 
 
