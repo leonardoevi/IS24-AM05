@@ -717,17 +717,22 @@ public class GameSceneController  implements Initializable  {
                             }
                             else if(placedSides[row][col]!=null &&  placedSides[row][col] instanceof EmptyPlacedSide)
                             {
-
-                                List<Node> childrens = playArea.getChildren();
-                                for(Node node : childrens) {
-                                    if(node instanceof Label && playArea.getRowIndex(node) == row && playArea.getColumnIndex(node) == col) {
-                                        Label toRemove= (Label) node; // use what you want to remove
-                                        playArea.getChildren().remove(toRemove);
-
+                                javafx.scene.Node nodeToRemove = null;
+                                for (javafx.scene.Node node : playArea.getChildren()) {
+                                    Integer column = GridPane.getColumnIndex(node);
+                                    Integer roww = GridPane.getRowIndex(node);
+                                    if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
+                                        nodeToRemove = node;
+                                        break;
                                     }
                                 }
 
+                                // Rimuovi il nodo se trovato
+                                if (nodeToRemove != null) {
+                                    playArea.getChildren().remove(nodeToRemove);
+                                }
 
+                                // Aggiungi il nuovo Label nella posizione (1, 1)
 
 
 
@@ -780,7 +785,7 @@ public class GameSceneController  implements Initializable  {
             else
                 cardId+= handViewMap.get(source).substring(20, 23);
             String CardServerId = "";
-            if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<80)
+            if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<=80)
                 CardServerId = "GC_";
             else
                 CardServerId = "RC_";
@@ -840,7 +845,7 @@ public class GameSceneController  implements Initializable  {
         else
             cardId+= visibleViewMap.get(source).substring(20, 23);
 
-        if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<80)
+        if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<=80)
             CardServerId = "GC_";
         else
             CardServerId = "RC_";
