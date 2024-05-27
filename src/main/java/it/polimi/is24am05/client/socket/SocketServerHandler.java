@@ -35,12 +35,6 @@ public class SocketServerHandler extends ServerHandler {
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
         new Thread(new SocketServerReader(this, socket)).start();
-        if (viewType == "GUI"){
-            if(getView() instanceof GUIRoot)
-            {
-                ((GUIRoot) getView()).launch();
-            }
-        }
     }
 
     @Override

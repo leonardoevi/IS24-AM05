@@ -19,6 +19,9 @@ public class GUIRoot extends View {
 
     GUIMain guiMain;
 
+    //TODO : kill the thread when disconnecting
+    private Thread guiThread;
+
     private String clientNickname;
 
 
@@ -34,11 +37,9 @@ public class GUIRoot extends View {
 
     public GUIRoot(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
-        //GUIMain.launchApp(this);
+        guiThread = new Thread(()->GUIMain.launchApp(this));
+        guiThread.start();
 
-    }
-    public void launch(){
-        GUIMain.launchApp(this);
     }
 
     @Override
@@ -277,7 +278,7 @@ public class GUIRoot extends View {
 
 
         server.setNumberOfPlayers(num);
-        server.joinGame();
+       // server.joinGame();
 
     }
 
