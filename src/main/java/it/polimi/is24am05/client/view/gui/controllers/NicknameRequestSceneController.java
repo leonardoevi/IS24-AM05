@@ -32,19 +32,15 @@ public class NicknameRequestSceneController implements Initializable {
     private Label logField;
 
 
-
-    boolean askNumOfPlayers=false;
-
+    boolean askNumOfPlayers = false;
 
 
-
-    public void setGUI(GUIRoot gui)
-    {
-        this.gui=gui;
+    public void setGUI(GUIRoot gui) {
+        this.gui = gui;
     }
 
     @Override
-    public void initialize (URL url, ResourceBundle resources) {
+    public void initialize(URL url, ResourceBundle resources) {
 
         logField.setText("");
         playerNickname.setPromptText("enter your nickname");
@@ -56,25 +52,27 @@ public class NicknameRequestSceneController implements Initializable {
         return playerNickname.getText();
     }
 
-    public int getNumPlayers(){return Integer.parseInt(numOfPlayers.getText()); }
+    public int getNumPlayers() {
+        return Integer.parseInt(numOfPlayers.getText());
+    }
 
     /**
      * Fills the player nickname text field with an empty string.
      */
-    public void resetPlayerNickname () {
+    public void resetPlayerNickname() {
         playerNickname.setText("");
     }
-   public void resetNumOfPlayers()
-   {
-       numOfPlayers.setText("");
-   }
-    public void showLog(String log)
-    {
+
+    public void resetNumOfPlayers() {
+        numOfPlayers.setText("");
+    }
+
+    public void showLog(String log) {
         logField.setText(log);
 
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.seconds(3),
-                event ->logField.setText("")
+                event -> logField.setText("")
         ));
         timeline.setCycleCount(1);
         timeline.play();
@@ -84,29 +82,24 @@ public class NicknameRequestSceneController implements Initializable {
     @FXML
     public void onButtonClicked(javafx.event.ActionEvent event) {
 
-        //for join server
 
-            String nickname = getPlayerNickname();
-       gui.nicknameChosen(nickname);
-
+        String nickname = getPlayerNickname();
+        gui.nicknameChosen(nickname);
 
 
     }
 
-
-        @FXML
-        public void numOfPlayersConfirmed(javafx.event.ActionEvent event) {
-
-            //for join server
-            int numPlayers = getNumPlayers();
-
-            gui.numberOfplayersChosen(numPlayers);
+    @FXML
+    public void numOfPlayersConfirmed(javafx.event.ActionEvent event) {
 
 
-            //  gui.gameCreated();
+        int numPlayers = getNumPlayers();
 
-        }
+        gui.numberOfplayersChosen(numPlayers);
+
+
     }
+}
 
 
 

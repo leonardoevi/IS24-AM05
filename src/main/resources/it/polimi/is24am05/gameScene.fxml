@@ -41,11 +41,14 @@
       <ImageView fx:id="handFrontSide2" onMousePressed="#onHandCardTouch" />
       <ImageView fx:id="handBackSide3" onMousePressed="#onHandCardTouch" />
       <ImageView fx:id="handFrontSide3" onMousePressed="#onHandCardTouch" />
-      <Button fx:id="buttonPlayer4" text="player4" />
+
       <Button fx:id="buttonPlayer3" text="player3" />
       <Button fx:id="buttonPlayer2" text="player2" />
       <Button fx:id="buttonPlayer1" text="player1" />
-      <Label fx:id="myPoints" text="POINTS: DIOCANE" />
+      <Label fx:id="myPoints" textFill="#099061">
+         <font>
+            <Font size="21.0" />
+         </font></Label>
       <ImageView fx:id="commonObjective1" />
       <ImageView fx:id="commonObjective2" />
       <ImageView fx:id="myObjective" />

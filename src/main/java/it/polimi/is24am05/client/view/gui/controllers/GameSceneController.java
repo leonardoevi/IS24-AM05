@@ -30,12 +30,13 @@ import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
 import static it.polimi.is24am05.model.enums.element.Resource.*;
 
-public class GameSceneController  implements Initializable  {
+public class GameSceneController implements Initializable {
 
     //TODO AGGIORNATE LA MAPPPAAA
 
@@ -85,9 +86,7 @@ public class GameSceneController  implements Initializable  {
     @FXML
 
     private Button buttonPlayer3;
-    @FXML
 
-    private Button buttonPlayer4;
 
     @FXML
 
@@ -108,10 +107,10 @@ public class GameSceneController  implements Initializable  {
     private String clientNickname;
 
 
-    private Map<ImageView, String> handViewMap=new HashMap<>();
+    private Map<ImageView, String> handViewMap = new HashMap<>();
 
-    
-    private Map<ImageView, String> visibleViewMap=new HashMap<>();
+
+    private Map<ImageView, String> visibleViewMap = new HashMap<>();
 
 
     @FXML
@@ -127,18 +126,19 @@ public class GameSceneController  implements Initializable  {
     @FXML
     private AnchorPane mainBackground;
     private GUIRoot gui;
-    public void setGUI(GUIRoot gui)
-    {
-        this.gui=gui;
+
+    public void setGUI(GUIRoot gui) {
+        this.gui = gui;
     }
 
-    public void setClientNickname(String nickname){
-        this.clientNickname=nickname;
+    public void setClientNickname(String nickname) {
+        this.clientNickname = nickname;
 
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
 
         String leftSidebackPath = getClass().getResource("/assets/images/leftSideBackground.png").toExternalForm();
 
@@ -161,10 +161,6 @@ public class GameSceneController  implements Initializable  {
         AnchorPane.setRightAnchor(backgroundPlayArea, 300.0);
 
 
-
-
-
-
         AnchorPane.setTopAnchor(labelCommonObjectives, 100.0);
         AnchorPane.setRightAnchor(labelCommonObjectives, 90.0);
 
@@ -172,13 +168,9 @@ public class GameSceneController  implements Initializable  {
         AnchorPane.setRightAnchor(labelMyObjective, 90.0);
 
 
+        Image backgroundImage = new Image(imageBackPath);
 
 
-
-
-        Image backgroundImage = new Image(imageBackPath); // Sostituisci con il percorso della tua immagine
-
-        // Crea un BackgroundImage
         BackgroundImage backgroundImg = new BackgroundImage(
                 backgroundImage,
                 BackgroundRepeat.NO_REPEAT,
@@ -187,193 +179,133 @@ public class GameSceneController  implements Initializable  {
                 new BackgroundSize(1.0, 1.0, true, true, false, false)
         );
 
-        // Imposta il Background al AnchorPane
+
         backgroundPlayArea.setBackground(new Background(backgroundImg));
 
 
-
-        /*
-        for (int i = 0; i < 10; i++) {
-            ColumnConstraints columnConstraints = new ColumnConstraints();
-            columnConstraints.setPercentWidth(100 / 10.0);
-            playArea.getColumnConstraints().add(columnConstraints);
-
-            RowConstraints rowConstraints = new RowConstraints();
-            rowConstraints.setPercentHeight(100 / 10.0);
-            playArea.getRowConstraints().add(rowConstraints);
-        }
-        StackPane.setMargin(playArea, new Insets(50));
-        playArea.widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            for (int i = 0; i < 10; i++) {
-                playArea.getColumnConstraints().get(i).setPrefWidth(newValue.doubleValue() / 10);
-            }
-        });
-
-        playArea.heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            for (int i = 0; i < 10; i++) {
-                playArea.getRowConstraints().get(i).setPrefHeight(newValue.doubleValue() / 10);
-            }
-        });
-
-         */
-        /*
-        for (int row = 0; row < 10; row++) {
-            for (int col = 0; col < 10; col++) {
-
-                if((row+col)%2==0) {
-
-                    ImageView card = new ImageView(new Image(imagePath));
-
-                    String imagePath2 = getClass().getResource("/assets/images/front/027.png").toExternalForm();
-                    StackPane region = new StackPane();
-                    region.setBackground(new Background(new BackgroundImage(new Image(imagePath2),  BackgroundRepeat.NO_REPEAT,
-                            BackgroundRepeat.NO_REPEAT,
-                            BackgroundPosition.CENTER,
-                            new BackgroundSize(1.0, 1.0, true, true, false, false))));
-                    playArea.add(region, col, row);
-
-                }
-            }
-        }
-
-         */
         AnchorPane.setTopAnchor(logField, 10.0);
         AnchorPane.setLeftAnchor(logField, 600.0);
         logField.setText("");
 
         resourceDeckTop.setPreserveRatio(false);
-      // resourceDeckTop.setImage(new Image(imageBackPath));
         resourceDeckTop.setFitWidth(120);
         resourceDeckTop.setFitHeight(90);
-        AnchorPane.setTopAnchor(resourceDeckTop, 130.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(resourceDeckTop, 130.0);
         AnchorPane.setLeftAnchor(resourceDeckTop, 20.0);
 
-       // resourceVisible1.setImage(new Image(imageBackPath));
+
         resourceVisible1.setFitWidth(120);
         resourceVisible1.setFitHeight(90);
-        AnchorPane.setTopAnchor(resourceVisible1, 70.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(resourceVisible1, 70.0);
         AnchorPane.setLeftAnchor(resourceVisible1, 150.0);
 
-      //  resourceVisible2.setImage(new Image(imageBackPath));
+
         resourceVisible2.setFitWidth(120);
         resourceVisible2.setFitHeight(90);
-        AnchorPane.setTopAnchor(resourceVisible2, 200.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(resourceVisible2, 200.0);
         AnchorPane.setLeftAnchor(resourceVisible2, 150.0);
 
         goldDeckTop.setPreserveRatio(false);
-      //  goldDeckTop.setImage(new Image(imageBackPath));
         goldDeckTop.setFitWidth(120);
         goldDeckTop.setFitHeight(90);
-        AnchorPane.setTopAnchor(goldDeckTop, 370.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(goldDeckTop, 370.0);
         AnchorPane.setLeftAnchor(goldDeckTop, 20.0);
 
-       // goldVisible1.setImage(new Image(imageBackPath));
+
         goldVisible1.setFitWidth(120);
         goldVisible1.setFitHeight(90);
-        AnchorPane.setTopAnchor(goldVisible1, 340.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(goldVisible1, 340.0);
         AnchorPane.setLeftAnchor(goldVisible1, 150.0);
 
 
-    //    goldVisible2.setImage(new Image(imageBackPath));
         goldVisible2.setFitWidth(120);
         goldVisible2.setFitHeight(90);
-        AnchorPane.setTopAnchor(goldVisible2, 450.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(goldVisible2, 450.0);
         AnchorPane.setLeftAnchor(goldVisible2, 150.0);
 
 
-    //    handBackSide1.setImage(new Image(imageBackPath));
         handBackSide1.setFitWidth(120);
         handBackSide1.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handBackSide1, 50.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(handBackSide1, 50.0);
         AnchorPane.setLeftAnchor(handBackSide1, 20.0);
 
 
-     //   handFrontSide1.setImage(new Image(imageBackPath));
         handFrontSide1.setFitWidth(120);
         handFrontSide1.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handFrontSide1, 50.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(handFrontSide1, 50.0);
         AnchorPane.setLeftAnchor(handFrontSide1, 150.0);
 
-    //    handBackSide2.setImage(new Image(imageBackPath));
+
         handBackSide2.setFitWidth(120);
         handBackSide2.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handBackSide2, 150.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(handBackSide2, 150.0);
         AnchorPane.setLeftAnchor(handBackSide2, 20.0);
 
-    //    handFrontSide2.setImage(new Image(imageBackPath));
+
         handFrontSide2.setFitWidth(120);
         handFrontSide2.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handFrontSide2, 150.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(handFrontSide2, 150.0);
         AnchorPane.setLeftAnchor(handFrontSide2, 150.0);
 
-     //   handFrontSide3.setImage(new Image(imageBackPath));
+
         handFrontSide3.setFitWidth(120);
         handFrontSide3.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handFrontSide3, 250.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(handFrontSide3, 250.0);
         AnchorPane.setLeftAnchor(handFrontSide3, 20.0);
 
-   //     handBackSide3.setImage(new Image(imageBackPath));
+
         handBackSide3.setFitWidth(120);
         handBackSide3.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handBackSide3, 250.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(handBackSide3, 250.0);
         AnchorPane.setLeftAnchor(handBackSide3, 150.0);
 
-        AnchorPane.setTopAnchor(myPoints, 30.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(myPoints, 30.0);
         AnchorPane.setRightAnchor(myPoints, 90.0);
-        myPoints.setPrefWidth(200); // Imposta la larghezza preferita del Label
+        myPoints.setPrefWidth(200);
         myPoints.setAlignment(Pos.CENTER);
         myPoints.setText("");
 
-        // commonObjective1.setImage(new Image(imageBackPath));
+
         commonObjective1.setFitWidth(120);
         commonObjective1.setFitHeight(90);
-        AnchorPane.setTopAnchor(commonObjective1, 130.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(commonObjective1, 130.0);
         AnchorPane.setRightAnchor(commonObjective1, 20.0);
 
-      //  commonObjective2.setImage(new Image(imageBackPath));
+
         commonObjective2.setFitWidth(120);
         commonObjective2.setFitHeight(90);
-        AnchorPane.setTopAnchor(commonObjective2, 130.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(commonObjective2, 130.0);
         AnchorPane.setRightAnchor(commonObjective2, 150.0);
 
 
-     //   myObjective.setImage(new Image(imageBackPath));
         myObjective.setFitWidth(120);
         myObjective.setFitHeight(90);
-        AnchorPane.setTopAnchor(myObjective, 280.0); // Distanza dal bordo superiore
+        AnchorPane.setTopAnchor(myObjective, 280.0);
         AnchorPane.setRightAnchor(myObjective, 100.0);
 
 
-
-
-        AnchorPane.setBottomAnchor(buttonPlayer1, 30.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(buttonPlayer1, 30.0);
         AnchorPane.setRightAnchor(buttonPlayer1, 20.0);
 
-        AnchorPane.setBottomAnchor(buttonPlayer2, 70.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(buttonPlayer2, 70.0);
         AnchorPane.setRightAnchor(buttonPlayer2, 20.0);
 
-        AnchorPane.setBottomAnchor(buttonPlayer3, 110.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(buttonPlayer3, 110.0);
         AnchorPane.setRightAnchor(buttonPlayer3, 20.0);
-        AnchorPane.setBottomAnchor(buttonPlayer4, 140.0); // Distanza dal bordo superiore
-        AnchorPane.setRightAnchor(buttonPlayer4, 20.0);
-        buttonPlayer1.setPrefWidth(200); // Imposta la larghezza preferita del Button
-       // Cen
-        buttonPlayer2.setPrefWidth(200); // Imposta la larghezza preferita del Button
 
-        buttonPlayer3.setPrefWidth(200); // Imposta la larghezza preferita del Button
+        buttonPlayer1.setPrefWidth(200);
+        // Cen
+        buttonPlayer2.setPrefWidth(200);
 
-        buttonPlayer4.setPrefWidth(200); // Imposta la larghezza preferita del Button
+        buttonPlayer3.setPrefWidth(200);
 
 
-        AnchorPane.setBottomAnchor(rowPlacer, 390.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(rowPlacer, 390.0);
         AnchorPane.setLeftAnchor(rowPlacer, 20.0);
         rowPlacer.setMaxWidth(50);
 
 
-
-
-
-        AnchorPane.setBottomAnchor(columnPlacer, 390.0); // Distanza dal bordo superiore
+        AnchorPane.setBottomAnchor(columnPlacer, 390.0);
         AnchorPane.setLeftAnchor(columnPlacer, 70.0);
         columnPlacer.setMaxWidth(50);
 
@@ -390,17 +322,18 @@ public class GameSceneController  implements Initializable  {
         }
 
     }
-    public void showLog(String log)
-    {
-       logField.setText(log);
+
+    public void showLog(String log) {
+        logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
                 Duration.seconds(3),
-                event ->logField.setText("")
+                event -> logField.setText("")
         ));
         timeline.setCycleCount(1);
         timeline.play();
 
     }
+
     public void update(Game game) {
 
         handViewMap.clear();
@@ -417,10 +350,19 @@ public class GameSceneController  implements Initializable  {
         goldVisible1.setImage(null);
         goldVisible2.setImage(null);
 
+
+        for (Player p : game.getPlayers()) {
+            if (p.getNickname().equals(clientNickname)) {
+
+                myPoints.setText("POINTS: " + p.getPoints());
+
+            }
+        }
+
         try {
             Resource resourceTop = FUNGI;
 
-            if ( game.getResourceDeck()!=null && game.getResourceDeck().peek() instanceof Resource) {
+            if (game.getResourceDeck() != null && game.getResourceDeck().peek() instanceof Resource) {
                 resourceTop = (Resource) game.getResourceDeck().peek();
             }
             String sidePath = "/assets/images/back/";
@@ -455,7 +397,7 @@ public class GameSceneController  implements Initializable  {
         try {
             Resource goldTop = FUNGI;
 
-            if (game.getGoldDeck()!=null && game.getGoldDeck().peek() instanceof Resource) {
+            if (game.getGoldDeck() != null && game.getGoldDeck().peek() instanceof Resource) {
                 goldTop = (Resource) game.getGoldDeck().peek();
             }
 
@@ -486,44 +428,45 @@ public class GameSceneController  implements Initializable  {
         } catch (EmptyDeckException e) {
             // logField.setText("resource deck empty");
         }
+
         int idCard;
-        String path="";
-       if(game.getResourceDeck()!=null && game.getResourceDeck().getVisible()!=null && !game.getResourceDeck().getVisible().isEmpty()) {
-           List<Card> resourceVisible = game.getResourceDeck().getVisible().stream().toList();
-           idCard = resourceVisible.get(0).getId();
+        String path = "";
+        if (game.getResourceDeck() != null && game.getResourceDeck().getVisible() != null && !game.getResourceDeck().getVisible().isEmpty()) {
+            List<Card> resourceVisible = game.getResourceDeck().getVisible().stream().toList();
+            idCard = resourceVisible.get(0).getId();
 
             path = "/assets/images/front/";
-           if (idCard >= 10) {
-               path += "0";
+            if (idCard >= 10) {
+                path += "0";
 
-           } else if (idCard < 10) {
-               path += "00";
+            } else if (idCard < 10) {
+                path += "00";
 
-           }
-           path += idCard;
-           path += ".png";
-           visibleViewMap.put(resourceVisible1, path);
-           path = getClass().getResource(path).toExternalForm();
-           resourceVisible1.setImage(new Image(path));
+            }
+            path += idCard;
+            path += ".png";
+            visibleViewMap.put(resourceVisible1, path);
+            path = getClass().getResource(path).toExternalForm();
+            resourceVisible1.setImage(new Image(path));
 
 
-           idCard = resourceVisible.get(1).getId();
+            idCard = resourceVisible.get(1).getId();
 
-           path = "/assets/images/front/";
-           if (idCard >= 10) {
-               path += "0";
+            path = "/assets/images/front/";
+            if (idCard >= 10) {
+                path += "0";
 
-           } else if (idCard < 10) {
-               path += "00";
+            } else if (idCard < 10) {
+                path += "00";
 
-           }
-           path += idCard;
-           path += ".png";
-           visibleViewMap.put(resourceVisible2, path);
-           path = getClass().getResource(path).toExternalForm();
-           resourceVisible2.setImage(new Image(path));
-       }
-        if(game.getGoldDeck()!=null && game.getGoldDeck().getVisible()!=null && !game.getGoldDeck().getVisible().isEmpty()) {
+            }
+            path += idCard;
+            path += ".png";
+            visibleViewMap.put(resourceVisible2, path);
+            path = getClass().getResource(path).toExternalForm();
+            resourceVisible2.setImage(new Image(path));
+        }
+        if (game.getGoldDeck() != null && game.getGoldDeck().getVisible() != null && !game.getGoldDeck().getVisible().isEmpty()) {
             List<Card> goldVisible = new HashSet<>(game.getGoldDeck().getVisible()).stream().toList();
             idCard = goldVisible.get(0).getId();
 
@@ -548,21 +491,21 @@ public class GameSceneController  implements Initializable  {
             path = getClass().getResource(path).toExternalForm();
             goldVisible2.setImage(new Image(path));
         }
-       if(game.getSharedObjectives()!=null) {
-           if(game.getSharedObjectives()[0]!=null) {
-               path = "/assets/images/front/";
-               path += game.getSharedObjectives()[0].name().substring(2);
-               path += ".png";
-               path = getClass().getResource(path).toExternalForm();
-               commonObjective1.setImage(new Image(path));
+        if (game.getSharedObjectives() != null) {
+            if (game.getSharedObjectives()[0] != null) {
+                path = "/assets/images/front/";
+                path += game.getSharedObjectives()[0].name().substring(2);
+                path += ".png";
+                path = getClass().getResource(path).toExternalForm();
+                commonObjective1.setImage(new Image(path));
 
-               path = "/assets/images/front/";
-               path += game.getSharedObjectives()[1].name().substring(2);
-               path += ".png";
-               path = getClass().getResource(path).toExternalForm();
-               commonObjective2.setImage(new Image(path));
-           }
-       }
+                path = "/assets/images/front/";
+                path += game.getSharedObjectives()[1].name().substring(2);
+                path += ".png";
+                path = getClass().getResource(path).toExternalForm();
+                commonObjective2.setImage(new Image(path));
+            }
+        }
 
         for (Player p : game.getPlayers()) {
             if (p.getNickname().equals(clientNickname)) {
@@ -579,8 +522,7 @@ public class GameSceneController  implements Initializable  {
                 List<Card> cards = p.getHand();
                 String pathcardfront;
                 String pathcardback;
-                if (p.getHand() != null && !p.getHand().isEmpty())
-                {
+                if (p.getHand() != null && !p.getHand().isEmpty()) {
                     if (!cards.isEmpty() && cards.get(0) != null) {
                         Card c = cards.get(0);
                         idCard = c.getId();
@@ -663,10 +605,9 @@ public class GameSceneController  implements Initializable  {
                         handBackSide3.setImage(new Image(path));
                         handViewMap.put(handBackSide3, pathcardback);
                     }
-                    }
-                        break;
-                    }
-
+                }
+                break;
+            }
 
 
         }
@@ -679,45 +620,28 @@ public class GameSceneController  implements Initializable  {
 
 
                 StackPane.setMargin(playArea, new Insets(50));
-                /*
-                playArea.widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-                    for (int i = 0; i < 10; i++) {
-                        playArea.getColumnConstraints().get(i).setPrefWidth(newValue.doubleValue() / 10);
-                    }
-                });
 
-                playArea.heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-                    for (int i = 0; i < 10; i++) {
-                        playArea.getRowConstraints().get(i).setPrefHeight(newValue.doubleValue() / 10);
-                    }
-                });
-
-                 */
                 int id;
                 System.out.println("row" + placedSides.length);
                 System.out.println("column" + placedSides[0].length);
 
 
-                for (int row = 0; row < placedSides.length  ; row++) {
+                for (int row = 0; row < placedSides.length; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
                         javafx.scene.Node nodeToRemove = null;
                         for (javafx.scene.Node node : playArea.getChildren()) {
                             Integer column = GridPane.getColumnIndex(node);
                             Integer roww = GridPane.getRowIndex(node);
-                            if(column != null && column == col && roww != null && row == roww && node instanceof StackPane)
-
-                            {
+                            if (column != null && column == col && roww != null && row == roww && node instanceof StackPane) {
                                 nodeToRemove = node;
 
-                            }
-                            else if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
+                            } else if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
                                 nodeToRemove = node;
 
                             }
                         }
                         if (nodeToRemove != null) {
-                            if(nodeToRemove instanceof  StackPane)
-                            {
+                            if (nodeToRemove instanceof StackPane) {
                                 ((StackPane) nodeToRemove).setBackground(null);
                             }
                             playArea.getChildren().remove(nodeToRemove);
@@ -726,11 +650,8 @@ public class GameSceneController  implements Initializable  {
                     }
 
                 }
-                for (int row = 0; row < placedSides.length  ; row++) {
+                for (int row = 0; row < placedSides.length; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
-
-
-                        // Aggiungi il nuovo Label nella posizione (1, 1)
 
 
                         if (placedSides[row][col] != null && placedSides[row][col] instanceof PlacedSide && placedSides[row][col].getSide() != null) {
@@ -771,13 +692,11 @@ public class GameSceneController  implements Initializable  {
 
                             }
 
-                            // Rimuovi il nodo se trovato
+
                             if (nodeToRemove != null) {
 
                                 playArea.getChildren().remove(nodeToRemove);
                             }
-
-                            // Aggiungi il nuovo Label nella posizione (1, 1)
 
 
                             if (p.getPlayArea().getFrontier().contains(new Tuple(placedSides[row][col].getActualCoord().i, placedSides[row][col].getActualCoord().j)))
@@ -786,15 +705,50 @@ public class GameSceneController  implements Initializable  {
 
                         }
                     }
-                    }
                 }
+            }
 
 
         }
+        List<String> nicknames = game.getPlayers().stream().map(p -> p.getNickname()).filter(n -> !n.equals(clientNickname)).toList();
+        buttonPlayer1.setText("View " + nicknames.get(0));
+        buttonPlayer1.setOnAction(event -> {
+            try {
+                gui.viewOtherPlayer(nicknames.get(0), game);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        if (nicknames.size() > 2) {
+            buttonPlayer2.setText("View" + nicknames.get(1));
+            buttonPlayer2.setOnAction(event -> {
+                try {
+                    gui.viewOtherPlayer(nicknames.get(1), game);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        } else {
+            buttonPlayer2.setVisible(false);
+        }
+        if (nicknames.size() > 3) {
+            buttonPlayer3.setText("View " + nicknames.get(2));
+            buttonPlayer3.setOnAction(event -> {
+                try {
+                    gui.viewOtherPlayer(nicknames.get(1), game);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else
+            buttonPlayer3.setVisible(false);
+
+
     }
+
     @FXML
-    public void onHandCardTouch(MouseEvent event)
-    {
+    public void onHandCardTouch(MouseEvent event) {
 
         ImageView source = (ImageView) event.getSource();
 
@@ -814,80 +768,57 @@ public class GameSceneController  implements Initializable  {
         });
 
 
-
-
     }
 
     private void checkFields(ImageView source) {
-        if (rowPlacer.getText()!=null && rowPlacer.getText()!="" && columnPlacer.getText()!=null && columnPlacer.getText()!="") {
+        if (rowPlacer.getText() != null && rowPlacer.getText() != "" && columnPlacer.getText() != null && columnPlacer.getText() != "") {
 
-            int row =(Integer.parseInt(rowPlacer.getText()));
-            int column=(Integer.parseInt(columnPlacer.getText()));
+            int row = (Integer.parseInt(rowPlacer.getText()));
+            int column = (Integer.parseInt(columnPlacer.getText()));
 
             rowPlacer.setText("");
             columnPlacer.setText("");
 
-             if(handViewMap.containsKey(source)) {
+            if (handViewMap.containsKey(source)) {
 
-                 boolean isFront = handViewMap.get(source).contains("/front");
-                 String cardId = "";
-                 if (isFront)
-                     cardId += handViewMap.get(source).substring(21, 24);
-                 else
-                     cardId += handViewMap.get(source).substring(20, 23);
-                 String CardServerId = "";
-                 if (Integer.parseInt(cardId) > 40 && Integer.parseInt(cardId) <= 80)
-                     CardServerId = "GC_";
-                 else
-                     CardServerId = "RC_";
-                 CardServerId += cardId;
+                boolean isFront = handViewMap.get(source).contains("/front");
+                String cardId = "";
+                if (isFront)
+                    cardId += handViewMap.get(source).substring(21, 24);
+                else
+                    cardId += handViewMap.get(source).substring(20, 23);
+                String CardServerId = "";
+                if (Integer.parseInt(cardId) > 40 && Integer.parseInt(cardId) <= 80)
+                    CardServerId = "GC_";
+                else
+                    CardServerId = "RC_";
+                CardServerId += cardId;
 
-                 System.out.println("trying to place" + CardServerId);
+                System.out.println("trying to place" + CardServerId);
 
-                 gui.placeCard(CardServerId, isFront, row, column);
-             }
-      else{
-                 System.out.println("there is no card");
-             }
-            /*
+                gui.placeCard(CardServerId, isFront, row, column);
+            } else {
+                System.out.println("there is no card");
+            }
 
-            for (var node : playArea.getChildren()) {
-                Integer rowIndex = GridPane.getRowIndex(node);
-                Integer colIndex = GridPane.getColumnIndex(node);
-                if (rowIndex != null && rowIndex == row && colIndex != null && colIndex == column) {
-                    Region region= (Region) node;
-
-                    region.setBackground(new Background(new BackgroundImage(source.getImage(), BackgroundRepeat.NO_REPEAT,
-                            BackgroundRepeat.NO_REPEAT,
-                            BackgroundPosition.CENTER,
-                            new BackgroundSize(1.0, 1.0, true, true, false, false))));
-                }
-            // Entrambi i campi sono completi, esegui l'azione desiderata
 
         }
-
-             */
-
-
-
-
-
-    }
     }
 
-    @FXML public void drawResourceDeck(MouseEvent event)
-    {
+    @FXML
+    public void drawResourceDeck(MouseEvent event) {
         gui.drawDeck(false);
 
     }
-    @FXML public void drawGoldDeck(MouseEvent event)
-    {
+
+    @FXML
+    public void drawGoldDeck(MouseEvent event) {
         gui.drawDeck(true);
 
     }
 
-    @FXML public void drawVisible(MouseEvent event)
-    {
+    @FXML
+    public void drawVisible(MouseEvent event) {
         ImageView source = (ImageView) event.getSource();
 
 
@@ -895,21 +826,19 @@ public class GameSceneController  implements Initializable  {
         String cardId = "";
         String CardServerId = "";
         if (isFront)
-            cardId+= visibleViewMap.get(source).substring(21, 24);
+            cardId += visibleViewMap.get(source).substring(21, 24);
         else
-            cardId+= visibleViewMap.get(source).substring(20, 23);
+            cardId += visibleViewMap.get(source).substring(20, 23);
 
-        if (Integer.parseInt(cardId)> 40 && Integer.parseInt(cardId)<=80)
+        if (Integer.parseInt(cardId) > 40 && Integer.parseInt(cardId) <= 80)
             CardServerId = "GC_";
         else
             CardServerId = "RC_";
-        CardServerId+= cardId;
+        CardServerId += cardId;
 
         System.out.println(CardServerId);
 
         gui.drawVisible(CardServerId);
-
-
 
 
     }

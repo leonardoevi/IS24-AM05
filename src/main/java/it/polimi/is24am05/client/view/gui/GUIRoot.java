@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -21,12 +22,7 @@ public class GUIRoot extends View {
 
     //TODO : kill the thread when disconnecting
     private Thread guiThread;
-
     private String clientNickname;
-
-
-    private WaitingRoomSceneController waitingRoomSceneController;
-
     private NicknameRequestSceneController nicknameRequestSceneController;
 
     private GameSceneController gameSceneController;
@@ -35,9 +31,11 @@ public class GUIRoot extends View {
 
     private DealHandAndObjectivesSceneController dealHandAndObjectivesSceneController;
 
+    private OtherPlayerSceneController otherPlayerSceneController;
+
     public GUIRoot(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
-        guiThread = new Thread(()->GUIMain.launchApp(this));
+        guiThread = new Thread(() -> GUIMain.launchApp(this));
         guiThread.start();
 
     }
@@ -47,10 +45,13 @@ public class GUIRoot extends View {
         // TODO : manuel questo metodo viene chiamato quando la connessione al server si perde (oppure fallisce all'inizio) tutto si deve chiudere.
     }
 
-    public void seGuiMain(GUIMain guiMain)
-    {
-        this.guiMain=guiMain;
+    public void seGuiMain(GUIMain guiMain) {
+        this.guiMain = guiMain;
     }
+
+    /**
+     * Updates the view after a game Update.
+     */
     @Override
     public void updateGame() {
 
@@ -59,69 +60,69 @@ public class GUIRoot extends View {
 
 
             Game toDisplay = clientModel.getGame().orElseThrow(NullPointerException::new);
-             if(toDisplay!=null) {
-                 System.out.println(toDisplay.getGameState());
-                 if (toDisplay.getGameState() == GameState.PLACE_STARTER_CARDS) {
-                     if (dealStarterCardsSceneController == null) {
-                         dealStarterCards();
-                         Platform.runLater(() -> {
-                             dealStarterCardsSceneController.update(toDisplay);
-                             // nicknameRequestSceneController.resetPlayerNickname();
-                         });
+            if (toDisplay != null) {
+                System.out.println(toDisplay.getGameState());
+                if (toDisplay.getGameState() == GameState.PLACE_STARTER_CARDS) {
+                    if (dealStarterCardsSceneController == null) {
+                        dealStarterCards();
+                        Platform.runLater(() -> {
+                            dealStarterCardsSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
 
-                     } else {
-                         Platform.runLater(() -> {
-                             dealStarterCardsSceneController.update(toDisplay);
-                             // nicknameRequestSceneController.resetPlayerNickname();
-                         });
-
-
-                     }
-
-                        }
-                 else if(toDisplay.getGameState() == GameState.CHOOSE_OBJECTIVE)
-                 {
-                     if (dealHandAndObjectivesSceneController == null) {
-                         dealHandsAndObjectives();
-                         Platform.runLater(() -> {
-                             dealHandAndObjectivesSceneController.update(toDisplay);
-                             // nicknameRequestSceneController.resetPlayerNickname();
-                         });
-
-                     } else {
-
-                         Platform.runLater(() -> {
-                             dealHandAndObjectivesSceneController.update(toDisplay);
-                             // nicknameRequestSceneController.resetPlayerNickname();
-                         });
-
-                     }
-                 }
-                 else if(toDisplay.getGameState() == GameState.GAME)
-                 {
-                     if (gameSceneController == null) {
-                         loadGame();
-                         Platform.runLater(() -> {
-                             gameSceneController.update(toDisplay);
-                             // nicknameRequestSceneController.resetPlayerNickname();
-                         });
-
-                     } else {
-
-                         Platform.runLater(() -> {
-                             gameSceneController.update(toDisplay);
-                             // nicknameRequestSceneController.resetPlayerNickname();
-                         });
-
-                     }
-                 }
-
-             }
+                    } else {
+                        Platform.runLater(() -> {
+                            dealStarterCardsSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
 
 
+                    }
+
+                } else if (toDisplay.getGameState() == GameState.CHOOSE_OBJECTIVE) {
+                    if (dealHandAndObjectivesSceneController == null) {
+                        dealHandsAndObjectives();
+                        Platform.runLater(() -> {
+                            dealHandAndObjectivesSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
+
+                    } else {
+
+                        Platform.runLater(() -> {
+                            dealHandAndObjectivesSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
+
+                    }
+                } else if (toDisplay.getGameState() == GameState.GAME) {
+                    if (gameSceneController == null) {
+                        loadGame();
+                        Platform.runLater(() -> {
+                            gameSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
+
+                    } else {
+
+                        Platform.runLater(() -> {
+                            gameSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
+
+                    }
+                    //if the other player's scene has already been open, update it.
+                    if (otherPlayerSceneController != null) {
+                        Platform.runLater(() -> {
+                            otherPlayerSceneController.update(toDisplay);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
+
+                    }
+                }
 
 
-
+            }
 
 
         } catch (NullPointerException ignored) {
@@ -132,14 +133,18 @@ public class GUIRoot extends View {
 
 
     }
+
+    /**
+     * Updates the view after adding a log.
+     */
+
     @Override
     public void updateLogs() {
 
 
-
         try {
             System.out.println("loggggg");
-            String log=clientModel.getLog().getLast().toString();
+            String log = clientModel.getLog().getLast().toString();
             System.out.println(log);
             Scene currentScene = this.getScene();
 
@@ -156,44 +161,52 @@ public class GUIRoot extends View {
                         });
                     }
 
-                }  else if (controller instanceof GameSceneController) {
-                    if(gameSceneController!=null)
+                } else if (controller instanceof GameSceneController) {
+                    if (gameSceneController != null)
                         Platform.runLater(() -> {
                             gameSceneController.showLog(log);
                             // nicknameRequestSceneController.resetPlayerNickname();
                         });
 
                 } else if (controller instanceof DealStarterCardsSceneController) {
-                    if(dealStarterCardsSceneController!=null)
+                    if (dealStarterCardsSceneController != null)
                         Platform.runLater(() -> {
                             dealStarterCardsSceneController.showLog(log);
                             // nicknameRequestSceneController.resetPlayerNickname();
                         });
-                }
-
-                else if (controller instanceof DealHandAndObjectivesSceneController)
-                {
-                    if(dealHandAndObjectivesSceneController!=null)
+                } else if (controller instanceof DealHandAndObjectivesSceneController) {
+                    if (dealHandAndObjectivesSceneController != null)
                         Platform.runLater(() -> {
                             dealHandAndObjectivesSceneController.showLog(log);
                             // nicknameRequestSceneController.resetPlayerNickname();
                         });
 
-                }
-                else return;
-            }
-        } catch (NullPointerException ignored) {}
+                } else if (controller instanceof OtherPlayerSceneController) {
+                    if (otherPlayerSceneController != null)
+                        Platform.runLater(() -> {
+                            otherPlayerSceneController.showLog(log);
+                            // nicknameRequestSceneController.resetPlayerNickname();
+                        });
 
+                } else return;
+            }
+        } catch (NullPointerException ignored) {
+        }
 
 
     }
-    /** returns the current scene. */
+
+    /**
+     * returns the current scene.
+     */
     public Scene getScene() {
         return guiMain.getPrimaryStage().getScene();
     }
 
 
-    /** Game's scene. */
+    /**
+     * change Game's scene.
+     */
 
     private void changeScene(Scene scene) {
         Platform.runLater(() -> {
@@ -203,16 +216,42 @@ public class GUIRoot extends View {
 
             stage.setScene(scene);
 
-          //  stage.setFullScreen(true);
+            //  stage.setFullScreen(true);
 
             stage.show();
         });
     }
 
-    public void chooseObjective(String objectiveId)
-    {
+    public void chooseObjective(String objectiveId) {
         server.chooseObjective(objectiveId);
     }
+
+    /**
+     * initialize other player's view.
+     */
+    public void viewOtherPlayer(String playerNickname, Game game) throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/it/polimi/is24am05/otherPlayerScene.fxml"));
+        Parent root = loader.load();
+
+        otherPlayerSceneController = loader.getController();
+        otherPlayerSceneController.setGUI(this);
+        otherPlayerSceneController.setClientNickname(playerNickname);
+
+
+        Scene scene = new Scene(root);
+
+        scene.setUserData(otherPlayerSceneController);
+        guiMain.sceneControllerMap.put(scene, otherPlayerSceneController);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
+        changeScene(scene);
+        Platform.runLater(() -> otherPlayerSceneController.update(game));
+    }
+
+    /**
+     * initialize the first Scene where the player choose the nickname.
+     */
+
 
     public void goToFirstScene() throws IOException {
         // When the server requires the client nickname, switch to the Nickname Request scene.
@@ -232,6 +271,12 @@ public class GUIRoot extends View {
         changeScene(scene);
 
     }
+
+    /**
+     * initialize the deal hands and objectives scene
+     */
+
+
     public void dealHandsAndObjectives() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/it/polimi/is24am05/dealHandAndObjectivesScene.fxml"));
@@ -241,7 +286,7 @@ public class GUIRoot extends View {
         dealHandAndObjectivesSceneController.setGUI(this);
         dealHandAndObjectivesSceneController.setClientNickname(clientNickname);
 
-        Scene scene = new Scene(root,900, 900);
+        Scene scene = new Scene(root, 900, 900);
 
         scene.setUserData(dealHandAndObjectivesSceneController);
         guiMain.sceneControllerMap.put(scene, dealHandAndObjectivesSceneController);
@@ -250,59 +295,35 @@ public class GUIRoot extends View {
 
     }
 
-    public void nicknameChosen(String nickname)
-    {
+    public void nicknameChosen(String nickname) {
 
-   this.clientNickname=nickname;
-      server.setNickname(nickname);
+        this.clientNickname = nickname;
+        server.setNickname(nickname);
         System.out.println(server.getNickname());
 
-     // server.joinServer();
+        // server.joinServer();
         server.setNickname(nickname);
         server.joinServer();
         server.joinGame();
 
 
-
     }
-    public void placeStarterSide (boolean isFront)
-    {
+
+    public void placeStarterSide(boolean isFront) {
 
         server.placeStarterSide(isFront);
     }
 
 
-
-    public void numberOfplayersChosen(int num)
-    {
+    public void numberOfplayersChosen(int num) {
 
 
         server.setNumberOfPlayers(num);
-       // server.joinGame();
+        // server.joinGame();
 
     }
 
-    public void switchToWaitingRoom() {
 
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/it/polimi/is24am05/waitingRoomScene.fxml"));
-            Parent root = loader.load();
-
-            WaitingRoomSceneController controller = loader.getController();
-            controller.setGUI(this);
-
-            Scene scene = new Scene(root);
-
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/WaitingRoomScene.css")).toExternalForm());
-
-            changeScene(scene);
-            //TODO: DELETE THS
-            controller.changeScene();
-        } catch(IOException e) {
-            System.out.println("Error");
-        }
-    }
     /**
      * Updates the view after creating the game.
      */
@@ -320,25 +341,26 @@ public class GUIRoot extends View {
 
             scene.setUserData(gameSceneController);
             guiMain.sceneControllerMap.put(scene, gameSceneController);
-             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/gameScene.css")).toExternalForm());
             changeScene(scene);
 
             //controller.update();
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.out.println("Error");
         }
     }
 
-    public void drawDeck(boolean isGold)
-    {
+    public void drawDeck(boolean isGold) {
         server.drawDeck(isGold);
     }
 
-    public void drawVisible(String cardId)
-    {
+    public void drawVisible(String cardId) {
         server.drawVisible(cardId);
     }
 
+    /**
+     * Updates the view when the starter cards are dealt.
+     */
     public void dealStarterCards() {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -353,23 +375,18 @@ public class GUIRoot extends View {
 
             scene.setUserData(dealStarterCardsSceneController);
             guiMain.sceneControllerMap.put(scene, dealStarterCardsSceneController);
-           // scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
+            // scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
             changeScene(scene);
 
-           // dealStarterCardsSceneController.update();
-        } catch(IOException e) {
+            // dealStarterCardsSceneController.update();
+        } catch (IOException e) {
             System.out.println("Error");
         }
     }
-    /**
-     * Updates the view after adding a log.
-     */
 
 
-
- public void placeCard(String cardId, boolean isFront, int i, int j)
- {
-     server.placeSide(cardId, isFront,i, j);
- }
+    public void placeCard(String cardId, boolean isFront, int i, int j) {
+        server.placeSide(cardId, isFront, i, j);
+    }
 
 }

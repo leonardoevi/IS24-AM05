@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="148.0" prefWidth="241.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.OtherPlayerSceneController">
+    <children>
+        <StackPane fx:id="backgroundPlayArea">
+            <children>
+                <GridPane fx:id="playArea">
+                    <columnConstraints>
+                        <ColumnConstraints />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                    </rowConstraints></GridPane>
+            </children>
+        </StackPane>
+
+        <Label fx:id="logField" textFill="#151ce1">
+            <font>
+                <Font name="System Bold" size="22.0" />
+            </font></Label>
+
+
+        <ImageView fx:id="handBackSide1"/>
+        <ImageView fx:id="handBackSide2" />
+
+        <ImageView fx:id="handBackSide3"  />
+
+
+
+        <Label fx:id="myPoints" textFill="#099061">
+            <font>
+                <Font size="21.0" />
+            </font></Label>
+
+
+
+    </children>
+
+</AnchorPane>
