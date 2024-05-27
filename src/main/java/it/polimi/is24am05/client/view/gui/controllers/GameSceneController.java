@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -105,10 +106,11 @@ public class GameSceneController  implements Initializable  {
 
     private String clientNickname;
 
-    private boolean isTextField1Filled = false;
-    private boolean isTextField2Filled = false;
 
-    private Map<ImageView, String> imageViewMap=new HashMap<>();
+    private Map<ImageView, String> handViewMap=new HashMap<>();
+
+    
+    private Map<ImageView, String> visibleViewMap=new HashMap<>();
 
 
     @FXML
@@ -400,6 +402,9 @@ public class GameSceneController  implements Initializable  {
     }
     public void update(Game game) {
 
+        handViewMap.clear();
+        visibleViewMap.clear();
+
         try {
             Resource resourceTop = FUNGI;
 
@@ -485,7 +490,7 @@ public class GameSceneController  implements Initializable  {
            }
            path += idCard;
            path += ".png";
-
+           visibleViewMap.put(resourceVisible1, path);
            path = getClass().getResource(path).toExternalForm();
            resourceVisible1.setImage(new Image(path));
 
@@ -502,6 +507,7 @@ public class GameSceneController  implements Initializable  {
            }
            path += idCard;
            path += ".png";
+           visibleViewMap.put(resourceVisible2, path);
            path = getClass().getResource(path).toExternalForm();
            resourceVisible2.setImage(new Image(path));
        }
@@ -514,6 +520,7 @@ public class GameSceneController  implements Initializable  {
             path += "0";
             path += idCard;
             path += ".png";
+            visibleViewMap.put(goldVisible1, path);
             path = getClass().getResource(path).toExternalForm();
             goldVisible1.setImage(new Image(path));
 
@@ -525,6 +532,7 @@ public class GameSceneController  implements Initializable  {
             path += "0";
             path += idCard;
             path += ".png";
+            visibleViewMap.put(goldVisible2, path);
             path = getClass().getResource(path).toExternalForm();
             goldVisible2.setImage(new Image(path));
         }
@@ -561,7 +569,7 @@ public class GameSceneController  implements Initializable  {
                 String pathcardback;
                 if (p.getHand() != null && !p.getHand().isEmpty())
                 {
-                    if (cards.size() > 0 && cards.get(0) != null) {
+                    if (!cards.isEmpty() && cards.get(0) != null) {
                         Card c = cards.get(0);
                         idCard = c.getId();
                         // TODO parsing function
@@ -578,14 +586,14 @@ public class GameSceneController  implements Initializable  {
 
                         path = getClass().getResource(pathcardfront).toExternalForm();
                         handFrontSide1.setImage(new Image(path));
-                        imageViewMap.put(handFrontSide1, pathcardfront);
+                        handViewMap.put(handFrontSide1, pathcardfront);
 
 
                         pathcardback = appendback + idCard + ".png";
 
                         path = getClass().getResource(pathcardback).toExternalForm();
                         handBackSide1.setImage(new Image(path));
-                        imageViewMap.put(handBackSide1, pathcardback);
+                        handViewMap.put(handBackSide1, pathcardback);
                         appendfront = "/assets/images/front/";
                         appendback = "/assets/images/back/";
                     }
@@ -605,14 +613,14 @@ public class GameSceneController  implements Initializable  {
 
                         path = getClass().getResource(pathcardfront).toExternalForm();
                         handFrontSide2.setImage(new Image(path));
-                        imageViewMap.put(handFrontSide2, pathcardfront);
+                        handViewMap.put(handFrontSide2, pathcardfront);
 
 
                         pathcardback = appendback + idCard + ".png";
 
                         path = getClass().getResource(pathcardback).toExternalForm();
                         handBackSide2.setImage(new Image(path));
-                        imageViewMap.put(handBackSide2, pathcardback);
+                        handViewMap.put(handBackSide2, pathcardback);
 
                         appendfront = "/assets/images/front/";
                         appendback = "/assets/images/back/";
@@ -635,13 +643,13 @@ public class GameSceneController  implements Initializable  {
 
                         path = getClass().getResource(pathcardfront).toExternalForm();
                         handFrontSide3.setImage(new Image(path));
-                        imageViewMap.put(handFrontSide3, pathcardfront);
+                        handViewMap.put(handFrontSide3, pathcardfront);
 
                         pathcardback = appendback + idCard + ".png";
 
                         path = getClass().getResource(pathcardback).toExternalForm();
                         handBackSide3.setImage(new Image(path));
-                        imageViewMap.put(handBackSide3, pathcardback);
+                        handViewMap.put(handBackSide3, pathcardback);
                     }
                     }
                         break;
@@ -715,9 +723,11 @@ public class GameSceneController  implements Initializable  {
                                     if(node instanceof Label && playArea.getRowIndex(node) == row && playArea.getColumnIndex(node) == col) {
                                         Label toRemove= (Label) node; // use what you want to remove
                                         playArea.getChildren().remove(toRemove);
-                                        break;
+
                                     }
                                 }
+
+
 
 
 
@@ -763,12 +773,12 @@ public class GameSceneController  implements Initializable  {
             int row =(Integer.parseInt(rowPlacer.getText()));
             int column=(Integer.parseInt(columnPlacer.getText()));
 
-            boolean isFront = imageViewMap.get(source).contains("/front");
+            boolean isFront = handViewMap.get(source).contains("/front");
             String cardId = "";
             if (isFront)
-                cardId+= imageViewMap.get(source).substring(21, 24);
+                cardId+= handViewMap.get(source).substring(21, 24);
             else
-                cardId+= imageViewMap.get(source).substring(20, 23);
+                cardId+= handViewMap.get(source).substring(20, 23);
             String CardServerId = "";
             if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<80)
                 CardServerId = "GC_";
@@ -776,7 +786,7 @@ public class GameSceneController  implements Initializable  {
                 CardServerId = "RC_";
             CardServerId+= cardId;
 
-           // System.out.println(CardServerId);
+            System.out.println(CardServerId);
 
             gui.placeCard(CardServerId, isFront, row, column);
 
@@ -820,6 +830,25 @@ public class GameSceneController  implements Initializable  {
     @FXML public void drawVisible(MouseEvent event)
     {
         ImageView source = (ImageView) event.getSource();
+
+
+        boolean isFront = visibleViewMap.get(source).contains("/front");
+        String cardId = "";
+        String CardServerId = "";
+        if (isFront)
+            cardId+= visibleViewMap.get(source).substring(21, 24);
+        else
+            cardId+= visibleViewMap.get(source).substring(20, 23);
+
+        if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<80)
+            CardServerId = "GC_";
+        else
+            CardServerId = "RC_";
+        CardServerId+= cardId;
+
+        System.out.println(CardServerId);
+
+        gui.drawVisible(CardServerId);
 
 
 

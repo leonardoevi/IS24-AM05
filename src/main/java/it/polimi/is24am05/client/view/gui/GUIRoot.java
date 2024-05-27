@@ -333,6 +333,11 @@ public class GUIRoot extends View {
         server.drawDeck(isGold);
     }
 
+    public void drawVisible(String cardId)
+    {
+        server.drawVisible(cardId);
+    }
+
     public void dealStarterCards() {
         try {
             FXMLLoader loader = new FXMLLoader();
