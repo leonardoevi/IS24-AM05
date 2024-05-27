@@ -404,7 +404,18 @@ public class GameSceneController  implements Initializable  {
     public void update(Game game) {
 
         handViewMap.clear();
-        visibleViewMap.clear();
+        handFrontSide1.setImage(null);
+        handBackSide1.setImage(null);
+        handFrontSide2.setImage(null);
+        handBackSide2.setImage(null);
+        handFrontSide3.setImage(null);
+        handBackSide3.setImage(null);
+        goldDeckTop.setImage(null);
+        resourceDeckTop.setImage(null);
+        resourceVisible1.setImage(null);
+        resourceVisible2.setImage(null);
+        goldVisible1.setImage(null);
+        goldVisible2.setImage(null);
 
         try {
             Resource resourceTop = FUNGI;
@@ -687,102 +698,94 @@ public class GameSceneController  implements Initializable  {
                 System.out.println("column" + placedSides[0].length);
 
 
-                for (int row = 0; row < placedSides.length+1  ; row++) {
-                    for (int col = 0; col < placedSides[0].length+1; col++) {
+                for (int row = 0; row < placedSides.length  ; row++) {
+                    for (int col = 0; col < placedSides[0].length; col++) {
+                        javafx.scene.Node nodeToRemove = null;
+                        for (javafx.scene.Node node : playArea.getChildren()) {
+                            Integer column = GridPane.getColumnIndex(node);
+                            Integer roww = GridPane.getRowIndex(node);
+                            if(column != null && column == col && roww != null && row == roww && node instanceof StackPane)
 
-
-
-                            if (placedSides[row][col] != null && placedSides[row][col] instanceof PlacedSide && placedSides[row][col].getSide()!=null) {
-
-                                path = "/assets/images/";
-
-                                String cardId = placedSides[row][col].getSide().toString();
-
-                                if (cardId.charAt(1) == 'B')
-                                    path += "back/";
-                                else
-                                    path += "front/";
-
-                                path += cardId.substring(4, 7);
-                                path+=".png";
-                                System.out.println(path);
-                                String imagePath2 = getClass().getResource(path).toExternalForm();
-
-                                StackPane region = new StackPane();
-                                region.setBackground(new Background(new BackgroundImage(new Image(imagePath2), BackgroundRepeat.NO_REPEAT,
-                                        BackgroundRepeat.NO_REPEAT,
-                                        BackgroundPosition.CENTER,
-                                        new BackgroundSize(1.0, 1.0, true, true, false, false))));
-                                playArea.add(region, col, row);
-
-                            }
-                            else if(placedSides[row][col]!=null &&  placedSides[row][col] instanceof EmptyPlacedSide)
                             {
-
-
-                                javafx.scene.Node nodeToRemove = null;
-                                for (javafx.scene.Node node : playArea.getChildren()) {
-                                    Integer column = GridPane.getColumnIndex(node);
-                                    Integer roww = GridPane.getRowIndex(node);
-                                    if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
-                                        nodeToRemove = node;
-
-                                    }
-                                    else if(column != null && column == col && roww != null && row == roww && node instanceof StackPane)
-
-                                    {
-                                        nodeToRemove = node;
-
-                                    }
-                                }
-
-                                // Rimuovi il nodo se trovato
-                                if (nodeToRemove != null) {
-                                    if(nodeToRemove instanceof  StackPane)
-                                    {
-                                        ((StackPane) nodeToRemove).setBackground(null);
-                                    }
-                                    playArea.getChildren().remove(nodeToRemove);
-                                }
-
-                                // Aggiungi il nuovo Label nella posizione (1, 1)
-
-
-
-
-        if(p.getPlayArea().getFrontier().contains(new Tuple( placedSides[row][col].getActualCoord().i , placedSides[row][col].getActualCoord().j)))
-
-                                playArea.add( new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j +")"), col, row);
+                                nodeToRemove = node;
 
                             }
-                            else if(placedSides[row][col]==null)
+                            else if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
+                                nodeToRemove = node;
+
+                            }
+                        }
+                        if (nodeToRemove != null) {
+                            if(nodeToRemove instanceof  StackPane)
                             {
-                                javafx.scene.Node nodeToRemove = null;
-                                for (javafx.scene.Node node : playArea.getChildren()) {
-                                    Integer column = GridPane.getColumnIndex(node);
-                                    Integer roww = GridPane.getRowIndex(node);
-                                    if (column != null && column == col && roww != null && row == roww && node instanceof StackPane) {
-                                        nodeToRemove = node;
-
-                                    }
-                                   else  if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
-                                        nodeToRemove = node;
-
-                                    }
-
-
-                                }
-
-                                // Rimuovi il nodo se trovato
-                                if (nodeToRemove != null) {
-
-                                     if(nodeToRemove instanceof StackPane)   ((StackPane) nodeToRemove).setBackground(null);
-
-                                    playArea.getChildren().remove(nodeToRemove);
-                                }
+                                ((StackPane) nodeToRemove).setBackground(null);
                             }
+                            playArea.getChildren().remove(nodeToRemove);
+                        }
+
+                    }
+
+                }
+                for (int row = 0; row < placedSides.length  ; row++) {
+                    for (int col = 0; col < placedSides[0].length; col++) {
+
+
+                        // Aggiungi il nuovo Label nella posizione (1, 1)
+
+
+                        if (placedSides[row][col] != null && placedSides[row][col] instanceof PlacedSide && placedSides[row][col].getSide() != null) {
+
+                            path = "/assets/images/";
+
+                            String cardId = placedSides[row][col].getSide().toString();
+
+                            if (cardId.charAt(1) == 'B')
+                                path += "back/";
+                            else
+                                path += "front/";
+
+                            path += cardId.substring(4, 7);
+                            path += ".png";
+                            System.out.println(path);
+                            String imagePath2 = getClass().getResource(path).toExternalForm();
+
+                            StackPane region = new StackPane();
+                            region.setBackground(new Background(new BackgroundImage(new Image(imagePath2), BackgroundRepeat.NO_REPEAT,
+                                    BackgroundRepeat.NO_REPEAT,
+                                    BackgroundPosition.CENTER,
+                                    new BackgroundSize(1.0, 1.0, true, true, false, false))));
+                            playArea.add(region, col, row);
+
+                        } else if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
+
+
+                            javafx.scene.Node nodeToRemove = null;
+                            for (javafx.scene.Node node : playArea.getChildren()) {
+                                Integer column = GridPane.getColumnIndex(node);
+                                Integer roww = GridPane.getRowIndex(node);
+
+                                if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
+                                    nodeToRemove = node;
+
+                                }
+
+                            }
+
+                            // Rimuovi il nodo se trovato
+                            if (nodeToRemove != null) {
+
+                                playArea.getChildren().remove(nodeToRemove);
+                            }
+
+                            // Aggiungi il nuovo Label nella posizione (1, 1)
+
+
+                            if (p.getPlayArea().getFrontier().contains(new Tuple(placedSides[row][col].getActualCoord().i, placedSides[row][col].getActualCoord().j)))
+
+                                playArea.add(new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j + ")"), col, row);
 
                         }
+                    }
                     }
                 }
 
