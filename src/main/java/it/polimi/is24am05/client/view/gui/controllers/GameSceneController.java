@@ -9,6 +9,7 @@ import it.polimi.is24am05.model.card.side.PlacedSide;
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.game.Game;
+import it.polimi.is24am05.model.playArea.Tuple;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 
@@ -686,12 +687,12 @@ public class GameSceneController  implements Initializable  {
                 System.out.println("column" + placedSides[0].length);
 
 
-                for (int row = 0; row < placedSides.length  ; row++) {
-                    for (int col = 0; col < placedSides[0].length; col++) {
+                for (int row = 0; row < placedSides.length+1  ; row++) {
+                    for (int col = 0; col < placedSides[0].length+1; col++) {
 
-                        if ( (row + col) % 2 == 0) {
 
-                            if (placedSides[row][col] != null && !(placedSides[row][col] instanceof EmptyPlacedSide)) {
+
+                            if (placedSides[row][col] != null && placedSides[row][col] instanceof PlacedSide && placedSides[row][col].getSide()!=null) {
 
                                 path = "/assets/images/";
 
@@ -718,28 +719,74 @@ public class GameSceneController  implements Initializable  {
                             else if(placedSides[row][col]!=null &&  placedSides[row][col] instanceof EmptyPlacedSide)
                             {
 
-                                List<Node> childrens = playArea.getChildren();
-                                for(Node node : childrens) {
-                                    if(node instanceof Label && playArea.getRowIndex(node) == row && playArea.getColumnIndex(node) == col) {
-                                        Label toRemove= (Label) node; // use what you want to remove
-                                        playArea.getChildren().remove(toRemove);
+
+                                javafx.scene.Node nodeToRemove = null;
+                                for (javafx.scene.Node node : playArea.getChildren()) {
+                                    Integer column = GridPane.getColumnIndex(node);
+                                    Integer roww = GridPane.getRowIndex(node);
+                                    if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
+                                        nodeToRemove = node;
+
+                                    }
+                                    else if(column != null && column == col && roww != null && row == roww && node instanceof StackPane)
+
+                                    {
+                                        nodeToRemove = node;
 
                                     }
                                 }
 
+                                // Rimuovi il nodo se trovato
+                                if (nodeToRemove != null) {
+                                    if(nodeToRemove instanceof  StackPane)
+                                    {
+                                        ((StackPane) nodeToRemove).setBackground(null);
+                                    }
+                                    playArea.getChildren().remove(nodeToRemove);
+                                }
+
+                                // Aggiungi il nuovo Label nella posizione (1, 1)
 
 
 
+
+        if(p.getPlayArea().getFrontier().contains(new Tuple( placedSides[row][col].getActualCoord().i , placedSides[row][col].getActualCoord().j)))
 
                                 playArea.add( new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j +")"), col, row);
 
                             }
+                            else if(placedSides[row][col]==null)
+                            {
+                                javafx.scene.Node nodeToRemove = null;
+                                for (javafx.scene.Node node : playArea.getChildren()) {
+                                    Integer column = GridPane.getColumnIndex(node);
+                                    Integer roww = GridPane.getRowIndex(node);
+                                    if (column != null && column == col && roww != null && row == roww && node instanceof StackPane) {
+                                        nodeToRemove = node;
+
+                                    }
+                                   else  if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
+                                        nodeToRemove = node;
+
+                                    }
+
+
+                                }
+
+                                // Rimuovi il nodo se trovato
+                                if (nodeToRemove != null) {
+
+                                     if(nodeToRemove instanceof StackPane)   ((StackPane) nodeToRemove).setBackground(null);
+
+                                    playArea.getChildren().remove(nodeToRemove);
+                                }
+                            }
+
                         }
                     }
                 }
-                break;
 
-            }
+
         }
     }
     @FXML
@@ -752,6 +799,7 @@ public class GameSceneController  implements Initializable  {
         rowPlacer.setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 checkFields(source);
+
             }
         });
 
@@ -773,23 +821,31 @@ public class GameSceneController  implements Initializable  {
             int row =(Integer.parseInt(rowPlacer.getText()));
             int column=(Integer.parseInt(columnPlacer.getText()));
 
-            boolean isFront = handViewMap.get(source).contains("/front");
-            String cardId = "";
-            if (isFront)
-                cardId+= handViewMap.get(source).substring(21, 24);
-            else
-                cardId+= handViewMap.get(source).substring(20, 23);
-            String CardServerId = "";
-            if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<80)
-                CardServerId = "GC_";
-            else
-                CardServerId = "RC_";
-            CardServerId+= cardId;
+            rowPlacer.setText("");
+            columnPlacer.setText("");
 
-            System.out.println(CardServerId);
+             if(handViewMap.containsKey(source)) {
 
-            gui.placeCard(CardServerId, isFront, row, column);
+                 boolean isFront = handViewMap.get(source).contains("/front");
+                 String cardId = "";
+                 if (isFront)
+                     cardId += handViewMap.get(source).substring(21, 24);
+                 else
+                     cardId += handViewMap.get(source).substring(20, 23);
+                 String CardServerId = "";
+                 if (Integer.parseInt(cardId) > 40 && Integer.parseInt(cardId) <= 80)
+                     CardServerId = "GC_";
+                 else
+                     CardServerId = "RC_";
+                 CardServerId += cardId;
 
+                 System.out.println("trying to place" + CardServerId);
+
+                 gui.placeCard(CardServerId, isFront, row, column);
+             }
+      else{
+                 System.out.println("there is no card");
+             }
             /*
 
             for (var node : playArea.getChildren()) {
@@ -840,7 +896,7 @@ public class GameSceneController  implements Initializable  {
         else
             cardId+= visibleViewMap.get(source).substring(20, 23);
 
-        if (Integer.parseInt(cardId)>= 40 && Integer.parseInt(cardId)<80)
+        if (Integer.parseInt(cardId)> 40 && Integer.parseInt(cardId)<=80)
             CardServerId = "GC_";
         else
             CardServerId = "RC_";
