@@ -5,6 +5,7 @@ target/
 out/
 shade/
 src/main/java/it/polimi/is24am05/Launcher.java
+copy.srz
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

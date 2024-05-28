@@ -201,7 +201,14 @@ public class Controller {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
-        Objective objective = Objective.valueOf(objectiveId);
+        Objective objective;
+
+        try {
+            objective = Objective.valueOf(objectiveId);
+        } catch (IllegalArgumentException e) {
+            // Translate exception
+            throw new ObjectiveNotAllowedException();
+        }
 
         game.chooseObjective(playerNickname, objective);
         GameState stateAfterChoosing = game.getGameState();
@@ -309,7 +316,7 @@ public class Controller {
      * @throws IOException propagated
      * @throws ClassNotFoundException propagated
      */
-    private static Game loadGame(String gamePath) throws IOException, ClassNotFoundException {
+    public static Game loadGame(String gamePath) throws IOException, ClassNotFoundException {
          // Create FileInputStream to read data from the file
         FileInputStream fileIn = new FileInputStream(gamePath);
         // Create ObjectInputStream to deserialize object
