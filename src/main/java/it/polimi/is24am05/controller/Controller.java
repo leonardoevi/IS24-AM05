@@ -309,7 +309,7 @@ public class Controller {
      * @throws IOException propagated
      * @throws ClassNotFoundException propagated
      */
-    private static Game loadGame(String gamePath) throws IOException, ClassNotFoundException {
+    public static Game loadGame(String gamePath) throws IOException, ClassNotFoundException {
          // Create FileInputStream to read data from the file
         FileInputStream fileIn = new FileInputStream(gamePath);
         // Create ObjectInputStream to deserialize object
