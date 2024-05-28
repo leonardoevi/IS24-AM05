@@ -201,7 +201,13 @@ public class Controller {
         // A game must be loaded
         if(this.game == null || this.lobbyState != LobbyState.STARTED)
             throw new RuntimeException("Game not started yet");
-        Objective objective = Objective.valueOf(objectiveId);
+        Objective objective;
+
+        try {
+            objective = Objective.valueOf(objectiveId);
+        } catch (IllegalArgumentException e) {
+            throw new ObjectiveNotAllowedException();
+        }
 
         game.chooseObjective(playerNickname, objective);
         GameState stateAfterChoosing = game.getGameState();
