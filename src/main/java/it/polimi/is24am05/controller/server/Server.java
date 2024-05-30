@@ -105,7 +105,7 @@ public class Server {
             try{
                 getClientHandler(nickname).setGame(toSend);
             } catch (NoSuchPlayerException e) {
-                System.out.println("Player " + nickname + " not found, unable to update game");
+                //System.out.println("Player " + nickname + " not found, unable to update game");
             }
         }
     }
@@ -114,7 +114,7 @@ public class Server {
         try{
             getClientHandler(nickname).setGame(controller.game);
         } catch (NoSuchPlayerException e) {
-            System.out.println("Player " + nickname + " not found, unable to update game");
+            //System.out.println("Player " + nickname + " not found, unable to update game");
         }
     }
 
@@ -127,7 +127,7 @@ public class Server {
             try{
                 getClientHandler(nickname).addLog(log);
             } catch (NoSuchPlayerException e) {
-                System.out.println("Player " + nickname + " not found, unable to send log");
+                //System.out.println("Player " + nickname + " not found, unable to send log");
             }
         }
     }

@@ -21,33 +21,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
 
     @Override
     public void setGame(Game toSend) {
-
-        // Write game to file to get a clone of it
-        Game toSendCopy;
-        try {
-            FileOutputStream f = new FileOutputStream("copy.srz");
-            ObjectOutputStream o = new ObjectOutputStream(f);
-
-            // Write objects to file
-            o.writeObject(toSend);
-
-            o.close();
-            f.close();
-
-            FileInputStream fi = new FileInputStream(new File("copy.srz"));
-            ObjectInputStream oi = new ObjectInputStream(fi);
-
-            // Read objects
-            toSendCopy = (Game) oi.readObject();
-
-            oi.close();
-            fi.close();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Failed to copy game to file");
-            return;
-        }
-
-        send(new Message("Game", Map.of("game", toSendCopy)));
+        send(new Message("Game", Map.of("game", toSend)));
     }
 
     @Override
@@ -58,10 +32,11 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
     private void send(Message message){
         synchronized(this.out){
             try {
+                out.reset();
                 out.writeObject(message);
                 out.flush();
             } catch (IOException e) {
-                System.out.println("Error sending message: " + message.title() + " to " + getNickname());
+                //System.out.println("Error sending message: " + message.title() + " to " + getNickname());
             }
         }
     }

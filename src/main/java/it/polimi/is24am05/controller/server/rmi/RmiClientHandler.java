@@ -39,7 +39,7 @@ public class RmiClientHandler extends ClientHandler {
         try {
             virtualClient.setGameRMI(game);
         } catch (RemoteException e) {
-            System.out.println("Error sending game update to: " + getNickname());
+            //System.out.println("Error sending game update to: " + getNickname());
         }
     }
 
@@ -48,7 +48,7 @@ public class RmiClientHandler extends ClientHandler {
         try {
             virtualClient.addLogRMI(log);
         } catch (RemoteException e) {
-            System.out.println("Error sending log: [" + log + "] to: " + getNickname());
+            //System.out.println("Error sending log: [" + log + "] to: " + getNickname());
         }
     }
 

@@ -820,6 +820,59 @@ class GameTest {
         }
         assertEquals(game.getGameState(), GameState.GAME);
 
+        //CASE 3
+        // L disconnects (his starter card should be automatically placed)
+        // L reconnects
+        // A places his starter card
+        // A disconnects (his objective should be choosen)
+
+        try {
+            game= new Game(List.of(A, L));
+        } catch (PlayerNamesMustBeDifferentException | TooManyPlayersException | TooFewPlayersException e) {throw new RuntimeException(e);}
+
+
+        A = game.getPlayers().get(0).getNickname();
+        M = game.getPlayers().get(1).getNickname();
+        L = game.getPlayers().get(2).getNickname();
+
+        try {
+            game.placeStarterSide(A, game.getPlayers().get(0).getStarterCard().getFrontSide());
+        } catch (InvalidStarterSideException | NoSuchPlayerException | MoveNotAllowedException e) {
+            throw new RuntimeException(e);}
+
+        try {
+            game.disconnect(M);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            game.placeStarterSide(L, game.getPlayers().get(2).getStarterCard().getFrontSide());
+        } catch (InvalidStarterSideException | NoSuchPlayerException | MoveNotAllowedException e) {
+            throw new RuntimeException(e);}
+
+        try {
+            game.disconnect(L);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            game.chooseObjective(A, game.getPlayers().get(0).getObjectivesHand()[1]);
+        } catch ( NoSuchPlayerException | MoveNotAllowedException |
+                  ObjectiveNotAllowedException e) {
+            throw new RuntimeException(e);}
+        //since have chosen the objectivecard and all the other players are disconnected, random objectives will be chosen for disconnected players
+        assertEquals(game.getGameState(), GameState.PAUSE);
+        for (Player player : game.getPlayers()) {
+            assertEquals(player.getState(), PlayerState.PLACE);
+        }
+
+        try {
+            game.reconnect(M);
+        } catch (NoSuchPlayerException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(game.getGameState(), GameState.GAME);
+
 
 
 

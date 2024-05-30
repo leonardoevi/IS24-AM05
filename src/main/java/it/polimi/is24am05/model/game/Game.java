@@ -199,7 +199,7 @@ public class Game implements Serializable {
      * @throws NoSuchPlayerException If such a player is not in the game
      * @throws MoveNotAllowedException If the current game state is not PLACE_STARTER_CARDS
      */
-    public void placeStarterSide(String playerName, Side side) throws InvalidStarterSideException, NoSuchPlayerException, MoveNotAllowedException {
+    public synchronized void placeStarterSide(String playerName, Side side) throws InvalidStarterSideException, NoSuchPlayerException, MoveNotAllowedException {
         // Check if the current game state is PLACE_STARTER_CARDS
         checkState(GameState.PLACE_STARTER_CARDS);
 
@@ -283,6 +283,7 @@ public class Game implements Serializable {
         {
             if(findPlayer(nickname).getState()==PlayerState.CHOOSE_OBJECTIVE)
             {
+                System.out.println(nickname + " is disconnected, objective randomly chosen. (2)");
                 chooseRandomObjective(nickname);
             }
         }
@@ -298,7 +299,7 @@ public class Game implements Serializable {
      * @throws NoSuchPlayerException If such a player is not in the game
      * @throws ObjectiveNotAllowedException If the player doesn't have that objective card
      */
-    public void chooseObjective(String playerName, Objective objective) throws MoveNotAllowedException, NoSuchPlayerException, ObjectiveNotAllowedException {
+    public synchronized void chooseObjective(String playerName, Objective objective) throws MoveNotAllowedException, NoSuchPlayerException, ObjectiveNotAllowedException {
         // Check if the current game state is CHOOSE_OBJECTIVE
         checkState(GameState.CHOOSE_OBJECTIVE);
 
@@ -365,7 +366,7 @@ public class Game implements Serializable {
      * @throws InvalidCardException propagated
      * @throws NoAdjacentCardException propagated
      */
-    public void placeSide(String playerName, Card card, Side side, int i, int j) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, PlacementNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
+    public synchronized void placeSide(String playerName, Card card, Side side, int i, int j) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, PlacementNotAllowedException, InvalidSideException, InvalidCoordinatesException, InvalidCardException, NoAdjacentCardException {
         // Check if the current game state is GAME
         checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
@@ -410,7 +411,7 @@ public class Game implements Serializable {
      * @throws NotYourTurnException If it is not the Player's turn
      * @throws EmptyDeckException propagated
      */
-    public void drawDeck(String playerName, boolean fromGold) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, EmptyDeckException {
+    public synchronized void drawDeck(String playerName, boolean fromGold) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, EmptyDeckException {
         // Check if the current game state is GAME
         checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
@@ -454,7 +455,7 @@ public class Game implements Serializable {
      * @throws NotYourTurnException If it is not the Player's turn
      * @throws InvalidVisibleCardException propagated
      */
-    public void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException{
+    public synchronized void drawVisible(String playerName, Card visible) throws MoveNotAllowedException, NoSuchPlayerException, NotYourTurnException, InvalidVisibleCardException{
         // Check if the current game state is GAME
         checkState(GameState.GAME, GameState.GAME_ENDING);     // throws MoveNotAllowedException
 
@@ -557,7 +558,7 @@ public class Game implements Serializable {
      * @param nickname is the nickname of the player to disconnect
      * @throws NoSuchPlayerException propagated
      */
-    public void disconnect(String nickname) throws NoSuchPlayerException {
+    public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
 
         // If the player is already disconnected do nothing
         if(!this.connected.contains(findPlayer(nickname)))
@@ -581,6 +582,7 @@ public class Game implements Serializable {
             this.connected.remove(findPlayer(nickname));
 
             if(gameState==GameState.CHOOSE_OBJECTIVE)
+                System.out.println(nickname + " is disconnected, objective randomly chosen. (1)");
                chooseRandomObjective(nickname);
 
             return;
@@ -612,7 +614,7 @@ public class Game implements Serializable {
      * @param nickname is the nickname of the player to reconnect
      * @throws NoSuchPlayerException propagated
      */
-    public void reconnect(String nickname) throws NoSuchPlayerException{
+    public synchronized void reconnect(String nickname) throws NoSuchPlayerException{
         // If the player is already connected do nothing
         if(this.connected.contains(findPlayer(nickname)))
             return;
@@ -673,10 +675,11 @@ public class Game implements Serializable {
     }
 
     @Override
-    public String toString(){
+    public synchronized String toString(){
         StringBuilder stringBuilder = new StringBuilder("\n=============================");
         for(Player p : this.getPlayers()){
             stringBuilder.append("\nPlayer: ").append(p.getNickname()).append("\n");
+            stringBuilder.append("\nState: ").append(p.getState()).append("\n");
             stringBuilder.append("Points: ").append(p.getPoints()).append("\n");
 
             stringBuilder.append("Play area: ").append("\n");
@@ -708,51 +711,56 @@ public class Game implements Serializable {
             stringBuilder.append(deckToString(this.getResourceDeck(), false, this.getGoldDeck(), true)).append("\n");
         }
 
+        stringBuilder.append("Game State: " + this.gameState+ "\n");
+        if(this.gameState == GameState.GAME || this.gameState == GameState.GAME_ENDING){
+            stringBuilder.append(players.get(turn).getNickname()).append("'s turn.\n");
+        }
+
         return stringBuilder.toString();
     }
 
     // Getters and Setters
 
-    public List<Player> getWinners() {
+    public synchronized List<Player> getWinners() {
         // Check if game has ended
         return new ArrayList<>(this.winners);
     }
 
-    public List<Player> getPlayers() {
+    public synchronized List<Player> getPlayers() {
         return new ArrayList<>(this.players);
     }
-    public Set<Player> getConnectedPlayers() {
+    public synchronized Set<Player> getConnectedPlayers() {
         return new HashSet<>(this.connected);
     }
 
-    public int getTurn() {
+    public synchronized int getTurn() {
         return turn;
     }
 
-    public Deck getResourceDeck() {
+    public synchronized Deck getResourceDeck() {
         return resourceDeck;
     }
 
-    public Deck getGoldDeck() {
+    public synchronized Deck getGoldDeck() {
         return goldDeck;
     }
 
-    public GameState getGameState() {
+    public synchronized GameState getGameState() {
         return gameState;
     }
 
-    public Objective[] getSharedObjectives() {
+    public synchronized Objective[] getSharedObjectives() {
         return sharedObjectives.clone();
     }
 
-    public Set<String> getDisconnected(){
+    public synchronized Set<String> getDisconnected(){
         return this.players.stream()
                     .filter(p -> !this.connected.contains(p))
                     .map(Player::getNickname)
                     .collect(Collectors.toSet());
     }
 
-    public Set<String> getNicknames(){
+    public synchronized Set<String> getNicknames(){
         return this.players.stream().map(Player::getNickname).collect(Collectors.toSet());
     }
 
@@ -762,7 +770,7 @@ public class Game implements Serializable {
      * @return Its starter card
      * @throws NoSuchPlayerException if the player is not in the game
      */
-    public Card getStarterCard(String playerNickname) throws NoSuchPlayerException {
+    public synchronized Card getStarterCard(String playerNickname) throws NoSuchPlayerException {
         Player player = findPlayer(playerNickname);
         return player.getStarterCard();
     }
@@ -773,7 +781,7 @@ public class Game implements Serializable {
      * @return the playArea of the given player.
      * @throws NoSuchPlayerException if the given player is not in the game.
      */
-    public PlayArea getPlayArea(String nickname) throws NoSuchPlayerException {
+    public synchronized PlayArea getPlayArea(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getPlayArea();
     }
@@ -784,7 +792,7 @@ public class Game implements Serializable {
      * @return the points of the given player.
      * @throws NoSuchPlayerException if the given player is not in the game.
      */
-    public int getPoints(String nickname) throws NoSuchPlayerException {
+    public synchronized int getPoints(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getPoints();
     }
@@ -795,7 +803,7 @@ public class Game implements Serializable {
      * @return the hand of the given player.
      * @throws NoSuchPlayerException if the given player is not in the game.
      */
-    public List<Card> getHand(String nickname) throws NoSuchPlayerException {
+    public synchronized List<Card> getHand(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getHand();
     }
@@ -806,8 +814,13 @@ public class Game implements Serializable {
      * @return the playArea of the given player.
      * @throws NoSuchPlayerException if the given player is not in the game.
      */
-    public List<Resource> getBlurredHand(String nickname) throws NoSuchPlayerException {
+    public synchronized List<Resource> getBlurredHand(String nickname) throws NoSuchPlayerException {
         Player player = findPlayer(nickname);
         return player.getBlurredHand();
+    }
+
+    public synchronized PlayerState getPlayerState(String nickname) throws NoSuchPlayerException {
+        Player player = findPlayer(nickname);
+        return player.getState();
     }
 }

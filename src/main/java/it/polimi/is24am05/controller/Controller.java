@@ -9,6 +9,7 @@ import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.state.GameState;
+import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
 import it.polimi.is24am05.model.exceptions.deck.InvalidVisibleCardException;
 import it.polimi.is24am05.model.exceptions.game.*;
@@ -92,8 +93,8 @@ public class Controller {
                 }
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
-                server.broadcastLog(messageRecipents, "Game restarted!");
                 server.broadcastGameUpdated(messageRecipents);
+                server.broadcastLog(messageRecipents, "Game restarted!");
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -137,8 +138,10 @@ public class Controller {
                         .filter(s -> !s.equals(playerNickname))
                         .toList(), playerNickname + " reconnected!");
 
-                if(stateBeforeReconnection != stateAfterReconnection)
+                if(stateBeforeReconnection != stateAfterReconnection) {
+                    server.broadcastGameUpdated(messageRecipents);
                     server.broadcastLog(messageRecipents, "Game resumed!");
+                }
 
             } catch (NoSuchPlayerException ignored) {}
         }
@@ -349,8 +352,21 @@ public class Controller {
             return;
 
         GameState stateBeforeDisconnection = game.getGameState();
+        PlayerState playerStateBeforeDisconnection = game.getPlayerState(nickname);
         game.disconnect(nickname);
         GameState stateAfterDisconnection = game.getGameState();
+
+        // If the disconnection happened during PLACE_STARTER_CARD game state, broadcast the new game state
+        if(stateBeforeDisconnection.equals(GameState.PLACE_STARTER_CARDS) && playerStateBeforeDisconnection.equals(PlayerState.PLACE_STARTER_CARD)) {
+            server.broadcastGameUpdated(messageRecipents);
+            server.broadcastLog(messageRecipents, nickname + "'s starter card automatically placed");
+        }
+
+        // If the disconnection happened during CHOOSE_OBJECTIVE game state, broadcast the new game state
+        if(stateBeforeDisconnection.equals(GameState.CHOOSE_OBJECTIVE) && playerStateBeforeDisconnection.equals(PlayerState.CHOOSE_OBJECTIVE)) {
+            server.broadcastGameUpdated(messageRecipents);
+            server.broadcastLog(messageRecipents, nickname + "'s objective automatically chosen");
+        }
 
         server.broadcastLog(messageRecipents, nickname + " disconnected!");
 
