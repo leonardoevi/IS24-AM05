@@ -21,6 +21,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -41,7 +42,7 @@ public class GameSceneController implements Initializable {
     //TODO AGGIORNATE LA MAPPPAAA
 
     @FXML
-    private GridPane playArea;
+    private Pane playArea;
     @FXML
     private StackPane backgroundPlayArea;
     @FXML
@@ -312,13 +313,13 @@ public class GameSceneController implements Initializable {
         for (int i = 0; i < 10; i++) {
             RowConstraints rowConstraints = new RowConstraints();
             rowConstraints.setPercentHeight(100.0 / 10);
-            playArea.getRowConstraints().add(rowConstraints);
+            //playArea.getRowConstraints().add(rowConstraints);
         }
 
         for (int j = 0; j < 10; j++) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
             columnConstraints.setPercentWidth(100.0 / 10);
-            playArea.getColumnConstraints().add(columnConstraints);
+            //playArea.getColumnConstraints().add(columnConstraints);
         }
 
     }
@@ -349,7 +350,7 @@ public class GameSceneController implements Initializable {
         resourceVisible2.setImage(null);
         goldVisible1.setImage(null);
         goldVisible2.setImage(null);
-
+        playArea.getChildren().removeIf(node -> node instanceof StackPane || node instanceof Label);
 
         for (Player p : game.getPlayers()) {
             if (p.getNickname().equals(clientNickname)) {
@@ -618,91 +619,61 @@ public class GameSceneController implements Initializable {
             if (p.getNickname().equals(clientNickname)) {
                 PlacedSide[][] placedSides = p.getPlayArea().getMatrixPlayArea();
 
-
                 StackPane.setMargin(playArea, new Insets(50));
 
                 int id;
                 System.out.println("row" + placedSides.length);
                 System.out.println("column" + placedSides[0].length);
 
+                for (PlacedSide placedSide : p.getPlayArea().getOrderedPlacements()) {
+                    if (placedSide.getSide() != null) {
 
-                for (int row = 0; row < placedSides.length; row++) {
-                    for (int col = 0; col < placedSides[0].length; col++) {
-                        javafx.scene.Node nodeToRemove = null;
-                        for (javafx.scene.Node node : playArea.getChildren()) {
-                            Integer column = GridPane.getColumnIndex(node);
-                            Integer roww = GridPane.getRowIndex(node);
-                            if (column != null && column == col && roww != null && row == roww && node instanceof StackPane) {
-                                nodeToRemove = node;
+                        path = "/assets/images/";
+                        String cardId = placedSide.getSide().toString();
 
-                            } else if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
-                                nodeToRemove = node;
+                        if (cardId.charAt(1) == 'B')
+                            path += "back/";
+                        else
+                            path += "front/";
 
-                            }
-                        }
-                        if (nodeToRemove != null) {
-                            if (nodeToRemove instanceof StackPane) {
-                                ((StackPane) nodeToRemove).setBackground(null);
-                            }
-                            playArea.getChildren().remove(nodeToRemove);
-                        }
+                        path += cardId.substring(4, 7);
+                        path += ".png";
+                        System.out.println(path);
+                        String imagePath2 = getClass().getResource(path).toExternalForm();
+
+
+                        StackPane region = new StackPane();
+                        ImageView imageView = new ImageView(new Image(imagePath2));
+                        imageView.setFitWidth(81);
+                        imageView.setFitHeight(54);
+                        imageView.setPreserveRatio(true);
+                        region.getChildren().add(imageView);
+                        Tuple coord = getCard(placedSides, placedSide);
+                        double x = (coord.j) * (60);
+                        double y = (coord.i) * (30);
+
+                        region.setLayoutX(x);
+                        region.setLayoutY(y);
+                        playArea.getChildren().add(region);
+
 
                     }
-
                 }
+
                 for (int row = 0; row < placedSides.length; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
 
+                          if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
+                              Tuple coord = placedSides[row][col].getActualCoord();
+                            Label coordinates = new Label("("+ coord.i + ","+coord.j+")");
+                            coordinates.setPrefWidth(81);
+                            coordinates.setPrefHeight(54);
+                            double x = (row) * (68);
+                            double y =(0.9*col) * (35);
 
-                        if (placedSides[row][col] != null && placedSides[row][col] instanceof PlacedSide && placedSides[row][col].getSide() != null) {
-
-                            path = "/assets/images/";
-
-                            String cardId = placedSides[row][col].getSide().toString();
-
-                            if (cardId.charAt(1) == 'B')
-                                path += "back/";
-                            else
-                                path += "front/";
-
-                            path += cardId.substring(4, 7);
-                            path += ".png";
-                            System.out.println(path);
-                            String imagePath2 = getClass().getResource(path).toExternalForm();
-
-                            StackPane region = new StackPane();
-                            region.setBackground(new Background(new BackgroundImage(new Image(imagePath2), BackgroundRepeat.NO_REPEAT,
-                                    BackgroundRepeat.NO_REPEAT,
-                                    BackgroundPosition.CENTER,
-                                    new BackgroundSize(1.0, 1.0, true, true, false, false))));
-                            playArea.add(region, col, row);
-
-                        } else if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
-
-
-                            javafx.scene.Node nodeToRemove = null;
-                            for (javafx.scene.Node node : playArea.getChildren()) {
-                                Integer column = GridPane.getColumnIndex(node);
-                                Integer roww = GridPane.getRowIndex(node);
-
-                                if (column != null && column == col && roww != null && row == roww && node instanceof Label) {
-                                    nodeToRemove = node;
-
-                                }
-
-                            }
-
-
-                            if (nodeToRemove != null) {
-
-                                playArea.getChildren().remove(nodeToRemove);
-                            }
-
-
-                            if (p.getPlayArea().getFrontier().contains(new Tuple(placedSides[row][col].getActualCoord().i, placedSides[row][col].getActualCoord().j)))
-
-                                playArea.add(new Label("(" + placedSides[row][col].getActualCoord().i + " , " + placedSides[row][col].getActualCoord().j + ")"), col, row);
-
+                            coordinates.setLayoutX(x);
+                            coordinates.setLayoutY(y);
+                            playArea.getChildren().add(coordinates);
                         }
                     }
                 }
@@ -710,6 +681,7 @@ public class GameSceneController implements Initializable {
 
 
         }
+
         List<String> nicknames = game.getPlayers().stream().map(p -> p.getNickname()).filter(n -> !n.equals(clientNickname)).toList();
         buttonPlayer1.setText("View " + nicknames.get(0));
         buttonPlayer1.setOnAction(event -> {
@@ -841,6 +813,19 @@ public class GameSceneController implements Initializable {
         gui.drawVisible(CardServerId);
 
 
+    }
+    public Tuple getCard(PlacedSide[][] placedSides, PlacedSide toFind){
+        Tuple found = null;
+        for (int i = 0; i < placedSides.length; i++) {
+            for (int j = 0; j < placedSides[0].length; j++) {
+                if (placedSides[i][j] != null) {
+                    if (placedSides[i][j].equals(toFind))
+                        found = new Tuple(i, j);
+                }
+            }
+
+        }
+        return found;
     }
 }
 
