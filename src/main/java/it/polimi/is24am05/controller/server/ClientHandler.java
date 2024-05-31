@@ -56,6 +56,11 @@ public abstract class ClientHandler implements VirtualClient {
             return;
         }
 
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
+            return;
+        }
+
         try {
             controller.newConnection(nickname);
         } catch (Exception e) {
@@ -66,6 +71,11 @@ public abstract class ClientHandler implements VirtualClient {
     protected void setNumberOfPlayers(int numberOfPlayers) {
         if(nickname == null) {
             addLog("Identify yourself!");
+            return;
+        }
+
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
             return;
         }
 
@@ -82,6 +92,11 @@ public abstract class ClientHandler implements VirtualClient {
             return;
         }
 
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
+            return;
+        }
+
         try {
             controller.playStarterCard(nickname, isFront);
         } catch (Exception e) {
@@ -95,6 +110,11 @@ public abstract class ClientHandler implements VirtualClient {
             return;
         }
 
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
+            return;
+        }
+
         try {
             controller.chooseObjective(nickname, objectiveId);
         } catch (Exception e) {
@@ -105,6 +125,11 @@ public abstract class ClientHandler implements VirtualClient {
     protected void placeSide(String cardId, boolean isFront, int i, int j) {
         if(nickname == null) {
             addLog("Identify yourself!");
+            return;
+        }
+
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
             return;
         }
 
@@ -127,6 +152,11 @@ public abstract class ClientHandler implements VirtualClient {
             return;
         }
 
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
+            return;
+        }
+
         try {
             Card card;
             try {
@@ -143,6 +173,11 @@ public abstract class ClientHandler implements VirtualClient {
     protected void drawDeck(boolean isGold) {
         if(nickname == null) {
             addLog("Identify yourself!");
+            return;
+        }
+
+        if(!server.isSubscribed(this)){
+            addLog("You are not subscribed to this game!");
             return;
         }
 

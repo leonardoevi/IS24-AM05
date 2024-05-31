@@ -8,6 +8,7 @@ import it.polimi.is24am05.model.game.Game;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 public class RmiClientHandler extends ClientHandler {
@@ -15,6 +16,7 @@ public class RmiClientHandler extends ClientHandler {
 
     private final RmiVirtualController rmiFromClient;
 
+    protected volatile String lastHeartBeat = "Manuel";
     private final ScheduledExecutorService connectionDemon = Executors.newSingleThreadScheduledExecutor();
 
     public RmiClientHandler(Controller controller, Server server, RmiVirtualClient virtualClient) throws RemoteException {
@@ -22,7 +24,7 @@ public class RmiClientHandler extends ClientHandler {
         this.virtualClient = virtualClient;
         this.rmiFromClient = new RmiFromClient();
 
-        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 0, 1, TimeUnit.SECONDS);
+        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 1, 5, TimeUnit.SECONDS);
     }
 
     // This getter is needed to give the Client an object that implements the RmiVirtualController interface
@@ -107,16 +109,40 @@ public class RmiClientHandler extends ClientHandler {
         }
 
         @Override
-        public void pongRMI() throws RemoteException {}
+        public void pingRMI(String key) throws RemoteException {
+            virtualClient.pongRMI(key);
+        }
+
+        @Override
+        public void pongRMI(String key) throws RemoteException {
+            lastHeartBeat = key;
+            //System.out.println("Received: " + key);
+        }
     }
+
 
     private class ConnectionCheckRoutine implements Runnable {
         @Override
         public void run() {
+            // Generate a random string
+            String heartBeat = UUID.randomUUID().toString();
+
+            //System.out.println("Sending: " + heartBeat);
+
+            new Thread(() -> {
+                try {
+                    virtualClient.pingRMI(heartBeat);
+                } catch (RemoteException ignored) {
+                }
+            }).start();
+
             try {
-                virtualClient.pingRMI();
-            } catch (RemoteException e) {
-                //System.out.println(getNickname() + " is not responding!");
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {}
+
+
+            // Check if client responded to the ping message
+            if (!heartBeat.equals(lastHeartBeat)) {
                 connectionDemon.shutdown();
                 disconnect();
             }

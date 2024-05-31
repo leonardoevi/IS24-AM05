@@ -17,7 +17,7 @@ public class SocketServerHandler extends ServerHandler {
     private final Socket socket;
     private final ObjectOutputStream outputStream;
 
-    protected String lastHeartBeat = "alesio";
+    protected volatile String lastHeartBeat = "alesio";
 
     public static void main(String[] args) {
         try {
@@ -195,7 +195,7 @@ public class SocketServerHandler extends ServerHandler {
             System.out.println("Ping: " + heartBeat);
             send(new Message("ping", Map.of("key", heartBeat)));
 
-            // Wait for 2 seconds
+            // Wait for 1 seconds
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}

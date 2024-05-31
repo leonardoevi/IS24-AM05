@@ -1,7 +1,6 @@
 package it.polimi.is24am05.client.rmi;
 
 import it.polimi.is24am05.client.ServerHandler;
-import it.polimi.is24am05.client.view.tui.TUI;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiVirtualController;
 import it.polimi.is24am05.model.game.Game;
@@ -11,14 +10,20 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Thread.sleep;
+
 public class RmiServerHandler extends ServerHandler {
     private RmiVirtualController virtualController;
     private final RmiVirtualClient rmiFromServer;
+
+    protected volatile String lastHeartBeat = "pippo";
     private ScheduledExecutorService serverChecker = Executors.newSingleThreadScheduledExecutor();
 
     public static void main(String[] args) throws Exception {
@@ -46,7 +51,7 @@ public class RmiServerHandler extends ServerHandler {
 
             // Set up a demon thread to check if server is still up
             Thread demon = new Thread(new RmiServerChecker()); demon.setDaemon(true);
-            serverChecker.scheduleAtFixedRate(demon, 0, 1, TimeUnit.SECONDS);
+            serverChecker.scheduleAtFixedRate(demon, 3, 5, TimeUnit.SECONDS);
 
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             notifyViewServerUnreachable();
@@ -174,19 +179,47 @@ public class RmiServerHandler extends ServerHandler {
         }
 
         @Override
-        public void pingRMI() throws RemoteException {
+        public void pingRMI(String key) throws RemoteException {
+            /*
+            if(new Random().nextInt() % 4 == 0) {
+                virtualController.pongRMI("UPSIE...");
+                return;
+            }
+             */
+
+            virtualController.pongRMI(key);
+        }
+
+        @Override
+        public void pongRMI(String key) throws RemoteException {
+            //System.out.println("Received: " + key);
+            lastHeartBeat = key;
         }
     }
 
     class RmiServerChecker implements Runnable {
         @Override
         public void run() {
+            // Generate a random string
+            String heartBeat = UUID.randomUUID().toString();
+
+            //System.out.println("Sending: " + heartBeat);
+
+            new Thread(() -> {
+                try {
+                    virtualController.pingRMI(heartBeat);
+                } catch (RemoteException ignored) {}
+            }).start();
+
             try {
-                virtualController.pongRMI();
-            } catch (RemoteException e) {
-                serverChecker.shutdown();
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {}
+
+            // Check if client responded to the ping message
+            if(!heartBeat.equals(lastHeartBeat)) {
                 notifyViewServerUnreachable();
                 killRmiReaper();
+                serverChecker.shutdown();
             }
         }
     }

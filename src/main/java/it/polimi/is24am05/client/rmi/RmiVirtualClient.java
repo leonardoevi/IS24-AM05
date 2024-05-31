@@ -13,5 +13,6 @@ public interface RmiVirtualClient extends Remote {
     public void addLogRMI(String log) throws RemoteException;
 
     // Allow the server to ping the client
-    public void pingRMI() throws RemoteException;
+    public void pingRMI(String key) throws RemoteException;
+    public void pongRMI(String key) throws RemoteException;
 }

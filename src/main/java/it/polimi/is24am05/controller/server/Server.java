@@ -90,6 +90,10 @@ public class Server {
         clientHandlers.remove(clientHandler);
     }
 
+    public synchronized boolean isSubscribed(ClientHandler clientHandler) {
+        return clientHandlers.contains(clientHandler);
+    }
+
     private synchronized ClientHandler getClientHandler(String nickname) throws NoSuchPlayerException {
         return clientHandlers.stream().filter(h -> h.getNickname().equals(nickname)).findFirst()
                 .orElseThrow(NoSuchPlayerException::new);
