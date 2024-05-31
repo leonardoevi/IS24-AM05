@@ -192,7 +192,7 @@ public class SocketServerHandler extends ServerHandler {
             String heartBeat = UUID.randomUUID().toString();
 
             // Send the string to the server
-            System.out.println("Ping: " + heartBeat);
+            //System.out.println("Ping: " + heartBeat);
             send(new Message("ping", Map.of("key", heartBeat)));
 
             // Wait for 1 seconds
@@ -206,8 +206,8 @@ public class SocketServerHandler extends ServerHandler {
                     socket.close();
                 } catch (IOException ignored) {}
             }
-            else
-                System.out.println("Pong: " + lastHeartBeat);
+            //else
+            //    System.out.println("Pong: " + lastHeartBeat);
         }
     }
 }
