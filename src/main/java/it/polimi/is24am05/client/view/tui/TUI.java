@@ -39,7 +39,6 @@ public class TUI extends View {
     }
 
     public void serverUnreachable() {
-        System.out.println("Connection to server unavailable, exiting.");
         inputReader.stopInputReader();
     }
 
@@ -121,6 +120,8 @@ public class TUI extends View {
         }
 
         private void stopInputReader(){
+            if(!stdinClosed)
+                System.out.println("Connection to server unavailable, exiting.");
             stdinClosed = true;
         }
     }

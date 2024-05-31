@@ -8,15 +8,37 @@ import it.polimi.is24am05.model.game.Game;
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SocketClientHandler extends ClientHandler implements Runnable {
     private final Socket socket;
     private final ObjectOutputStream out;
 
+    protected String lastHeartBeat = "andrea";
+
+    /**
+     * This thread is necessary to handle server input asynchronously
+     * This way answering to ping messages is immediate
+     * Must be a single thread to avoid synchronization problems
+     */
+    private final ExecutorService inputHandler = Executors.newSingleThreadExecutor();
+
+    /**
+     * This thread periodically check the connection to the client
+     */
+    private final ScheduledExecutorService connectionChecker = Executors.newSingleThreadScheduledExecutor();
+
     public SocketClientHandler(Controller controller, Server server, Socket socket) throws IOException {
         super(controller, server);
         this.socket = socket;
         out = new ObjectOutputStream(socket.getOutputStream());
+
+        // Start checking connection
+        connectionChecker.scheduleAtFixedRate(new ConnectionChecker(this.socket), 1, 2, TimeUnit.SECONDS);
     }
 
     @Override
@@ -54,7 +76,15 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         while(true){
             try{
                 Message message = (Message) in.readObject();
-                handleClientInput(message);
+
+                // Handle heartbeat messages right away
+                if(message.title().equals("pong"))
+                    lastHeartBeat = (String) message.arguments().get("key");
+                else if(message.title().equals("ping"))
+                    send(new Message("pong", Map.of("key", message.arguments().get("key"))));
+                else
+                    inputHandler.submit(() -> handleClientInput(message));
+
             } catch (Exception e){
                 //System.out.println("Error reading from socket: " + getNickname() + " -> " + e.getMessage());
                 break;
@@ -64,6 +94,8 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
         try {
             socket.close();
         } catch (IOException ignored) {}
+        inputHandler.shutdown();
+        connectionChecker.shutdown();
         disconnect();
     }
 
@@ -101,6 +133,39 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             case "disconnect":
                 super.disconnect();
                 break;
+        }
+    }
+
+    /**
+     * This class sends a heartbeat message to the client, if the client doesn't answer with the appropriate message,
+     * the socket is closed.
+     */
+    public class ConnectionChecker implements Runnable {
+        private final Socket socket;
+
+        public ConnectionChecker(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            // Generate a random string
+            String heartBeat = UUID.randomUUID().toString();
+
+            // Send the string to the server
+            send(new Message("ping", Map.of("key", heartBeat)));
+
+            // Wait for 2 seconds
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {}
+
+            // If the string did not come back, close the socket
+            if(!heartBeat.equals(lastHeartBeat)) {
+                try {
+                    socket.close();
+                } catch (IOException ignored) {}
+            }
         }
     }
 }

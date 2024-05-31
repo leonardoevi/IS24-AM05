@@ -42,6 +42,7 @@ public class Main {
         } catch (ArrayIndexOutOfBoundsException e){
             System.out.println("Unexpected parameters");
         } catch (Exception e){
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
