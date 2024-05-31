@@ -155,7 +155,7 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             // Send the string to the server
             send(new Message("ping", Map.of("key", heartBeat)));
 
-            // Wait for 2 seconds
+            // Wait for 1 seconds
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}

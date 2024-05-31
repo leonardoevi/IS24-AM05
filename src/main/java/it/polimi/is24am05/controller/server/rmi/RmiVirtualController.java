@@ -17,5 +17,6 @@ public interface RmiVirtualController extends Remote {
     public void drawDeckRMI(boolean isGold) throws RemoteException;
     public void disconnectRMI() throws RemoteException;
 
-    public void pongRMI() throws RemoteException;
+    public void pingRMI(String key) throws RemoteException;
+    public void pongRMI(String key) throws RemoteException;
 }
