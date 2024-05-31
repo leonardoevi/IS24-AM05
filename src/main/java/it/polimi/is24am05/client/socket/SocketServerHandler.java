@@ -2,6 +2,7 @@ package it.polimi.is24am05.client.socket;
 
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.controller.server.socket.Message;
+import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.game.Game;
 
 import java.io.IOException;
@@ -191,7 +192,7 @@ public class SocketServerHandler extends ServerHandler {
             String heartBeat = UUID.randomUUID().toString();
 
             // Send the string to the server
-            //System.out.println("Ping: " + heartBeat);
+            System.out.println("Ping: " + heartBeat);
             send(new Message("ping", Map.of("key", heartBeat)));
 
             // Wait for 2 seconds
@@ -205,8 +206,8 @@ public class SocketServerHandler extends ServerHandler {
                     socket.close();
                 } catch (IOException ignored) {}
             }
-            //else
-            //    System.out.println("Pong: " + lastHeartBeat);
+            else
+                System.out.println("Pong: " + lastHeartBeat);
         }
     }
 }
