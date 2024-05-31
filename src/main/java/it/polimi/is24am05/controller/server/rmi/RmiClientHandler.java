@@ -129,12 +129,13 @@ public class RmiClientHandler extends ClientHandler {
 
             //System.out.println("Sending: " + heartBeat);
 
-            new Thread(() -> {
+            Thread pinger = new Thread(() -> {
                 try {
                     virtualClient.pingRMI(heartBeat);
-                } catch (RemoteException ignored) {
-                }
-            }).start();
+                } catch (RemoteException ignored) {}
+            });
+            pinger.setDaemon(true);
+            pinger.start();
 
             try {
                 Thread.sleep(1000);
@@ -143,8 +144,8 @@ public class RmiClientHandler extends ClientHandler {
 
             // Check if client responded to the ping message
             if (!heartBeat.equals(lastHeartBeat)) {
-                connectionDemon.shutdown();
                 disconnect();
+                connectionDemon.shutdown();
             }
         }
     }

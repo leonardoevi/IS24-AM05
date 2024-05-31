@@ -202,11 +202,13 @@ public class RmiServerHandler extends ServerHandler {
 
             //System.out.println("Sending: " + heartBeat);
 
-            new Thread(() -> {
+            Thread pinger = new Thread(() -> {
                 try {
                     virtualController.pingRMI(heartBeat);
                 } catch (RemoteException ignored) {}
-            }).start();
+            });
+            pinger.setDaemon(true);
+            pinger.start();
 
             try {
                 Thread.sleep(1000);
