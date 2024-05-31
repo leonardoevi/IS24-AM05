@@ -24,7 +24,7 @@ public class RmiClientHandler extends ClientHandler {
         this.virtualClient = virtualClient;
         this.rmiFromClient = new RmiFromClient();
 
-        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 1, 5, TimeUnit.SECONDS);
+        connectionDemon.scheduleAtFixedRate(new ConnectionCheckRoutine(), 1, 2, TimeUnit.SECONDS);
     }
 
     // This getter is needed to give the Client an object that implements the RmiVirtualController interface

@@ -10,23 +10,20 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.sleep;
-
 public class RmiServerHandler extends ServerHandler {
     private RmiVirtualController virtualController;
     private final RmiVirtualClient rmiFromServer;
 
     protected volatile String lastHeartBeat = "pippo";
-    private ScheduledExecutorService serverChecker = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService serverChecker = Executors.newSingleThreadScheduledExecutor();
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         try {
             new RmiServerHandler("localhost", "9696", "GUI");
         } catch (RemoteException e) {
@@ -50,8 +47,8 @@ public class RmiServerHandler extends ServerHandler {
             virtualController = provider.connect(rmiFromServer);
 
             // Set up a demon thread to check if server is still up
-            Thread demon = new Thread(new RmiServerChecker()); demon.setDaemon(true);
-            serverChecker.scheduleAtFixedRate(demon, 3, 5, TimeUnit.SECONDS);
+            Thread demon = new Thread(new RmiServerChecker()); demon.setDaemon(true); demon.setName("Rmi connection checker");
+            serverChecker.scheduleAtFixedRate(demon, 1, 2, TimeUnit.SECONDS);
 
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             notifyViewServerUnreachable();
@@ -63,7 +60,7 @@ public class RmiServerHandler extends ServerHandler {
     private static void killRmiReaper(){
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         for (Thread t : threadSet) {
-            if(t.getName().equals("RMI Reaper")){
+            if(t.getName().contains("RMI")){
                 //System.out.println("Killing RMI Reaper");
                 t.interrupt();
                 }
@@ -217,9 +214,11 @@ public class RmiServerHandler extends ServerHandler {
 
             // Check if client responded to the ping message
             if(!heartBeat.equals(lastHeartBeat)) {
-                notifyViewServerUnreachable();
-                killRmiReaper();
-                serverChecker.shutdown();
+                new Thread(() -> {
+                    notifyViewServerUnreachable();
+                    serverChecker.shutdownNow();
+                    killRmiReaper();
+                }).start();
             }
         }
     }

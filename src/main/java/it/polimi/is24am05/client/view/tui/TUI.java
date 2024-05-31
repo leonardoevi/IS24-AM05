@@ -18,7 +18,10 @@ public class TUI extends View {
         super(clientModel, server);
 
         inputReader = new InputReader();
-        new Thread(inputReader).start();
+        Thread t = new Thread(inputReader);
+        t.setName("Stdin InputReader");
+        t.setDaemon(true);
+        t.start();
     }
 
     @Override
@@ -115,7 +118,7 @@ public class TUI extends View {
                         throw new NoSuchElementException();
                 }
             } catch (Exception e) {
-                System.out.println("Invalid input");;
+                System.out.println("Invalid input");
             }
         }
 
