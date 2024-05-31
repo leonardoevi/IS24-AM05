@@ -1,6 +1,7 @@
 package it.polimi.is24am05.client.rmi;
 
 import it.polimi.is24am05.client.ServerHandler;
+import it.polimi.is24am05.controller.server.rmi.RmiClientHandler;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiVirtualController;
 import it.polimi.is24am05.model.game.Game;
@@ -12,6 +13,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +22,10 @@ public class RmiServerHandler extends ServerHandler {
     private RmiVirtualController virtualController;
     private final RmiVirtualClient rmiFromServer;
 
+    // Single thread that runs RMI methods
+    private final ExecutorService rmiExecutor = Executors.newSingleThreadExecutor(new RmiClientHandler.DeamonThreadFactory());
+
+    // Variables needed for connection check
     protected volatile String lastHeartBeat = "pippo";
     private final ScheduledExecutorService serverChecker = Executors.newSingleThreadScheduledExecutor();
 
@@ -80,82 +86,76 @@ public class RmiServerHandler extends ServerHandler {
 
     @Override
     public void joinGame() {
-        try {
-            virtualController.joinGameRMI();
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.joinGameRMI();
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void setNumberOfPlayers(int numberOfPlayers) {
-        try {
-            virtualController.setNumberOfPlayersRMI(numberOfPlayers);
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.setNumberOfPlayersRMI(numberOfPlayers);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void placeStarterSide(boolean isFront) {
-        try {
-            virtualController.placeStarterSideRMI(isFront);
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.placeStarterSideRMI(isFront);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void chooseObjective(String objectiveId) {
-        try {
-            virtualController.chooseObjectiveRMI(objectiveId);
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.chooseObjectiveRMI(objectiveId);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void placeSide(String cardId, boolean isFront, int i, int j) {
-        try {
-            virtualController.placeSideRMI(cardId, isFront, i, j);
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.placeSideRMI(cardId, isFront, i, j);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void drawVisible(String cardId) {
-        try {
-            virtualController.drawVisibleRMI(cardId);
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.drawVisibleRMI(cardId);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void drawDeck(boolean isGold) {
-        try {
-            virtualController.drawDeckRMI(isGold);
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-            killRmiReaper();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.drawDeckRMI(isGold);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void disconnect() {
-        try {
-            virtualController.disconnectRMI();
-        } catch (RemoteException e) {
-            notifyViewServerUnreachable();
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.disconnectRMI();
+            } catch (RemoteException ignored) {}
+        });
         serverChecker.shutdownNow();
+        rmiExecutor.shutdown();
         killRmiReaper();
         notifyViewServerUnreachable();
     }
@@ -219,6 +219,7 @@ public class RmiServerHandler extends ServerHandler {
                 new Thread(() -> {
                     notifyViewServerUnreachable();
                     serverChecker.shutdownNow();
+                    rmiExecutor.shutdownNow();
                     killRmiReaper();
                 }).start();
             }

@@ -16,6 +16,10 @@ public class RmiClientHandler extends ClientHandler {
 
     private final RmiVirtualController rmiFromClient;
 
+    // Single thread that runs RMI methods
+    private final ExecutorService rmiExecutor = Executors.newSingleThreadExecutor(new DeamonThreadFactory());
+
+    // variables needed for connection check
     protected volatile String lastHeartBeat = "Manuel";
     private final ScheduledExecutorService connectionDemon = Executors.newSingleThreadScheduledExecutor();
 
@@ -38,19 +42,33 @@ public class RmiClientHandler extends ClientHandler {
 
     @Override
     public void setGame(Game game) {
-        try {
-            virtualClient.setGameRMI(game);
-        } catch (RemoteException e) {
-            //System.out.println("Error sending game update to: " + getNickname());
-        }
+        rmiExecutor.submit(() -> {
+            try {
+                virtualClient.setGameRMI(game);
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
     public void addLog(String log) {
-        try {
-            virtualClient.addLogRMI(log);
-        } catch (RemoteException e) {
-            //System.out.println("Error sending log: [" + log + "] to: " + getNickname());
+        rmiExecutor.submit(() -> {
+            try {
+                virtualClient.addLogRMI(log);
+            } catch (RemoteException ignored) {}
+        });
+    }
+
+    /**
+     * This class is needed to create a Demon thread to submit to the executor service.
+     * Having a demon thread execute RMI requests is necessary to avoid waiting for long timeouts in case the
+     * network fails
+     */
+    public static class DeamonThreadFactory implements ThreadFactory {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setDaemon(true);
+            return thread;
         }
     }
 
@@ -146,6 +164,7 @@ public class RmiClientHandler extends ClientHandler {
             if (!heartBeat.equals(lastHeartBeat)) {
                 disconnect();
                 connectionDemon.shutdown();
+                rmiExecutor.shutdown();
             }
         }
     }
