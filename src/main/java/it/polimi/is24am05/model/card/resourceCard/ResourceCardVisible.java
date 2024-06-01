@@ -18,7 +18,7 @@ public enum ResourceCardVisible implements Card {
 
     public Side getFrontSide()
     {
-        return null;
+        return this.backSide;
     }
 
     public Side getBackSide() {

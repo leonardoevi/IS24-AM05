@@ -104,10 +104,9 @@ public class Server {
      * @param nicknames players nicknames to which an update will be sent
      */
     public void broadcastGameUpdated(List<String> nicknames) {
-        Game toSend = controller.game;
         for (String nickname : nicknames) {
             try{
-                getClientHandler(nickname).setGame(toSend);
+                getClientHandler(nickname).setGame(controller.game.getPov(nickname));
             } catch (NoSuchPlayerException e) {
                 //System.out.println("Player " + nickname + " not found, unable to update game");
             }
@@ -116,7 +115,7 @@ public class Server {
 
     public void gameUpdated(String nickname) {
         try{
-            getClientHandler(nickname).setGame(controller.game);
+            getClientHandler(nickname).setGame(controller.game.getPov(nickname));
         } catch (NoSuchPlayerException e) {
             //System.out.println("Player " + nickname + " not found, unable to update game");
         }

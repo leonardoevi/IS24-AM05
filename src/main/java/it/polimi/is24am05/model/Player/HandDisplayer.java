@@ -4,12 +4,15 @@ package it.polimi.is24am05.model.Player;
 
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
+import it.polimi.is24am05.model.card.goldCard.GoldCard;
+import it.polimi.is24am05.model.card.goldCard.GoldCardVisible;
 import it.polimi.is24am05.model.card.goldCard.GoldFrontSide;
 import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.AlwaysTrueMultiplier;
 import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.CornerMultiplier;
 import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.GoldCardMultiplier;
 import it.polimi.is24am05.model.card.goldCard.goldCardMultiplier.ItemMultiplier;
 import it.polimi.is24am05.model.card.resourceCard.ResourceBackSide;
+import it.polimi.is24am05.model.card.resourceCard.ResourceCardVisible;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.playArea.AreaDisplayer;
@@ -51,13 +54,24 @@ public class HandDisplayer {
         fillMatrix(result);
 
         // Create title
-        String title = "- " +  "CardID:  " + String.format("%02d", card.getId()) + " -";
+        String title;
+        if(card instanceof ResourceCardVisible || card instanceof GoldCardVisible){
+            title = " ".repeat(15);
+        } else {
+            title = "- " +  "CardID:  " + String.format("%02d", card.getId()) + " -";
+        }
         String padding = " ".repeat(((CARD_WIDTH*2 + 4 + STARTER_SIDES_SPACING) - (title.length()))/2);
         title = padding + title + padding;
 
         // Put labels
-        result[4][1] = BLACK_BOLD_BRIGHT + "front  " + RESET;
-        result[4][7] = BLACK_BOLD_BRIGHT + "   back" + RESET;
+        if(card instanceof ResourceCardVisible || card instanceof GoldCardVisible){
+            result[4][1] = "       ";
+            result[4][7] = "       ";
+        }
+        else {
+            result[4][1] = BLACK_BOLD_BRIGHT + "front  " + RESET;
+            result[4][7] = BLACK_BOLD_BRIGHT + "   back" + RESET;
+        }
 
         // Put sides
         AreaDisplayer.put(frontSide, result, 1,0);

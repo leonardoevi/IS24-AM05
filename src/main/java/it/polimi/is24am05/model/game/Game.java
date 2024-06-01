@@ -693,7 +693,10 @@ public class Game implements Serializable, Cloneable {
             }
 
             if(this.gameState != GameState.PLACE_STARTER_CARDS && this.gameState != GameState.CHOOSE_OBJECTIVE){
-                stringBuilder.append(p.getObjective().toString()).append("\n");
+                if(p.getObjective() != null) {
+                    Objective[] personalAndShared = List.of(p.getObjective(), getSharedObjectives()[0], getSharedObjectives()[1]).toArray(Objective[]::new);
+                    stringBuilder.append(new SharedObjectiveDisplayer(personalAndShared).toString("Alesio")).append("\n");
+                }
             }
 
             if(p.getHand() != null && !p.getHand().isEmpty()) {
@@ -702,9 +705,17 @@ public class Game implements Serializable, Cloneable {
             }
 
             if(this.gameState == GameState.CHOOSE_OBJECTIVE)
-                stringBuilder.append("\n")
-                        .append(new SharedObjectiveDisplayer(p.getObjectivesHand()))
-                        .append("\n");
+                if(p.getObjectivesHand() != null) {
+                    stringBuilder.append("\n")
+                            .append("To choose from:\n")
+                            .append(new SharedObjectiveDisplayer(p.getObjectivesHand()))
+                            .append("\n");
+
+                    stringBuilder.append("\n")
+                            .append("Shared objectives:\n")
+                            .append(new SharedObjectiveDisplayer(this.sharedObjectives))
+                            .append("\n");
+                }
 
         }
 

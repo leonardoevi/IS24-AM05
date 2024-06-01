@@ -17,10 +17,16 @@ public enum GoldCardVisible implements Card {
 
     public Side getFrontSide()
     {
-        return null;
+        return this.backSide;
     }
 
     public Side getBackSide() {
         return this.backSide;
+    }
+
+
+    @Override
+    public String toString() {
+        return "      ";
     }
 }

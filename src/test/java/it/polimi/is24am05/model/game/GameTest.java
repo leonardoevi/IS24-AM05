@@ -1967,6 +1967,143 @@ class GameTest {
         assertEquals(L,game.getWinners().getFirst().getNickname());
     }
 
+
+    @Test
+    void gamePovToString() throws NoSuchPlayerException {
+        // Simulate a game being played
+        // Verify only the correct methods can be invoked
+        // Verify the correct evolution of the game model
+
+        Game game;
+        List<String> players = List.of("Acoustic", "Andrea", "Chad", "Ale");
+
+        try {
+            game = new Game(players);
+        } catch (TooManyPlayersException | TooFewPlayersException | PlayerNamesMustBeDifferentException e) { throw new RuntimeException(e); }
+
+
+        // Make sure each player places their card
+        for(String name : players){
+            Card starterCard = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getStarterCard();
+
+            try {
+                game.placeStarterSide(name, starterCard.getBackSide());
+            } catch (InvalidStarterSideException | MoveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+        }
+
+        System.out.println(game);
+
+        System.out.println(game.getPov("Acoustic"));
+
+        // Each player chooses an objective
+        for(String name : players){
+            Objective[] toChooseFrom = game.getPlayers().stream()
+                    .filter(p -> p.getNickname().equals(name))
+                    .findFirst()
+                    .get()
+                    .getObjectivesHand();
+
+            Objective choice = toChooseFrom[new Random().nextInt(toChooseFrom.length)];
+
+            try {
+                game.chooseObjective(name, choice);
+            } catch (MoveNotAllowedException | ObjectiveNotAllowedException | NoSuchPlayerException e) {throw new RuntimeException(e);}
+        }
+
+
+        while(game.getGameState() != GameState.END) {
+            Player current = getCurrentPlayer(game);
+
+            // Others players may not make any move
+            for (Player other : game.getPlayers()) {
+                if (other.getNickname().equals(current.getNickname())) continue;
+            }
+
+            // Current player plays a card
+            Card toPlace = current.getHand().getFirst();
+            Tuple coord = getRandomFreePlacingSpot(current);
+            try {
+                // Try placing it facing up
+                game.placeSide(current.getNickname(), toPlace, toPlace.getFrontSide(), coord.i, coord.j);
+            } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                     InvalidCoordinatesException | InvalidSideException |
+                     NotYourTurnException | NoSuchPlayerException e) {
+                throw new RuntimeException(e);
+            } catch (PlacementNotAllowedException e){
+                try {
+                    // Place it facing down
+                    game.placeSide(current.getNickname(), toPlace, toPlace.getBackSide(), coord.i, coord.j);
+                } catch (MoveNotAllowedException | NoAdjacentCardException | InvalidCardException |
+                         InvalidCoordinatesException | InvalidSideException | PlacementNotAllowedException |
+                         NotYourTurnException | NoSuchPlayerException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            // If there is nothing to draw
+            if( game.getGoldDeck().getVisible().isEmpty() && game.getResourceDeck().getVisible().isEmpty()){
+                continue;
+            }
+
+            // Others players may not make any move
+            for (Player other : game.getPlayers()) {
+                if (other.getNickname().equals(current.getNickname())) continue;
+            }
+
+            // Current Player Draws a card
+            int randomDecision = new Random().nextInt(4);
+
+            // Draw from ResourceDeck
+            if(randomDecision == 0){
+                try {
+                    game.drawDeck(current.getNickname(), false);
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (EmptyDeckException e) {
+                    randomDecision += 1;
+                }
+            }
+            // Draw from GoldDeck
+            if(randomDecision == 1){
+                try {
+                    game.drawDeck(current.getNickname(), false);
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (EmptyDeckException e) {
+                    randomDecision += 1;
+                }
+            }
+            // Draw a Visible Resource Card
+            if(randomDecision == 2){
+                try {
+                    game.drawVisible(current.getNickname(), game.getResourceDeck().getVisible().stream().findAny().orElse(null));
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (InvalidVisibleCardException e) {
+                    randomDecision += 1;
+                }
+            }
+            // Draw a Visible Gold Card
+            if(randomDecision == 3){
+                try {
+                    game.drawVisible(current.getNickname(), game.getGoldDeck().getVisible().stream().findAny().orElse(null));
+                } catch (MoveNotAllowedException | NoSuchPlayerException | NotYourTurnException e) {
+                    throw new RuntimeException(e);
+                } catch (InvalidVisibleCardException e) {
+                    randomDecision = 0;
+                }
+            }
+        }
+
+        //System.out.println(game);
+
+        System.out.println(game.getPov("Acoustic"));
+    }
+
     private void save(Game game, String fileName) {
         try {
             // Create FileOutputStream to write data to a file
