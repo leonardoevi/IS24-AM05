@@ -31,6 +31,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -43,7 +46,12 @@ import static it.polimi.is24am05.model.enums.element.Resource.*;
 
 public class GameSceneController implements Initializable {
 
-    //TODO AGGIORNATE LA MAPPPAAA
+    private double xcoord = 81;
+    private double ycoord = 54;
+
+    private double xshifht = 62;
+    private double yshift = 30;
+    private double fontSize = 14;
 
     @FXML
     private Pane playArea;
@@ -665,22 +673,30 @@ public class GameSceneController implements Initializable {
                 int id;
                 for (int row = 0; row < placedSides.length; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
-
+                        if (placedSides[0].length*xshifht>= 780){
+                            xcoord*=0.75;
+                            ycoord*=0.75;
+                            xshifht*=0.75;
+                            yshift*=0.75;
+                            fontSize*=0.75;
+                        }
                         if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
                             Tuple coord = placedSides[row][col].getActualCoord();
-                            Label coordinates = new Label("("+ coord.i + ","+coord.j+")");
-
+                            Label coordinates = new Label("(" + coord.i + "," + coord.j + ")");
+                            coord = getCard(placedSides, placedSides[row][col]);
+                            Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, fontSize);
+                            coordinates.setFont(font);
                             StackPane region = new StackPane();
                             String imagePath2 = getClass().getResource("/assets/images/emptycard.png").toExternalForm();
                             ImageView imageView = new ImageView(new Image(imagePath2));
-                            imageView.setFitWidth(81);
-                            imageView.setFitHeight(54);
+                            imageView.setFitWidth(xcoord);
+                            imageView.setFitHeight(ycoord);
                             imageView.setPreserveRatio(true);
 
                             region.getChildren().addAll(imageView, coordinates);
-                            coord = getCard(placedSides, placedSides[row][col]);
-                            double x = (coord.j) * (62);
-                            double y = (coord.i) * (30);
+
+                            double x = (coord.j) * (xshifht);
+                            double y = (coord.i) * (yshift);
 
                             region.setLayoutX(x);
                             region.setLayoutY(y);
@@ -704,22 +720,28 @@ public class GameSceneController implements Initializable {
                         path += ".png";
                         String imagePath2 = getClass().getResource(path).toExternalForm();
 
+                        Tuple coord = getCard(placedSides, placedSide);
+                        if (coord.j*xshifht>= 780){
+                            xcoord*=0.75;
+                            ycoord*=0.75;
+                            xshifht*=0.75;
+                            yshift*=0.75;
+                            fontSize*=0.75;
+                        }
 
                         StackPane region = new StackPane();
                         ImageView imageView = new ImageView(new Image(imagePath2));
-                        imageView.setFitWidth(81);
-                        imageView.setFitHeight(54);
+                        imageView.setFitWidth(xcoord);
+                        imageView.setFitHeight(ycoord);
                         imageView.setPreserveRatio(true);
                         region.getChildren().add(imageView);
-                        Tuple coord = getCard(placedSides, placedSide);
-                        double x = (coord.j) * (62);
-                        double y = (coord.i) * (30);
+
+                        double x = (coord.j) * (xshifht);
+                        double y = (coord.i) * (yshift);
 
                         region.setLayoutX(x);
                         region.setLayoutY(y);
                         playArea.getChildren().add(region);
-
-
                     }
                 }
             }
