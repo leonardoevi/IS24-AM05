@@ -76,86 +76,86 @@ public enum Objective {
         String f = RED_BOLD + "F" + RESET;
         String p = GREEN_BOLD + "P" + RESET;
         String a = CYAN_BOLD + "A" + RESET;
-        String i = PURPLE_BOLD + "P" + RESET;
+        String i = PURPLE_BOLD + "I" + RESET;
         switch (this){
             case O_087:
-                matrix[1][1] = "----" + f + "--";
+                matrix[1][1] = "-----" + f + "-";
                 matrix[2][1] = "   " + f + "   ";
-                matrix[3][1] = "--" + f + "----";
+                matrix[3][1] = "-" + f + "-----";
                 break;
             case O_088:
-                matrix[1][1] = "--" + p + "----";
+                matrix[1][1] = "-" + p + "-----";
                 matrix[2][1] = "   " + p + "   ";
-                matrix[3][1] = "----" + p + "--";
+                matrix[3][1] = "-----" + p + "-";
                 break;
             case O_089:
-                matrix[1][1] = "----" + a + "--";
+                matrix[1][1] = "-----" + a + "-";
                 matrix[2][1] = "   " + a + "   ";
-                matrix[3][1] = "--" + a + "----";
+                matrix[3][1] = "-" + a + "-----";
                 break;
             case O_090:
-                matrix[1][1] = "--" + i + "----";
+                matrix[1][1] = "-" + i + "-----";
                 matrix[2][1] = "   " + i + "   ";
-                matrix[3][1] = "----" + i + "--";
+                matrix[3][1] = "-----" + i + "-";
                 break;
             case O_091:
                 matrix[1][1] = "---" + f + "---";
                 matrix[2][1] = "   " + f + "   ";
-                matrix[3][1] = "----" + p + "--";
+                matrix[3][1] = "-----" + p + "-";
                 break;
             case O_092:
                 matrix[1][1] = "---" + p + "---";
                 matrix[2][1] = "   " + p + "   ";
-                matrix[3][1] = "--" + i + "----";
+                matrix[3][1] = "-" + i + "-----";
                 break;
             case O_093:
-                matrix[1][1] = "----" + f + "--";
+                matrix[1][1] = "-----" + f + "-";
                 matrix[2][1] = "   " + a + "   ";
                 matrix[3][1] = "---" + a + "---";
                 break;
             case O_094:
-                matrix[1][1] = "--" + a + "----";
+                matrix[1][1] = "-" + a + "-----";
                 matrix[2][1] = "   " + i + "   ";
                 matrix[3][1] = "---" + i + "---";
                 break;
             case O_095:
                 matrix[1][1] = "-------";
-                matrix[2][1] = " F F F ";
+                matrix[2][1] = RED_BOLD + " F F F " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_096:
                 matrix[1][1] = "-------";
-                matrix[2][1] = " P P P ";
+                matrix[2][1] = GREEN_BOLD + " P P P " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_097:
                 matrix[1][1] = "-------";
-                matrix[2][1] = " A A A ";
+                matrix[2][1] = CYAN_BOLD + " A A A " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_098:
                 matrix[1][1] = "-------";
-                matrix[2][1] = " I I I ";
+                matrix[2][1] = PURPLE_BOLD + " I I I " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_099:
                 matrix[1][1] = "-------";
-                matrix[2][1] = " Q I M ";
+                matrix[2][1] = YELLOW_BOLD + " Q K M " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_100:
                 matrix[1][1] = "-------";
-                matrix[2][1] = "  M M  ";
+                matrix[2][1] = YELLOW_BOLD + "  M M  " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_101:
                 matrix[1][1] = "-------";
-                matrix[2][1] = "  I I  ";
+                matrix[2][1] = YELLOW_BOLD + "  K K  " + RESET;
                 matrix[3][1] = "-------";
                 break;
             case O_102:
                 matrix[1][1] = "-------";
-                matrix[2][1] = "  Q Q  ";
+                matrix[2][1] = YELLOW_BOLD + "  Q Q  " + RESET;
                 matrix[3][1] = "-------";
                 break;
         }
