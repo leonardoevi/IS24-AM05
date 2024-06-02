@@ -12,6 +12,7 @@
 <?import javafx.scene.text.Font?>
 
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Circle?>
 <AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="148.0" prefWidth="241.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.GameSceneController">
    <children>
       <StackPane fx:id="backgroundPlayArea">
@@ -41,6 +42,11 @@
       <Button fx:id="buttonPlayer3" text="player3" />
       <Button fx:id="buttonPlayer2" text="player2" />
       <Button fx:id="buttonPlayer1" text="player1" />
+
+      <Circle fx:id="circle1"/>
+      <Circle fx:id="circle2"/>
+      <Circle fx:id="circle3"/>
+      <Circle fx:id="circle4"/>
       <Label fx:id="myPoints" textFill="#099061">
          <font>
             <Font size="21.0" />
@@ -48,6 +54,7 @@
       <ImageView fx:id="commonObjective1" />
       <ImageView fx:id="commonObjective2" />
       <ImageView fx:id="myObjective" />
+      <ImageView fx:id="plateau" />
       <Label fx:id="labelCommonObjectives" prefHeight="17.0" prefWidth="117.0" text="Common Objectives" textFill="#10a842">
          <font>
             <Font size="15.0" />

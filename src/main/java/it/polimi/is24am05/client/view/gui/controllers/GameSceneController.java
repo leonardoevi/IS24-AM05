@@ -28,6 +28,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 
@@ -79,7 +83,9 @@ public class GameSceneController implements Initializable {
 
     private ImageView myObjective;
     @FXML
+    private ImageView plateau;
 
+    @FXML
     private Button buttonPlayer1;
     @FXML
 
@@ -87,6 +93,19 @@ public class GameSceneController implements Initializable {
     @FXML
 
     private Button buttonPlayer3;
+
+    @FXML
+    private Circle circle1;
+    @FXML
+
+    private Circle circle2;
+    @FXML
+
+    private Circle circle3;
+
+    @FXML
+
+    private Circle circle4;
 
 
     @FXML
@@ -162,10 +181,10 @@ public class GameSceneController implements Initializable {
         AnchorPane.setRightAnchor(backgroundPlayArea, 300.0);
 
 
-        AnchorPane.setTopAnchor(labelCommonObjectives, 100.0);
+        AnchorPane.setTopAnchor(labelCommonObjectives, 40.0);
         AnchorPane.setRightAnchor(labelCommonObjectives, 90.0);
 
-        AnchorPane.setTopAnchor(labelMyObjective, 250.0);
+        AnchorPane.setTopAnchor(labelMyObjective, 150.0);
         AnchorPane.setRightAnchor(labelMyObjective, 90.0);
 
 
@@ -260,8 +279,8 @@ public class GameSceneController implements Initializable {
         AnchorPane.setBottomAnchor(handBackSide3, 250.0);
         AnchorPane.setLeftAnchor(handBackSide3, 150.0);
 
-        AnchorPane.setTopAnchor(myPoints, 30.0);
-        AnchorPane.setRightAnchor(myPoints, 90.0);
+        AnchorPane.setTopAnchor(myPoints, 10.0);
+        AnchorPane.setRightAnchor(myPoints, 60.0);
         myPoints.setPrefWidth(200);
         myPoints.setAlignment(Pos.CENTER);
         myPoints.setText("");
@@ -269,29 +288,36 @@ public class GameSceneController implements Initializable {
 
         commonObjective1.setFitWidth(120);
         commonObjective1.setFitHeight(90);
-        AnchorPane.setTopAnchor(commonObjective1, 130.0);
+        AnchorPane.setTopAnchor(commonObjective1, 60.0);
         AnchorPane.setRightAnchor(commonObjective1, 20.0);
 
 
         commonObjective2.setFitWidth(120);
         commonObjective2.setFitHeight(90);
-        AnchorPane.setTopAnchor(commonObjective2, 130.0);
+        AnchorPane.setTopAnchor(commonObjective2, 60.0);
         AnchorPane.setRightAnchor(commonObjective2, 150.0);
 
 
         myObjective.setFitWidth(120);
         myObjective.setFitHeight(90);
-        AnchorPane.setTopAnchor(myObjective, 280.0);
+        AnchorPane.setTopAnchor(myObjective, 170.0);
         AnchorPane.setRightAnchor(myObjective, 100.0);
 
+        /*plateau.setFitHeight(400);
+        plateau.setFitWidth(200);
+        AnchorPane.setTopAnchor(plateau, 270.0);
+        AnchorPane.setRightAnchor(plateau, 60.0);
+        String path1 = getClass().getResource("/assets/images/plateau.png").toExternalForm();
+        plateau.setImage(new Image(path1));*/
 
-        AnchorPane.setBottomAnchor(buttonPlayer1, 30.0);
+
+        AnchorPane.setBottomAnchor(buttonPlayer1, 20.0);
         AnchorPane.setRightAnchor(buttonPlayer1, 20.0);
 
-        AnchorPane.setBottomAnchor(buttonPlayer2, 70.0);
+        AnchorPane.setBottomAnchor(buttonPlayer2, 60.0);
         AnchorPane.setRightAnchor(buttonPlayer2, 20.0);
 
-        AnchorPane.setBottomAnchor(buttonPlayer3, 110.0);
+        AnchorPane.setBottomAnchor(buttonPlayer3, 100.0);
         AnchorPane.setRightAnchor(buttonPlayer3, 20.0);
 
         buttonPlayer1.setPrefWidth(200);
@@ -299,7 +325,10 @@ public class GameSceneController implements Initializable {
         buttonPlayer2.setPrefWidth(200);
 
         buttonPlayer3.setPrefWidth(200);
-
+        circle1.setVisible(false);
+        circle2.setVisible(false);
+        circle3.setVisible(false);
+        circle4.setVisible(false);
 
         AnchorPane.setBottomAnchor(rowPlacer, 390.0);
         AnchorPane.setLeftAnchor(rowPlacer, 20.0);
@@ -350,7 +379,7 @@ public class GameSceneController implements Initializable {
         resourceVisible2.setImage(null);
         goldVisible1.setImage(null);
         goldVisible2.setImage(null);
-        playArea.getChildren().removeIf(node -> node instanceof StackPane || node instanceof Label);
+        playArea.getChildren().removeIf(node -> node instanceof StackPane || node instanceof Text);
 
         for (Player p : game.getPlayers()) {
             if (p.getNickname().equals(clientNickname)) {
@@ -612,8 +641,10 @@ public class GameSceneController implements Initializable {
 
 
         }
+        if(game.getPlayers() != null && !game.getPlayers().isEmpty())
+            SetCircles(game.getPlayers());
 
-        System.out.println("Displaying playarea");
+
         for (Player p : game.getPlayers()) {
 
             if (p.getNickname().equals(clientNickname)) {
@@ -622,9 +653,32 @@ public class GameSceneController implements Initializable {
                 StackPane.setMargin(playArea, new Insets(50));
 
                 int id;
-                System.out.println("row" + placedSides.length);
-                System.out.println("column" + placedSides[0].length);
+                for (int row = 0; row < placedSides.length; row++) {
+                    for (int col = 0; col < placedSides[0].length; col++) {
 
+                        if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
+                            Tuple coord = placedSides[row][col].getActualCoord();
+                            Label coordinates = new Label("("+ coord.i + ","+coord.j+")");
+
+                            StackPane region = new StackPane();
+                            String imagePath2 = getClass().getResource("/assets/images/emptycard.png").toExternalForm();
+                            ImageView imageView = new ImageView(new Image(imagePath2));
+                            imageView.setFitWidth(81);
+                            imageView.setFitHeight(54);
+                            imageView.setPreserveRatio(true);
+
+                            region.getChildren().addAll(imageView, coordinates);
+                            coord = getCard(placedSides, placedSides[row][col]);
+                            double x = (coord.j) * (62);
+                            double y = (coord.i) * (30);
+
+                            region.setLayoutX(x);
+                            region.setLayoutY(y);
+
+                            playArea.getChildren().add(region);
+                        }
+                    }
+                }
                 for (PlacedSide placedSide : p.getPlayArea().getOrderedPlacements()) {
                     if (placedSide.getSide() != null) {
 
@@ -638,7 +692,6 @@ public class GameSceneController implements Initializable {
 
                         path += cardId.substring(4, 7);
                         path += ".png";
-                        System.out.println(path);
                         String imagePath2 = getClass().getResource(path).toExternalForm();
 
 
@@ -649,7 +702,7 @@ public class GameSceneController implements Initializable {
                         imageView.setPreserveRatio(true);
                         region.getChildren().add(imageView);
                         Tuple coord = getCard(placedSides, placedSide);
-                        double x = (coord.j) * (60);
+                        double x = (coord.j) * (62);
                         double y = (coord.i) * (30);
 
                         region.setLayoutX(x);
@@ -657,24 +710,6 @@ public class GameSceneController implements Initializable {
                         playArea.getChildren().add(region);
 
 
-                    }
-                }
-
-                for (int row = 0; row < placedSides.length; row++) {
-                    for (int col = 0; col < placedSides[0].length; col++) {
-
-                          if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
-                              Tuple coord = placedSides[row][col].getActualCoord();
-                            Label coordinates = new Label("("+ coord.i + ","+coord.j+")");
-                            coordinates.setPrefWidth(81);
-                            coordinates.setPrefHeight(54);
-                            double x = (row) * (68);
-                            double y =(0.9*col) * (35);
-
-                            coordinates.setLayoutX(x);
-                            coordinates.setLayoutY(y);
-                            playArea.getChildren().add(coordinates);
-                        }
                     }
                 }
             }
@@ -686,7 +721,7 @@ public class GameSceneController implements Initializable {
         buttonPlayer1.setText("View " + nicknames.get(0));
         buttonPlayer1.setOnAction(event -> {
             try {
-                gui.viewOtherPlayer(nicknames.get(0), game);
+                gui.viewOtherPlayer(clientNickname, nicknames.get(0), game);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -695,7 +730,7 @@ public class GameSceneController implements Initializable {
             buttonPlayer2.setText("View" + nicknames.get(1));
             buttonPlayer2.setOnAction(event -> {
                 try {
-                    gui.viewOtherPlayer(nicknames.get(1), game);
+                    gui.viewOtherPlayer(clientNickname, nicknames.get(1), game);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -708,7 +743,7 @@ public class GameSceneController implements Initializable {
             buttonPlayer3.setText("View " + nicknames.get(2));
             buttonPlayer3.setOnAction(event -> {
                 try {
-                    gui.viewOtherPlayer(nicknames.get(1), game);
+                    gui.viewOtherPlayer(clientNickname, nicknames.get(1), game);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -766,8 +801,6 @@ public class GameSceneController implements Initializable {
                     CardServerId = "RC_";
                 CardServerId += cardId;
 
-                System.out.println("trying to place" + CardServerId);
-
                 gui.placeCard(CardServerId, isFront, row, column);
             } else {
                 System.out.println("there is no card");
@@ -808,8 +841,6 @@ public class GameSceneController implements Initializable {
             CardServerId = "RC_";
         CardServerId += cardId;
 
-        System.out.println(CardServerId);
-
         gui.drawVisible(CardServerId);
 
 
@@ -827,9 +858,179 @@ public class GameSceneController implements Initializable {
         }
         return found;
     }
+    public void SetCircles(List<Player> players){
+
+        Tuple coord = calculatecoord(players.getFirst().getPoints());
+        circle1.setVisible(true);
+        circle1.setRadius(17);
+        circle1.setFill(getPaint(players.getFirst().getColor()));
+
+        StackPane region = new StackPane();
+        String imagePath2 = getClass().getResource("/assets/images/plateau.png").toExternalForm();
+        ImageView imageView = new ImageView(new Image(imagePath2));
+        imageView.setFitWidth(700);
+        imageView.setFitHeight(350);
+        imageView.setPreserveRatio(true);
+
+
+        circle1.setTranslateX(coord.i);
+        circle1.setTranslateY(coord.j);
+
+
+
+        if(players.size()>=2) {
+            coord = calculatecoord(players.get(1).getPoints());
+            circle2.setVisible(true);
+            circle2.setRadius(17);
+            circle2.setFill(getPaint(players.get(1).getColor()));
+            circle2.setTranslateX(coord.i);
+            circle2.setTranslateY(coord.j);
+        }
+        if(players.size()>=3) {
+            coord = calculatecoord(players.get(2).getPoints());
+            circle3.setVisible(true);
+            circle3.setRadius(17);
+            circle3.setFill(getPaint(players.get(2).getColor()));
+            circle3.setTranslateX(coord.i);
+            circle3.setTranslateY(coord.j);
+        }
+        if(players.size()>=4) {
+            coord = calculatecoord(players.get(3).getPoints());
+            circle4.setVisible(true);
+            circle4.setFill(getPaint(players.get(3).getColor()));
+            circle4.setRadius(17);
+            circle4.setTranslateX(coord.i);
+            circle4.setTranslateY(coord.j);
+        }
+
+        if (players.size() == 1){
+            region.getChildren().addAll(imageView, circle1);
+        } else if (players.size() == 2) {
+            region.getChildren().addAll(imageView, circle1, circle2);
+        } else if (players.size() == 3) {
+            region.getChildren().addAll(imageView, circle1, circle2, circle3);
+        } else
+            region.getChildren().addAll(imageView, circle1, circle2, circle3, circle4);
+
+        region.setLayoutX(1200);
+        region.setLayoutY(300);
+        mainBackground.getChildren().add(region);
+
+    }
+
+    public Tuple calculatecoord(int points){
+        Tuple coord = null;
+
+        switch (points){
+            case 0:
+                coord = new Tuple(-42, 151);
+                break;
+            case 1:
+                coord = new Tuple(0, 151);
+                break;
+            case 2:
+                coord = new Tuple(42, 151);
+                break;
+            case 3:
+                coord = new Tuple(61, 114);
+                break;
+            case 4:
+                coord = new Tuple(20, 114);
+                break;
+            case 5:
+                coord = new Tuple(-21, 114);
+                break;
+            case 6:
+                coord = new Tuple(-62, 114);
+                break;
+            case 7:
+                coord = new Tuple(-62, 77);
+                break;
+            case 8:
+                coord = new Tuple(-21, 77);
+                break;
+            case 9:
+                coord = new Tuple(20, 77);
+                break;
+            case 10:
+                coord = new Tuple(61, 77);
+                break;
+            case 11:
+                coord = new Tuple(61, 40);
+                break;
+            case 12:
+                coord = new Tuple(20, 40);
+                break;
+            case 13:
+                coord = new Tuple(-21, 40);
+                break;
+            case 14:
+                coord = new Tuple(-62,40);
+                break;
+            case 15:
+                coord = new Tuple(-62,3);
+                break;
+            case 16:
+                coord = new Tuple(-21,3);
+                break;
+            case 17:
+                coord = new Tuple(20,3);
+                break;
+            case 18:
+                coord = new Tuple(61,3);
+                break;
+            case 19:
+                coord = new Tuple(61,-38);
+                break;
+            case 20:
+                coord = new Tuple(0, -57);
+                break;
+            case 21:
+                coord = new Tuple(-62, -38);
+                break;
+            case 22:
+                coord = new Tuple(-62, -75);
+                break;
+            case 23:
+                coord = new Tuple(-62, -112);
+                break;
+            case 24:
+                coord = new Tuple(-38, -143);
+                break;
+            case 25:
+                coord = new Tuple(0, -150);
+                break;
+            case 26:
+                coord = new Tuple(38, -143);
+                break;
+            case 27:
+                coord = new Tuple(61, -112);
+                break;
+            case 28:
+                coord = new Tuple(61, -75);
+                break;
+            case 29:
+                coord = new Tuple(0, -105);
+                break;
+            default:
+                break;
+        }
+
+        return coord;
+    }
+    public Color getPaint(it.polimi.is24am05.model.enums.Color color){
+        if(color == it.polimi.is24am05.model.enums.Color.BLUE){
+            return Color.BLUE;
+        }
+        else if (color == it.polimi.is24am05.model.enums.Color.RED){
+            return Color.RED;
+        }
+        else if (color == it.polimi.is24am05.model.enums.Color.YELLOW){
+            return Color.YELLOW;
+        }else{
+            return Color.GREEN;
+        }
+
+    }
 }
-
-
-
-
 

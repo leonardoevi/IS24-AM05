@@ -157,11 +157,7 @@ public class DealHandAndObjectivesSceneController implements Initializable {
         String pathcardback;
         String path;
         System.out.println(clientNickname);
-        String card = game.getPlayers().get(0).getObjectivesHand()[0].name();
-        System.out.println(card);
-        card = game.getPlayers().get(1).getObjectivesHand()[0].name();
-        System.out.println(card);
-
+        String card = "";
         for (Player p : game.getPlayers()) {
             String appendfront = "/assets/images/front/";
             String appendback = "/assets/images/back/";
