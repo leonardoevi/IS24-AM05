@@ -1,7 +1,8 @@
 package it.polimi.is24am05.controller;
 
-import it.polimi.is24am05.model.game.Game;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,6 +15,11 @@ public class GameSaver implements Runnable {
      */
     private final Controller controller;
 
+    /**
+     * Name of the last saved file
+     */
+    private static String lastFileSaved = "unBelNiente";
+
     public GameSaver(Controller controller) {
         this.controller = controller;
     }
@@ -21,7 +27,17 @@ public class GameSaver implements Runnable {
 
     @Override
     public void run() {
-        controller.saveGame(timeToString());
+        // Save last file name
+        String toDelete = lastFileSaved;
+
+        // Save new file and record its name
+        lastFileSaved = timeToString();
+        controller.saveGame(lastFileSaved);
+
+        // Delete last file
+        try{
+            Files.delete(Paths.get(toDelete));
+        } catch (IOException ignored) {}
     }
 
     private static String timeToString() {

@@ -23,10 +23,7 @@ import it.polimi.is24am05.model.game.Game;
 import it.polimi.is24am05.model.objective.Objective;
 
 import java.io.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +58,7 @@ public class Controller {
         this.lobbyState = LobbyState.OLD;
 
         this.messageRecipents.addAll(game.getNicknames().stream().toList());
+        startSaver();
         server.start();
     }
 
@@ -77,7 +75,7 @@ public class Controller {
     // Start the game saver demon thread
     private void startSaver(){
         Thread t = new Thread(new GameSaver(this)); t.setDaemon(true);
-        saver.scheduleAtFixedRate(t, 0, 10, TimeUnit.SECONDS);
+        saver.scheduleAtFixedRate(t, 3, 10, TimeUnit.SECONDS);
     }
 
     /**
@@ -415,9 +413,8 @@ public class Controller {
             // Close streams
             objectOut.close();
             fileOut.close();
-        } catch (Exception ex) {
-
-            ex.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Saving game failed");
         }
     }
 
