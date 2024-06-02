@@ -44,6 +44,7 @@ public class GUIRoot extends View {
     @Override
     public void serverUnreachable() {
         // TODO : manuel questo metodo viene chiamato quando la connessione al server si perde (oppure fallisce all'inizio) tutto si deve chiudere.
+        guiMain.stop();
     }
 
     public void seGuiMain(GUIMain guiMain) {
@@ -235,7 +236,7 @@ public class GUIRoot extends View {
             stage.setTitle("Codex Naturalis");
 
             stage.setScene(scene);
-            stage.setFullScreen(true);
+            //stage.setFullScreen(true);
             stage.show();
         });
     }

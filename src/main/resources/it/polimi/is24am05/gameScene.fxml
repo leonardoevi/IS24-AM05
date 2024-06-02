@@ -47,6 +47,7 @@
       <Circle fx:id="circle2"/>
       <Circle fx:id="circle3"/>
       <Circle fx:id="circle4"/>
+      <Circle fx:id="turn"/>
       <Label fx:id="myPoints" textFill="#099061">
          <font>
             <Font size="21.0" />

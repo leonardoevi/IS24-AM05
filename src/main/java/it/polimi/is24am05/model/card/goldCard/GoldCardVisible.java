@@ -9,7 +9,7 @@ public enum GoldCardVisible implements Card {
     GCV_F(GoldBackSide.GBS_041),
     GCV_P(GoldBackSide.GBS_051),
     GCV_A(GoldBackSide.GBS_061),
-    GCV_I(GoldBackSide.GBS_061);
+    GCV_I(GoldBackSide.GBS_071);
     private GoldBackSide backSide;
     GoldCardVisible(GoldBackSide backside) {
         this.backSide=backside;

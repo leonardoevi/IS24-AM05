@@ -107,6 +107,9 @@ public class GameSceneController implements Initializable {
 
     private Circle circle4;
 
+    @FXML
+    private Circle turn;
+
 
     @FXML
 
@@ -325,6 +328,7 @@ public class GameSceneController implements Initializable {
         buttonPlayer2.setPrefWidth(200);
 
         buttonPlayer3.setPrefWidth(200);
+
         circle1.setVisible(false);
         circle2.setVisible(false);
         circle3.setVisible(false);
@@ -643,8 +647,14 @@ public class GameSceneController implements Initializable {
         }
         if(game.getPlayers() != null && !game.getPlayers().isEmpty())
             SetCircles(game.getPlayers());
-
-
+        turn.setVisible(false);
+        if (Objects.equals(game.getPlayers().get(game.getTurn()).getNickname(), clientNickname)){
+            turn.setFill(Color.BLACK);
+            turn.setRadius(25);
+            turn.setVisible(true);
+            AnchorPane.setBottomAnchor(turn, 200.0);
+            AnchorPane.setRightAnchor(turn, 190.0);
+            }
         for (Player p : game.getPlayers()) {
 
             if (p.getNickname().equals(clientNickname)) {
@@ -726,8 +736,8 @@ public class GameSceneController implements Initializable {
                 throw new RuntimeException(e);
             }
         });
-        if (nicknames.size() > 2) {
-            buttonPlayer2.setText("View" + nicknames.get(1));
+        if (nicknames.size() > 1) {
+            buttonPlayer2.setText("View " + nicknames.get(1));
             buttonPlayer2.setOnAction(event -> {
                 try {
                     gui.viewOtherPlayer(clientNickname, nicknames.get(1), game);
@@ -739,11 +749,11 @@ public class GameSceneController implements Initializable {
         } else {
             buttonPlayer2.setVisible(false);
         }
-        if (nicknames.size() > 3) {
+        if (nicknames.size() > 2) {
             buttonPlayer3.setText("View " + nicknames.get(2));
             buttonPlayer3.setOnAction(event -> {
                 try {
-                    gui.viewOtherPlayer(clientNickname, nicknames.get(1), game);
+                    gui.viewOtherPlayer(clientNickname, nicknames.get(2), game);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

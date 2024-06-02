@@ -3,6 +3,8 @@ package it.polimi.is24am05.client.view.gui.controllers;
 import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
+import it.polimi.is24am05.model.card.resourceCard.ResourceBackSide;
 import it.polimi.is24am05.model.card.side.EmptyPlacedSide;
 import it.polimi.is24am05.model.card.side.PlacedSide;
 
@@ -28,6 +30,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -63,6 +67,9 @@ public class OtherPlayerSceneController implements Initializable {
     @FXML
 
     private Label logField;
+    @FXML
+
+    private Circle turn;
 
 
     private String clientNickname;
@@ -155,7 +162,7 @@ public class OtherPlayerSceneController implements Initializable {
 
         handBackSide3.setFitWidth(120);
         handBackSide3.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handBackSide3, 150.0);
+        AnchorPane.setBottomAnchor(handBackSide3, 250.0);
         AnchorPane.setLeftAnchor(handBackSide3, 20.0);
 
         AnchorPane.setTopAnchor(myPoints, 30.0);
@@ -195,10 +202,9 @@ public class OtherPlayerSceneController implements Initializable {
         handViewMap.clear();
 
         handBackSide1.setImage(null);
-
         handBackSide2.setImage(null);
-
         handBackSide3.setImage(null);
+
         HandImageViewList.clear();
         playArea.getChildren().removeIf(node -> node instanceof StackPane || node instanceof Text);
 
@@ -210,34 +216,22 @@ public class OtherPlayerSceneController implements Initializable {
                     HandImageViewList.add(handBackSide1);
                     HandImageViewList.add(handBackSide2);
                     HandImageViewList.add(handBackSide3);
-                    for (Resource r : resources) {
-                        String sidePath = "/assets/images/back/";
-                        switch (r) {
-                            case FUNGI: {
-                                sidePath += "001.png";
-                                break;
-                            }
-                            case PLANT: {
-                                sidePath += "011.png";
-                                break;
-                            }
-                            case ANIMAL: {
-                                sidePath += "021.png";
-                                break;
-                            }
-                            case INSECT: {
-                                sidePath += "031.png";
-                                break;
-                            }
 
-                            default:
-                                break;
-                        }
+                    List<Card> hand = p.getHand();
+                    String path = getPath(hand.getFirst());
+                    path = getClass().getResource(path).toExternalForm();
+                    handBackSide1.setImage(new Image(path));
 
-                        sidePath = getClass().getResource(sidePath).toExternalForm();
-                        HandImageViewList.getFirst().setImage(new Image(sidePath));
-                        HandImageViewList.removeFirst();
+                    path = getPath(hand.get(1));
+                    path = getClass().getResource(path).toExternalForm();
+                    handBackSide2.setImage(new Image(path));
+
+                    if (hand.size()>2){
+                        path = getPath(hand.get(2));
+                        path = getClass().getResource(path).toExternalForm();
+                        handBackSide3.setImage(new Image(path));
                     }
+
                 } catch (NoSuchPlayerException e) {
                     throw new RuntimeException(e);
                 }
@@ -247,7 +241,14 @@ public class OtherPlayerSceneController implements Initializable {
             }
         }
 
-
+        turn.setVisible(false);
+        if (Objects.equals(game.getPlayers().get(game.getTurn()).getNickname(), clientNickname)){
+            turn.setFill(Color.BLACK);
+            turn.setRadius(25);
+            turn.setVisible(true);
+            AnchorPane.setBottomAnchor(turn, 200.0);
+            AnchorPane.setRightAnchor(turn, 190.0);
+        }
         System.out.println("Displaying playarea");
         for (Player p : game.getPlayers()) {
 
@@ -258,8 +259,6 @@ public class OtherPlayerSceneController implements Initializable {
                 StackPane.setMargin(playArea, new Insets(50));
 
                 int id;
-                System.out.println("row" + placedSides.length);
-                System.out.println("column" + placedSides[0].length);
 
                 for (int row = 0; row < placedSides.length; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
@@ -300,7 +299,6 @@ public class OtherPlayerSceneController implements Initializable {
 
                             path += cardId.substring(4, 7);
                             path += ".png";
-                            System.out.println(path);
                             String imagePath2 = getClass().getResource(path).toExternalForm();
 
 
@@ -344,5 +342,31 @@ public class OtherPlayerSceneController implements Initializable {
         }
         return found;
     }
-
+public String getPath(Card c) {
+    String sidePath = "/assets/images/back/";
+    if (c.getBackSide() instanceof GoldBackSide) {
+        Resource r = c.getBackSide().getSeed();
+        if (r.equals(Resource.FUNGI)) {
+            sidePath += "041.png";
+        } else if (r.equals(Resource.PLANT)) {
+            sidePath += "051.png";
+        } else if (r.equals(Resource.ANIMAL)) {
+            sidePath += "061.png";
+        } else {
+            sidePath += "071.png";
+        }
+    } else {
+        Resource r = c.getBackSide().getSeed();
+        if (r.equals(Resource.FUNGI)) {
+            sidePath += "001.png";
+        } else if (r.equals(Resource.PLANT)) {
+            sidePath += "011.png";
+        } else if (r.equals(Resource.ANIMAL)) {
+            sidePath += "021.png";
+        } else {
+            sidePath += "031.png";
+        }
+    }
+    return sidePath;
+}
 }
