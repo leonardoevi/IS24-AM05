@@ -279,16 +279,16 @@ public class GameSceneController implements Initializable {
         AnchorPane.setLeftAnchor(handFrontSide2, 150.0);
 
 
-        handFrontSide3.setFitWidth(120);
-        handFrontSide3.setFitHeight(90);
-        AnchorPane.setBottomAnchor(handFrontSide3, 250.0);
-        AnchorPane.setLeftAnchor(handFrontSide3, 20.0);
-
-
         handBackSide3.setFitWidth(120);
         handBackSide3.setFitHeight(90);
         AnchorPane.setBottomAnchor(handBackSide3, 250.0);
-        AnchorPane.setLeftAnchor(handBackSide3, 150.0);
+        AnchorPane.setLeftAnchor(handBackSide3, 20.0);
+
+
+        handFrontSide3.setFitWidth(120);
+        handFrontSide3.setFitHeight(90);
+        AnchorPane.setBottomAnchor(handFrontSide3, 250.0);
+        AnchorPane.setLeftAnchor(handFrontSide3, 150.0);
 
         AnchorPane.setTopAnchor(myPoints, 10.0);
         AnchorPane.setRightAnchor(myPoints, 60.0);
@@ -313,13 +313,6 @@ public class GameSceneController implements Initializable {
         myObjective.setFitHeight(90);
         AnchorPane.setTopAnchor(myObjective, 170.0);
         AnchorPane.setRightAnchor(myObjective, 100.0);
-
-        /*plateau.setFitHeight(400);
-        plateau.setFitWidth(200);
-        AnchorPane.setTopAnchor(plateau, 270.0);
-        AnchorPane.setRightAnchor(plateau, 60.0);
-        String path1 = getClass().getResource("/assets/images/plateau.png").toExternalForm();
-        plateau.setImage(new Image(path1));*/
 
 
         AnchorPane.setBottomAnchor(buttonPlayer1, 20.0);
