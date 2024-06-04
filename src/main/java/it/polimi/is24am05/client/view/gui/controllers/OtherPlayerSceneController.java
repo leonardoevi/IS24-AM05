@@ -32,6 +32,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -42,9 +45,19 @@ import java.util.*;
 
 import static it.polimi.is24am05.model.enums.element.Resource.*;
 
+/**
+ * Other Player scene Controller
+ */
 public class OtherPlayerSceneController implements Initializable {
+    /**
+     * Values needed in order to place cards one on top of the other snd cover only the corners
+     */
+    private double xcoord = 81;
+    private double ycoord = 54;
 
-    //TODO AGGIORNATE LA MAPPPAAA
+    private double xshifht = 62;
+    private double yshift = 30;
+    private double fontSize = 14;
 
     @FXML
     private Pane playArea;
@@ -102,6 +115,11 @@ public class OtherPlayerSceneController implements Initializable {
 
     }
 
+    /**
+     * Initializes a similar scen to the game scene but it only shows the backside of the hand cards, their playArea and how many points they have
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -185,7 +203,10 @@ public class OtherPlayerSceneController implements Initializable {
         }
 
     }
-
+    /**
+     * Shows logs
+     * @param log log to show
+     */
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -196,7 +217,10 @@ public class OtherPlayerSceneController implements Initializable {
         timeline.play();
 
     }
-
+    /**
+     * Updates the scene when it receives a new Game update
+     * @param game Game update
+     */
     public void update(Game game) {
 
         handViewMap.clear();
@@ -262,22 +286,30 @@ public class OtherPlayerSceneController implements Initializable {
 
                 for (int row = 0; row < placedSides.length; row++) {
                     for (int col = 0; col < placedSides[0].length; col++) {
+                        if (placedSides[0].length*xshifht>= 780){
+                            xcoord*=0.75;
+                            ycoord*=0.75;
+                            xshifht*=0.75;
+                            yshift*=0.75;
+                            fontSize*=0.75;
+                        }
 
                         if (placedSides[row][col] != null && placedSides[row][col] instanceof EmptyPlacedSide) {
                             Tuple coord = placedSides[row][col].getActualCoord();
                             Label coordinates = new Label("("+ coord.i + ","+coord.j+")");
-
+                            Font font = Font.font("Arial", FontWeight.NORMAL, FontPosture.REGULAR, fontSize);
+                            coordinates.setFont(font);
                             StackPane region = new StackPane();
                             String imagePath2 = getClass().getResource("/assets/images/emptycard.png").toExternalForm();
                             ImageView imageView = new ImageView(new Image(imagePath2));
-                            imageView.setFitWidth(81);
-                            imageView.setFitHeight(54);
+                            imageView.setFitWidth(xcoord);
+                            imageView.setFitHeight(ycoord);
                             imageView.setPreserveRatio(true);
 
                             region.getChildren().addAll(imageView, coordinates);
                             coord = getCard(placedSides, placedSides[row][col]);
-                            double x = (coord.j) * (60);
-                            double y = (coord.i) * (30);
+                            double x = (coord.j) * (xshifht);
+                            double y = (coord.i) * (yshift);
 
                             region.setLayoutX(x);
                             region.setLayoutY(y);
@@ -301,16 +333,24 @@ public class OtherPlayerSceneController implements Initializable {
                             path += ".png";
                             String imagePath2 = getClass().getResource(path).toExternalForm();
 
+                            Tuple coord = getCard(placedSides, placedSide);
+                            if (coord.j*xshifht>= 780){
+                                xcoord*=0.75;
+                                ycoord*=0.75;
+                                xshifht*=0.75;
+                                yshift*=0.75;
+                                fontSize*=0.75;
+                            }
 
                             StackPane region = new StackPane();
                             ImageView imageView = new ImageView(new Image(imagePath2));
-                            imageView.setFitWidth(81);
-                            imageView.setFitHeight(54);
+                            imageView.setFitWidth(xcoord);
+                            imageView.setFitHeight(ycoord);
                             imageView.setPreserveRatio(true);
                             region.getChildren().add(imageView);
-                            Tuple coord = getCard(placedSides, placedSide);
-                            double x = (coord.j) * (60);
-                            double y = (coord.i) * (30);
+
+                            double x = (coord.j) * (xshifht);
+                            double y = (coord.i) * (yshift);
 
                             region.setLayoutX(x);
                             region.setLayoutY(y);
@@ -329,6 +369,12 @@ public class OtherPlayerSceneController implements Initializable {
         });
 
     }
+    /**
+     * Support method to place Cards correctly
+     * @param placedSides Matrix of placed cards
+     * @param toFind card to find
+     * @return coordinates
+     */
     public Tuple getCard(PlacedSide[][] placedSides, PlacedSide toFind){
         Tuple found = null;
         for (int i = 0; i < placedSides.length; i++) {
@@ -342,7 +388,13 @@ public class OtherPlayerSceneController implements Initializable {
         }
         return found;
     }
-public String getPath(Card c) {
+
+    /**
+     * Given a Card based on if its Gold or Resource and based on their resource returns a generic backside path card
+     * @param c Card
+     * @return Path
+     */
+    public String getPath(Card c) {
     String sidePath = "/assets/images/back/";
     if (c.getBackSide() instanceof GoldBackSide) {
         Resource r = c.getBackSide().getSeed();

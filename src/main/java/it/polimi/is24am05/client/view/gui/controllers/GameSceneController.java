@@ -44,8 +44,13 @@ import java.util.*;
 
 import static it.polimi.is24am05.model.enums.element.Resource.*;
 
+/**
+ * Game scene Controller
+ */
 public class GameSceneController implements Initializable {
-
+    /**
+     * Values needed in order to place cards one on top of the other snd cover only the corners
+     */
     private double xcoord = 81;
     private double ycoord = 54;
 
@@ -151,7 +156,6 @@ public class GameSceneController implements Initializable {
     @FXML
     private Label labelCommonObjectives;
 
-
     @FXML
     private StackPane leftSideBackground;
     @FXML
@@ -167,6 +171,11 @@ public class GameSceneController implements Initializable {
 
     }
 
+    /**
+     * Initializes the scen by setting the decks and the hand to the left, the playAre in the center and the common objective and the plateau to the right
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -357,7 +366,10 @@ public class GameSceneController implements Initializable {
         }
 
     }
-
+    /**
+     * Shows logs
+     * @param log log to show
+     */
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -368,7 +380,10 @@ public class GameSceneController implements Initializable {
         timeline.play();
 
     }
-
+    /**
+     * Updates the scene when it receives a new Game update
+     * @param game Game update
+     */
     public void update(Game game) {
 
         handViewMap.clear();
@@ -779,29 +794,29 @@ public class GameSceneController implements Initializable {
 
     }
 
+    /**
+     * Starts waiting for coordinates where to place the card
+     * @param event Click with mouse on hand card
+     */
     @FXML
     public void onHandCardTouch(MouseEvent event) {
-
         ImageView source = (ImageView) event.getSource();
-
-
         rowPlacer.setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 checkFields(source);
-
             }
         });
-
-
         columnPlacer.setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 checkFields(source);
             }
         });
-
-
     }
 
+    /**
+     * Checks if both coordinates are set
+     * @param source
+     */
     private void checkFields(ImageView source) {
         if (rowPlacer.getText() != null && rowPlacer.getText() != "" && columnPlacer.getText() != null && columnPlacer.getText() != "") {
 
@@ -835,18 +850,28 @@ public class GameSceneController implements Initializable {
         }
     }
 
+    /**
+     * Draws from Resource deck
+     * @param event Click on Resource deck
+     */
     @FXML
     public void drawResourceDeck(MouseEvent event) {
         gui.drawDeck(false);
 
     }
-
+    /**
+     * Draws from Gold deck
+     * @param event Click on Gold deck
+     */
     @FXML
     public void drawGoldDeck(MouseEvent event) {
         gui.drawDeck(true);
 
     }
-
+    /**
+     * Draws visible card
+     * @param event Click on card
+     */
     @FXML
     public void drawVisible(MouseEvent event) {
         ImageView source = (ImageView) event.getSource();
@@ -870,6 +895,13 @@ public class GameSceneController implements Initializable {
 
 
     }
+
+    /**
+     * Support method to place Cards correctly
+     * @param placedSides Matrix of placed cards
+     * @param toFind card to find
+     * @return coordinates
+     */
     public Tuple getCard(PlacedSide[][] placedSides, PlacedSide toFind){
         Tuple found = null;
         for (int i = 0; i < placedSides.length; i++) {
@@ -883,6 +915,11 @@ public class GameSceneController implements Initializable {
         }
         return found;
     }
+
+    /**
+     * Support method that sets the circles based on the player's points
+     * @param players
+     */
     public void SetCircles(List<Player> players){
 
         Tuple coord = calculatecoord(players.getFirst().getPoints());
@@ -943,6 +980,11 @@ public class GameSceneController implements Initializable {
 
     }
 
+    /**
+     * Calculate coordinates where to place the circle based on the number of points
+     * @param points number of points
+     * @return Pixels coordinates
+     */
     public Tuple calculatecoord(int points){
         Tuple coord = null;
 
@@ -1043,6 +1085,12 @@ public class GameSceneController implements Initializable {
 
         return coord;
     }
+
+    /**
+     * Based on the color choose by the player return the same color but as JavaFX library class
+     * @param color player color
+     * @return Paint color
+     */
     public Color getPaint(it.polimi.is24am05.model.enums.Color color){
         if(color == it.polimi.is24am05.model.enums.Color.BLUE){
             return Color.BLUE;

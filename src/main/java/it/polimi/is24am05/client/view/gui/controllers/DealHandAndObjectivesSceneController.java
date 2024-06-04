@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-
+/**
+ * Deal Hand and Objective Card scene Controller
+ */
 public class DealHandAndObjectivesSceneController implements Initializable {
 
     @FXML
@@ -64,6 +66,11 @@ public class DealHandAndObjectivesSceneController implements Initializable {
         this.clientNickname = nickname;
     }
 
+    /**
+     * Initializes the scene by setting up the background, the hand cards and the objectives to choose
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         objectivePathMap = new HashMap<>();
@@ -133,13 +140,19 @@ public class DealHandAndObjectivesSceneController implements Initializable {
 
     }
 
+    /**
+     * Chooses the secret objective card
+     * @param event Click with the mouse on Imageview
+     */
     @FXML
     public void onTouch(MouseEvent event) {
         ImageView source = (ImageView) event.getSource();
-
         gui.chooseObjective(objectivePathMap.get(source));
     }
-
+    /**
+     * Shows logs
+     * @param log log to show
+     */
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -150,7 +163,10 @@ public class DealHandAndObjectivesSceneController implements Initializable {
         timeline.play();
 
     }
-
+    /**
+     * Updates the scene when it receives a new Game update
+     * @param game Game update
+     */
     public void update(Game game) {
         int idCard;
         String pathcardfront;

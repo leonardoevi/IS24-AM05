@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Main class that deploys the GUI
+ */
 public class GUIMain extends Application {
     private Stage primaryStage;
     private static GUIMain instance;
@@ -22,34 +24,34 @@ public class GUIMain extends Application {
         instance = this;
     }
 
-    public static GUIMain getInstance() {
-        return instance;
-    }
-
+    /**
+     * Launches the application
+     * @param guiRootInstance sets the GUI root
+     */
     public static void launchApp(GUIRoot guiRootInstance) {
         guiRoot = guiRootInstance;
         Application.launch(GUIMain.class);
 
     }
 
-
-    public static GUIRoot getGuiRoot() {
-        return guiRoot;
-    }
-
+    /**
+     * Starts the application and displays first scene
+     * @param stage Stage to set
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
         this.primaryStage = new Stage();
-        guiRoot.seGuiMain(this);
-
+        guiRoot.setGuiMain(this);
         guiRoot.goToFirstScene();
 
     }
-    public void loadScene(Scene scene, Object controller) throws IOException {
 
-        sceneControllerMap.put(scene, controller);
-
-    }
+    /**
+     * Given a scene return the controller of that scene
+     * @param scene scene to get controller from
+     * @return Controller
+     */
     public Object getControllerForScene(Scene scene) {
         return sceneControllerMap.get(scene);
     }
@@ -58,6 +60,9 @@ public class GUIMain extends Application {
         launch();
     }
 
+    /**
+     * Stops the application
+     */
     public void stop () {
         Platform.exit();
         System.exit(0);

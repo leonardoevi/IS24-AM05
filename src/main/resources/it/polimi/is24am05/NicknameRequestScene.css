@@ -47,14 +47,8 @@
     -fx-font-size: 12px;
 
     -fx-color: #fff;
-    -fx-background-color:  #006400 ;
-    -fx-padding: 15px 30px;
-    -fx-margin: 20px 0;
-    -fx-text-align: center;
-    -fx-text-transform: uppercase;
-    -fx-letter-spacing: 1px;
-    -fx-font-weight: bold;
-    -fx-border: none;
+    -fx-background-color: #e15808;
+    -fx-padding: 10px 20px;
     -fx-border-radius: 20px;
     -fx-cursor: pointer;
 

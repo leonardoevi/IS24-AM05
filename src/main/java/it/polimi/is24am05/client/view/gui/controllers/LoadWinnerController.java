@@ -7,30 +7,36 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.net.URL;
-import java.time.format.TextStyle;
 import java.util.ResourceBundle;
 
+/**
+ * Load Winner scene Controller
+ */
 public class LoadWinnerController implements Initializable {
     private GUIRoot gui;
     @FXML
-    private AnchorPane anchorPane;
+    private BorderPane borderPane;
     @FXML
-    private Label text;
+    private VBox vBox;
     @FXML
     private Label winners;
 
     @FXML
     private Label logField;
+
+    /**
+     * Initializes the scene by simply setting the background
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -43,14 +49,13 @@ public class LoadWinnerController implements Initializable {
                 BackgroundPosition.CENTER,
                 new BackgroundSize(1.0, 1.0, true, true, false, false)
         );
-
-        AnchorPane.setTopAnchor(text, 50.0);
-        AnchorPane.setLeftAnchor(text, 0.0);
-        AnchorPane.setRightAnchor(text, 0.0);
-        text.setText("GAME ENDED");
-        anchorPane.setBackground(new Background(leftSideBack));
+        borderPane.setBackground(new Background(leftSideBack));
 
     }
+    /**
+     * Shows logs
+     * @param log log to show
+     */
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -64,8 +69,12 @@ public class LoadWinnerController implements Initializable {
     public void setGUI(GUIRoot gui) {
         this.gui = gui;
     }
-
+    /**
+     * Updates the scene when it receives a new Game update
+     * @param game Game update
+     */
     public void update(Game game) {
+
         String text = "";
         if (game.getWinners().size()>1){
             text += "The winners are: \n";
@@ -75,12 +84,17 @@ public class LoadWinnerController implements Initializable {
             }
 
         }else{
-            text+="The winners is: " + game.getWinners().getFirst().getNickname();
+            text+="The winner is: " + game.getWinners().getFirst().getNickname();
         }
 
         winners.setText(text);
-        AnchorPane.setLeftAnchor(winners, 0.0);
-        AnchorPane.setRightAnchor(winners, 0.0);
+
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setPadding(new Insets(-200, 0, 0, 0));
+        vBox.getChildren().add(winners);
+        vBox.setSpacing(30);
+
+        borderPane.setCenter(vBox);
 
     }
 

@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Deal Starter Cards scene Controller
+ */
 public class DealStarterCardsSceneController implements Initializable {
     @FXML
     private AnchorPane mainBackground;
@@ -59,14 +62,15 @@ public class DealStarterCardsSceneController implements Initializable {
         this.gui = gui;
     }
 
-    public void setClientModel(ClientModel client) {
-        this.client = client;
-    }
-
     public void setNickname(String nickname) {
         this.clientNickname = nickname;
     }
 
+    /**
+     * Initializes the scene by setting the background and placing both sides of the starter card
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -138,7 +142,10 @@ public class DealStarterCardsSceneController implements Initializable {
 
 
     }
-
+    /**
+     * Shows logs
+     * @param log log to show
+     */
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -150,20 +157,20 @@ public class DealStarterCardsSceneController implements Initializable {
 
     }
 
-    //if the currentScene is DealStarterCardsSceneController-> update it
+    /**
+     * Updates the scene when it receives a new Game update
+     * @param toDisplay Game update
+     */
 
     public void update(Game toDisplay) {
 
-
         List<ImageView> listImageView = new ArrayList<>();
-
         listImageView.add(player1SCFrontSide);
         listImageView.add(player1SCBackSide);
         listImageView.add(player2SCFrontSide);
         listImageView.add(player2SCBackSide);
         listImageView.add(player3SCFrontSide);
         listImageView.add(player3SCBackSide);
-
 
         for (Player p : toDisplay.getPlayers()) {
             int idCard;
@@ -197,11 +204,7 @@ public class DealStarterCardsSceneController implements Initializable {
             curr = listImageView.getFirst();
             curr.setImage(new Image(path));
             listImageView.removeFirst();
-
-
         }
-
-
     }
 
     @FXML
