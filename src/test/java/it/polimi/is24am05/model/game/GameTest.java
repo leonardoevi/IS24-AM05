@@ -35,7 +35,7 @@ import static it.polimi.is24am05.model.deck.DeckDisplayer.deckToString;
 import static it.polimi.is24am05.model.playArea.SideDisplayer.sideToString;
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameTest {
+public class GameTest {
 
     @Test
     void Game1() {
@@ -1824,7 +1824,7 @@ class GameTest {
         System.out.println(deckToString(game.getResourceDeck(), false, game.getGoldDeck(), true));
     }
 
-    private void deterministicallyPlay(Game game, String nickname){
+    public static void deterministicallyPlay(Game game, String nickname){
         Player player = getPlayer(game, nickname);
         List<Card> hand = player.getHand();
         Card toPlay = hand.getFirst();

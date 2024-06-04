@@ -7,7 +7,6 @@ import it.polimi.is24am05.controller.server.Server;
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.side.Side;
-import it.polimi.is24am05.model.deck.Deck;
 import it.polimi.is24am05.model.enums.state.GameState;
 import it.polimi.is24am05.model.enums.state.PlayerState;
 import it.polimi.is24am05.model.exceptions.deck.EmptyDeckException;
@@ -23,10 +22,12 @@ import it.polimi.is24am05.model.exceptions.player.ObjectiveNotAllowedException;
 import it.polimi.is24am05.model.game.Game;
 import it.polimi.is24am05.model.objective.Objective;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static it.polimi.is24am05.model.game.Game.MAX_PLAYERS;
 import static it.polimi.is24am05.model.game.Game.MIN_PLAYERS;
@@ -44,6 +45,9 @@ public class Controller {
 
     private final List<String> messageRecipents = new ArrayList<>();
 
+    // Schedule a thread that periodically saves the game
+    private final ScheduledExecutorService saver = Executors.newSingleThreadScheduledExecutor();
+
     /**
      * Controller for a loaded game
      * @param game old game
@@ -54,7 +58,7 @@ public class Controller {
         this.lobbyState = LobbyState.OLD;
 
         this.messageRecipents.addAll(game.getNicknames().stream().toList());
-
+        startSaver();
         server.start();
     }
 
@@ -63,7 +67,15 @@ public class Controller {
      */
     public Controller() throws IOException {
         this.lobbyState = LobbyState.NEW;
+
+        startSaver();
         server.start();
+    }
+
+    // Start the game saver demon thread
+    private void startSaver(){
+        Thread t = new Thread(new GameSaver(this)); t.setDaemon(true);
+        saver.scheduleAtFixedRate(t, 3, 10, TimeUnit.SECONDS);
     }
 
     /**
@@ -83,18 +95,35 @@ public class Controller {
             // Add the user to the list of reconnected users
             users.add(playerNickname);
             // Broadcast update
-            server.broadcastLog(messageRecipents, playerNickname + "rejoined!");
+            server.broadcastLog(messageRecipents, playerNickname + " rejoined!");
             // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
-                for (String nickname : this.users) {
+                // Reconnect users starting from the user that was expected to play, in the same order of playing
+                int turn = game.getTurn();
+                List<String> nicknames =  game.getPlayers().stream().map(Player::getNickname).collect(Collectors.toList());
+
+                // Sort the list such that the first player is the one that was expected to play
+                while (turn > 0){
+                    String toAppend = nicknames.getFirst();
+                    nicknames.removeFirst();
+                    nicknames.add(toAppend);
+                    turn--;
+                }
+
+                // Reconnect the players
+                for(String nickname : nicknames){
                     try {
                         game.reconnect(nickname);
-                    } catch (NoSuchPlayerException ignored) {}
+                    } catch (NoSuchPlayerException e) {
+                        System.out.println("Error reconnecting: " + nickname);
+                    }
                 }
+
+
                 //tell all players the game is resumed
                 this.lobbyState = LobbyState.STARTED;
                 server.broadcastGameUpdated(messageRecipents);
-                server.broadcastLog(messageRecipents, "Game restarted!");
+                server.broadcastLog(messageRecipents, "Game restarted!"); // TODO : change this message
             }
         } else if (this.lobbyState == LobbyState.NEW) {
             // If numUsers parameter is not already set
@@ -313,32 +342,7 @@ public class Controller {
     }
 
 
-    /**
-     * @param gamePath path of the game save file
-     * @return the game
-     * @throws IOException propagated
-     * @throws ClassNotFoundException propagated
-     */
-    public static Game loadGame(String gamePath) throws IOException, ClassNotFoundException {
-         // Create FileInputStream to read data from the file
-        FileInputStream fileIn = new FileInputStream(gamePath);
-        // Create ObjectInputStream to deserialize object
-        ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-        // Read object from file
-        Game game = (Game) objectIn.readObject();
-        // Close streams
-        objectIn.close();
-        fileIn.close();
 
-        // Set all players to disconnected
-        for(String nickname : game.getNicknames()) {
-            try {
-                game.disconnect(nickname);
-            } catch (NoSuchPlayerException ignored) {}
-        }
-
-        return game;
-    }
 
     /**
      * Records a player as disconnected
@@ -382,5 +386,55 @@ public class Controller {
      */
     public synchronized List<String> getUsers() {
         return new LinkedList<>(users);
+    }
+
+    /**
+     * Saves the current game state to a file. Without modifying anything.
+     */
+    public synchronized void saveGame(String path){
+        if(game == null){
+            //System.out.println("No game yet");
+            return;
+        }
+
+        if(game.getGameState().equals(GameState.END)){
+            System.out.println("Game already ended, skip saving");
+            return;
+        }
+
+        try {
+            // Create FileOutputStream to write data to a file
+            System.out.println("Saving game to file at: " + path);
+            FileOutputStream fileOut = new FileOutputStream(path);
+            // Create ObjectOutputStream to serialize object
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            // Write object to file
+            objectOut.writeObject(game);
+            // Close streams
+            objectOut.close();
+            fileOut.close();
+        } catch (Exception e) {
+            System.out.println("Saving game failed");
+        }
+    }
+
+    /**
+     * @param gamePath path of the game save file
+     * @return the game
+     * @throws IOException propagated
+     * @throws ClassNotFoundException propagated
+     */
+    public static Game loadGame(String gamePath) throws IOException, ClassNotFoundException {
+        // Create FileInputStream to read data from the file
+        FileInputStream fileIn = new FileInputStream(gamePath);
+        // Create ObjectInputStream to deserialize object
+        ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+        // Read object from file
+        Game game = (Game) objectIn.readObject();
+        // Close streams
+        objectIn.close();
+        fileIn.close();
+
+        return game;
     }
 }
