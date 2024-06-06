@@ -38,6 +38,7 @@ public class GUIRoot extends View {
     private DealStarterCardsSceneController dealStarterCardsSceneController;
 
     private DealHandAndObjectivesSceneController dealHandAndObjectivesSceneController;
+    private ErrorSceneController errorScenecontroller;
 
     private OtherPlayerSceneController otherPlayerSceneController;
     private LoadWinnerController loadWinnerController;
@@ -59,9 +60,30 @@ public class GUIRoot extends View {
      */
     @Override
     public void serverUnreachable() {
-        guiMain.stop();
+        try {
+            goToErrorScene();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //guiMain.stop();
     }
 
+    public void goToErrorScene() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/it/polimi/is24am05/errorscene.fxml"));
+        Parent root = loader.load();
+
+        errorScenecontroller = loader.getController();
+        errorScenecontroller.setGUI(this);
+
+        Scene scene = new Scene(root,  2560, 1600);
+
+        scene.setUserData(errorScenecontroller);
+        guiMain.sceneControllerMap.put(scene, errorScenecontroller);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
+        changeScene(scene);
+
+    }
     /**
      * GuiMain setter method
      * @param guiMain the object to set

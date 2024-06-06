@@ -3,8 +3,6 @@ package it.polimi.is24am05.client.view.gui.controllers;
 import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.model.Player.Player;
-import it.polimi.is24am05.model.card.side.Side;
-import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -14,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
@@ -56,7 +53,6 @@ public class DealStarterCardsSceneController implements Initializable {
 
     private GUIRoot gui;
 
-    private ClientModel client;
 
     public void setGUI(GUIRoot gui) {
         this.gui = gui;
@@ -68,8 +64,8 @@ public class DealStarterCardsSceneController implements Initializable {
 
     /**
      * Initializes the scene by setting the background and placing both sides of the starter card
-     * @param url
-     * @param resourceBundle
+     * @param url url
+     * @param resourceBundle resource bundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -213,8 +209,6 @@ public class DealStarterCardsSceneController implements Initializable {
 
 
         String id = source.getId();
-        System.out.println("eccomi quaaaaasdasdf");
-
         switch (id) {
             case "mySCFrontSide":
                 gui.placeStarterSide(true);

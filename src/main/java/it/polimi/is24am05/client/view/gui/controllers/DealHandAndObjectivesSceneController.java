@@ -172,7 +172,6 @@ public class DealHandAndObjectivesSceneController implements Initializable {
         String pathcardfront;
         String pathcardback;
         String path;
-        System.out.println(clientNickname);
         String card = "";
         for (Player p : game.getPlayers()) {
             String appendfront = "/assets/images/front/";
@@ -192,13 +191,11 @@ public class DealHandAndObjectivesSceneController implements Initializable {
                 }
 
                 pathcardfront = appendfront + idCard + ".png";
-                System.out.println(pathcardfront);
                 path = getClass().getResource(pathcardfront).toExternalForm();
                 handCard1FS.setImage(new Image(path));
 
 
                 pathcardback = appendback + idCard + ".png";
-                System.out.println(pathcardback);
                 path = getClass().getResource(pathcardback).toExternalForm();
                 handCard1BS.setImage(new Image(path));
 
@@ -216,13 +213,11 @@ public class DealHandAndObjectivesSceneController implements Initializable {
                     appendfront += "00";
                 }
                 pathcardfront = appendfront + idCard + ".png";
-                System.out.println(pathcardfront);
                 path = getClass().getResource(pathcardfront).toExternalForm();
                 handCard2FS.setImage(new Image(path));
 
 
                 pathcardback = appendback + idCard + ".png";
-                System.out.println(pathcardback);
                 path = getClass().getResource(pathcardback).toExternalForm();
                 handCard2BS.setImage(new Image(path));
 
@@ -240,29 +235,24 @@ public class DealHandAndObjectivesSceneController implements Initializable {
                 }
 
                 pathcardfront = appendfront + idCard + ".png";
-                System.out.println(pathcardfront);
                 path = getClass().getResource(pathcardfront).toExternalForm();
                 handCard3FS.setImage(new Image(path));
 
                 pathcardback = appendback + idCard + ".png";
-                System.out.println(pathcardback);
                 path = getClass().getResource(pathcardback).toExternalForm();
                 handCard3BS.setImage(new Image(path));
 
                 appendfront = "/assets/images/front/";
 
                 card = p.getObjectivesHand()[0].name();
-                System.out.println(card);
 
                 pathcardfront = appendfront + card.substring(2) + ".png";
-                System.out.println(pathcardfront);
                 path = getClass().getResource(pathcardfront).toExternalForm();
                 objectiveCard1.setImage(new Image(path));
                 objectivePathMap.put(objectiveCard1, card);
 
                 card = p.getObjectivesHand()[1].name();
                 pathcardfront = appendfront + card.substring(2) + ".png";
-                System.out.println(pathcardfront);
                 path = getClass().getResource(pathcardfront).toExternalForm();
                 objectiveCard2.setImage(new Image(path));
                 objectivePathMap.put(objectiveCard2, card);
