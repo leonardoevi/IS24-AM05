@@ -168,7 +168,9 @@ public class Controller {
                         .toList(), playerNickname + " reconnected!");
 
                 if(stateBeforeReconnection != stateAfterReconnection) {
-                    server.broadcastGameUpdated(messageRecipents);
+                    server.broadcastGameUpdated(messageRecipents.stream()
+                            .filter(s -> !s.equals(playerNickname))
+                            .toList());
                     server.broadcastLog(messageRecipents, "Game resumed!");
                 }
 
