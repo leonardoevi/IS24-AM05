@@ -2,8 +2,11 @@ package it.polimi.is24am05.model.game;
 
 import it.polimi.is24am05.model.Player.Player;
 import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.goldCard.GoldBackSide;
 import it.polimi.is24am05.model.card.goldCard.GoldCard;
+import it.polimi.is24am05.model.card.goldCard.GoldCardVisible;
 import it.polimi.is24am05.model.card.resourceCard.ResourceCard;
+import it.polimi.is24am05.model.card.resourceCard.ResourceCardVisible;
 import it.polimi.is24am05.model.card.side.Side;
 import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.deck.Deck;
@@ -34,7 +37,7 @@ import java.util.stream.Collectors;
 import static it.polimi.is24am05.model.Player.HandDisplayer.handToString;
 import static it.polimi.is24am05.model.deck.DeckDisplayer.deckToString;
 
-public class Game implements Serializable {
+public class Game implements Serializable, Cloneable {
     /**
      * List of winners of the game, updated after game is ended.
      */
@@ -42,7 +45,7 @@ public class Game implements Serializable {
     /**
      * Players in the game. No player can be added.
      */
-    private final List<Player> players;
+    private List<Player> players;
 
 
     /**
@@ -144,7 +147,6 @@ public class Game implements Serializable {
 
         // Set game state
         this.gameState = GameState.PLACE_STARTER_CARDS;
-
     }
 
     /**
@@ -691,7 +693,10 @@ public class Game implements Serializable {
             }
 
             if(this.gameState != GameState.PLACE_STARTER_CARDS && this.gameState != GameState.CHOOSE_OBJECTIVE){
-                stringBuilder.append(p.getObjective().toString()).append("\n");
+                if(p.getObjective() != null) {
+                    Objective[] personalAndShared = List.of(p.getObjective(), getSharedObjectives()[0], getSharedObjectives()[1]).toArray(Objective[]::new);
+                    stringBuilder.append(new SharedObjectiveDisplayer(personalAndShared).toString("Alesio")).append("\n");
+                }
             }
 
             if(p.getHand() != null && !p.getHand().isEmpty()) {
@@ -700,9 +705,17 @@ public class Game implements Serializable {
             }
 
             if(this.gameState == GameState.CHOOSE_OBJECTIVE)
-                stringBuilder.append("\n")
-                        .append(new SharedObjectiveDisplayer(p.getObjectivesHand()))
-                        .append("\n");
+                if(p.getObjectivesHand() != null) {
+                    stringBuilder.append("\n")
+                            .append("To choose from:\n")
+                            .append(new SharedObjectiveDisplayer(p.getObjectivesHand()))
+                            .append("\n");
+
+                    stringBuilder.append("\n")
+                            .append("Shared objectives:\n")
+                            .append(new SharedObjectiveDisplayer(this.sharedObjectives))
+                            .append("\n");
+                }
 
         }
 
@@ -719,6 +732,78 @@ public class Game implements Serializable {
         return stringBuilder.toString();
     }
 
+    /**
+     * returns a clone of the current game
+     *
+     * @throws CloneNotSupportedException If the clone does not work
+     */
+    protected Game clone() throws CloneNotSupportedException {
+        Game cloned=(Game) super.clone();
+        cloned.players=new ArrayList<>();
+
+        for(Player p: this.players){
+
+            cloned.players.add(p.clone());
+
+        }
+
+        return cloned;
+    }
+    /**
+     * allows to display the game to a player with only necessary information about other players
+     * @param nickname Player name
+     * @throws NoSuchPlayerException If such a player is not in the game
+     */
+    public Game getPov(String nickname) throws NoSuchPlayerException {
+
+
+        try {
+            //copy of the current game
+            Game gameToDisplay = this.clone();
+
+            Player main = gameToDisplay.findPlayer(nickname); //Throws NoSuchPlayerException
+
+            //obscure information about other players
+            for (Player p : gameToDisplay.getPlayers()) {
+
+                if(!p.getNickname().equals(nickname)) {
+                    List<Card> cardToDisplay=new ArrayList<>();
+                     for(Card c :p.getHand()) {
+
+                       if(c.getBackSide() instanceof GoldBackSide)
+                       {
+                           if(c.getBackSide().getSeed().equals(Resource.INSECT))
+                               cardToDisplay.add(GoldCardVisible.GCV_I);
+                           if(c.getBackSide().getSeed().equals( Resource.ANIMAL))
+                               cardToDisplay.add(GoldCardVisible.GCV_A);
+                           if(c.getBackSide().getSeed().equals( Resource.FUNGI))
+                               cardToDisplay.add(GoldCardVisible.GCV_F);
+                           if(c.getBackSide().getSeed().equals(Resource.PLANT))
+                               cardToDisplay.add(GoldCardVisible.GCV_P);
+
+                       }
+                       else{
+                           if(c.getBackSide().getSeed().equals(Resource.INSECT))
+                               cardToDisplay.add(ResourceCardVisible.RCV_I);
+                           if(c.getBackSide().getSeed().equals(Resource.ANIMAL))
+                               cardToDisplay.add(ResourceCardVisible.RCV_A);
+                           if(c.getBackSide().getSeed().equals( Resource.FUNGI))
+                               cardToDisplay.add(ResourceCardVisible.RCV_F);
+                           if(c.getBackSide().getSeed().equals( Resource.PLANT))
+                               cardToDisplay.add(ResourceCardVisible.RCV_P);
+
+                       }
+                       //obscure information about the cloned player in the cloned game
+                       p.obscure(cardToDisplay);
+
+                     }
+                }
+            }
+        return gameToDisplay;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
     // Getters and Setters
 
     public synchronized List<Player> getWinners() {

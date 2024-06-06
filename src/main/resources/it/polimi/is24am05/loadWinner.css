@@ -1,0 +1,24 @@
+#text {
+    -fx-color-label-visible: #850400 ;
+    -fx-font-family: 'Georgia', serif; /* Font elegante */
+    -fx-font-size: 48px; /* Dimensione del testo grande */
+    -fx-font-weight: bold; /* Testo in grassetto */
+    -fx-text-fill: #850400 ; /* Colore del testo */
+    -fx-text-transform: uppercase; /* Testo in maiuscolo */
+    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
+    -fx-alignment: center;
+    -fx-text-align: center; /* Allineamento al centro */
+    -fx-margin: 20px 0; /* Margine sopra e sotto */
+}
+#winners {
+    -fx-color-label-visible: #850400 ;
+    -fx-font-family: 'Georgia', serif; /* Font elegante */
+    -fx-font-size: 36px; /* Dimensione del testo grande */
+    -fx-font-weight: bold; /* Testo in grassetto */
+    -fx-text-fill: #850400 ; /* Colore del testo */
+    -fx-text-transform: uppercase; /* Testo in maiuscolo */
+    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
+    -fx-alignment: center;
+    -fx-text-align: center; /* Allineamento al centro */
+    -fx-margin: 20px 0; /* Margine sopra e sotto */
+}

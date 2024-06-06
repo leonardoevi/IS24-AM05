@@ -3,8 +3,6 @@ package it.polimi.is24am05.client.view.gui.controllers;
 import it.polimi.is24am05.client.view.gui.GUIRoot;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.model.Player.Player;
-import it.polimi.is24am05.model.card.side.Side;
-import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -14,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
@@ -24,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Deal Starter Cards scene Controller
+ */
 public class DealStarterCardsSceneController implements Initializable {
     @FXML
     private AnchorPane mainBackground;
@@ -53,20 +53,20 @@ public class DealStarterCardsSceneController implements Initializable {
 
     private GUIRoot gui;
 
-    private ClientModel client;
 
     public void setGUI(GUIRoot gui) {
         this.gui = gui;
-    }
-
-    public void setClientModel(ClientModel client) {
-        this.client = client;
     }
 
     public void setNickname(String nickname) {
         this.clientNickname = nickname;
     }
 
+    /**
+     * Initializes the scene by setting the background and placing both sides of the starter card
+     * @param url url
+     * @param resourceBundle resource bundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -138,7 +138,10 @@ public class DealStarterCardsSceneController implements Initializable {
 
 
     }
-
+    /**
+     * Shows logs
+     * @param log log to show
+     */
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
@@ -150,20 +153,20 @@ public class DealStarterCardsSceneController implements Initializable {
 
     }
 
-    //if the currentScene is DealStarterCardsSceneController-> update it
+    /**
+     * Updates the scene when it receives a new Game update
+     * @param toDisplay Game update
+     */
 
     public void update(Game toDisplay) {
 
-
         List<ImageView> listImageView = new ArrayList<>();
-
         listImageView.add(player1SCFrontSide);
         listImageView.add(player1SCBackSide);
         listImageView.add(player2SCFrontSide);
         listImageView.add(player2SCBackSide);
         listImageView.add(player3SCFrontSide);
         listImageView.add(player3SCBackSide);
-
 
         for (Player p : toDisplay.getPlayers()) {
             int idCard;
@@ -197,11 +200,7 @@ public class DealStarterCardsSceneController implements Initializable {
             curr = listImageView.getFirst();
             curr.setImage(new Image(path));
             listImageView.removeFirst();
-
-
         }
-
-
     }
 
     @FXML
@@ -210,8 +209,6 @@ public class DealStarterCardsSceneController implements Initializable {
 
 
         String id = source.getId();
-        System.out.println("eccomi quaaaaasdasdf");
-
         switch (id) {
             case "mySCFrontSide":
                 gui.placeStarterSide(true);

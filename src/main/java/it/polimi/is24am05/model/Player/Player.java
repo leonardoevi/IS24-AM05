@@ -6,6 +6,7 @@ import it.polimi.is24am05.model.card.starterCard.StarterCard;
 import it.polimi.is24am05.model.enums.Color;
 import it.polimi.is24am05.model.enums.element.Resource;
 import it.polimi.is24am05.model.enums.state.PlayerState;
+import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 import it.polimi.is24am05.model.exceptions.playArea.InvalidCoordinatesException;
 import it.polimi.is24am05.model.exceptions.playArea.NoAdjacentCardException;
 import it.polimi.is24am05.model.exceptions.playArea.PlacementNotAllowedException;
@@ -18,7 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player implements Serializable {
+public class Player implements Serializable, Cloneable {
 
     /**
      * nickname chosen by the player, it can't change during the game
@@ -298,6 +299,36 @@ public class Player implements Serializable {
             this.points += objectivePoints;
         }
     }
+    /**
+     * returns a clone of the player
+     */
+    public Player clone()
+    {
+        try {
+            Player cloned=(Player) super.clone();
+            return cloned;
+
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    /**
+     * Hides the player's hand from other players and obscure player's objective hand and objective
+     *
+     * @param handToDisplay is the hand of only back side cards  that can be shown to other players
+     */
+       public void obscure(List<Card> handToDisplay)
+        {
+            this.hand=handToDisplay;
+            this.objectivesHand=null;
+            this.objective=null;
+        }
+
+
+
 
     /**
      * Gets the blurred hand of this player, i.e. the resources on the backsides.

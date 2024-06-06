@@ -8,7 +8,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.NicknameRequestSceneController">
+<?import javafx.scene.control.cell.ChoiceBoxListCell?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.NicknameRequestSceneController">
    <top>
       <Label id="title" prefHeight="60.0" prefWidth="604.0" text="CODEX NATURALIS" textAlignment="CENTER" BorderPane.alignment="CENTER">
          <BorderPane.margin>
@@ -17,42 +20,29 @@
       </Label>
    </top>
    <center>
-      <VBox>
+      <VBox fx:id="vBox">
          <children>
-            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" BorderPane.alignment="CENTER">
+            <HBox fx:id="hBox1">
                <children>
-                  <Label text="nickname">
-                     <HBox.margin>
-                        <Insets top="30.0" />
-                     </HBox.margin>
-                  </Label>
-                  <TextField fx:id="playerNickname" prefHeight="26.0" prefWidth="205.0">
-                     <HBox.margin>
-                        <Insets top="30.0" />
-                     </HBox.margin>
-                  </TextField>
+                  <Label fx:id="nickname" text="Nickname" alignment="BASELINE_LEFT"/>
+                  <TextField fx:id="playerNickname"/>
                   <Label fx:id="logField" prefHeight="59.0" prefWidth="381.0" text="Label" textAlignment="CENTER" />
                </children>
-               <opaqueInsets>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </opaqueInsets>
-               <BorderPane.margin>
-                  <Insets top="10.0" />
-               </BorderPane.margin>
             </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+
+            <HBox fx:id="nickBox">
+               <Button fx:id="confirButton" mnemonicParsing="false" onAction="#onButtonClicked" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="Join Server"/>
+            </HBox>
+
+            <HBox fx:id="hBox2">
                <children>
-                  <Label text="num of players" />
-                  <TextField fx:id="numOfPlayers" />
-                  <Button fx:id="confirmNumOfPlayers" mnemonicParsing="false" onAction="#numOfPlayersConfirmed" text="confirm" />
-               </children></HBox>
-         </children></VBox>
+                  <Label fx:id="numPlayers" text="Number of players" />
+                  </children></HBox>
+            <HBox fx:id="numBox">
+               <ComboBox fx:id="numPlays"/>
+               <Button fx:id="confirmNumOfPlayers" mnemonicParsing="false" onAction="#numOfPlayersConfirmed" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="Confirm" />
+            </HBox>
+         </children>
+      </VBox>
    </center>
-   <bottom>
-      <Button mnemonicParsing="false" onAction="#onButtonClicked" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="joinServer" BorderPane.alignment="CENTER_RIGHT">
-         <BorderPane.margin>
-            <Insets bottom="60.0" right="60.0" />
-         </BorderPane.margin>
-      </Button>
-   </bottom>
 </BorderPane>
