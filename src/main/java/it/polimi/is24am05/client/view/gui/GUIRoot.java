@@ -43,6 +43,8 @@ public class GUIRoot extends View {
     private OtherPlayerSceneController otherPlayerSceneController;
     private LoadWinnerController loadWinnerController;
 
+    private boolean isLoggedOut;
+
     /**
      * Constructor
      * @param clientModel the client model
@@ -52,6 +54,7 @@ public class GUIRoot extends View {
         super(clientModel, server);
         guiThread = new Thread(() -> GUIMain.launchApp(this));
         guiThread.start();
+        isLoggedOut = false;
 
     }
 
@@ -135,7 +138,10 @@ public class GUIRoot extends View {
                         });
 
                     } else {
-
+                        if (isLoggedOut) {
+                            loadGame();
+                            isLoggedOut = false;
+                        }
                         Platform.runLater(() -> {
                             gameSceneController.update(toDisplay);
                         });
@@ -347,7 +353,6 @@ public class GUIRoot extends View {
     public void nicknameChosen(String nickname) {
         this.clientNickname = nickname;
         server.setNickname(nickname);
-        server.setNickname(nickname);
         server.joinServer();
         server.joinGame();
 
@@ -472,5 +477,11 @@ public class GUIRoot extends View {
      */
     public void placeCard(String cardId, boolean isFront, int i, int j) {
         server.placeSide(cardId, isFront, i, j);
+    }
+
+    public void logout() throws IOException {
+        isLoggedOut = true;
+        server.leaveServer();
+        goToFirstScene();
     }
 }

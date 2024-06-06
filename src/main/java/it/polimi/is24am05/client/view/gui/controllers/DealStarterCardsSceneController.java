@@ -8,6 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,8 @@ public class DealStarterCardsSceneController implements Initializable {
     private ImageView player3SCFrontSide;
     @FXML
     private Label logField;
+    @FXML
+    private Button logout;
 
     @FXML
     private Label playSC;
@@ -136,6 +140,9 @@ public class DealStarterCardsSceneController implements Initializable {
         player3SCBackSide.setFitWidth(120);
         player3SCBackSide.setFitHeight(90);
 
+        AnchorPane.setTopAnchor(logout, 0.0);
+        AnchorPane.setLeftAnchor(logout, 0.0);
+
 
     }
     /**
@@ -201,6 +208,14 @@ public class DealStarterCardsSceneController implements Initializable {
             curr.setImage(new Image(path));
             listImageView.removeFirst();
         }
+
+        logout.setOnAction(event -> {
+            try {
+                gui.logout();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @FXML

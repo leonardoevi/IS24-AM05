@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.Button?>
 <AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="839.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.DealStarterCardsSceneController">
    <children>
       <ImageView fx:id="mySCBackSide" onMousePressed="#onTouch" />
@@ -24,5 +25,6 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
+      <Button fx:id="logout" mnemonicParsing="false" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="LOGOUT"/>
    </children>
 </AnchorPane>

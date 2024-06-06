@@ -4,6 +4,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.control.Button?>
 <AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="148.0" prefWidth="241.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.DealHandAndObjectivesSceneController">
    <children>
       <Label fx:id="logField" layoutX="91.0" layoutY="6.0" />
@@ -15,5 +16,6 @@
       <ImageView fx:id="handCard3BS" />
       <ImageView fx:id="objectiveCard1" onMousePressed="#onTouch" />
       <ImageView fx:id="objectiveCard2" onMousePressed="#onTouch" />
+      <Button fx:id="logout" mnemonicParsing="false" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="LOGOUT"/>
    </children>
 </AnchorPane>

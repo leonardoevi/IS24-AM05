@@ -97,6 +97,8 @@ public class GameSceneController implements Initializable {
     private ImageView myObjective;
     @FXML
     private ImageView plateau;
+    @FXML
+    private Button logout;
 
     @FXML
     private Button buttonPlayer1;
@@ -221,7 +223,8 @@ public class GameSceneController implements Initializable {
 
 
         backgroundPlayArea.setBackground(new Background(backgroundImg));
-
+        AnchorPane.setTopAnchor(logout, 10.0);
+        AnchorPane.setLeftAnchor(logout, 10.0);
 
         AnchorPane.setTopAnchor(logField, 10.0);
         AnchorPane.setLeftAnchor(logField, 600.0);
@@ -791,6 +794,13 @@ public class GameSceneController implements Initializable {
         } else
             buttonPlayer3.setVisible(false);
 
+        logout.setOnAction(event -> {
+            try {
+                gui.logout();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
     }
 
