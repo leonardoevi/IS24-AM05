@@ -9,6 +9,8 @@ public interface VirtualServer {
      */
     public void joinServer();
 
+    public void leaveServer();
+
     /**
      * Allows the client to join a game
      */

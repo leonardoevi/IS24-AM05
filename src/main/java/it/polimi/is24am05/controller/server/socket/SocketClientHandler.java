@@ -130,6 +130,11 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             case "drawDeck":
                 super.drawDeck((boolean) message.arguments().get("isGold"));
                 break;
+
+            case "leaveServer":
+                super.leaveServer();
+                break;
+
             case "disconnect":
                 super.disconnect();
                 break;

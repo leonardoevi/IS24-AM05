@@ -47,6 +47,11 @@ public class SocketServerHandler extends ServerHandler {
     }
 
     @Override
+    public void leaveServer() {
+        send(new Message("leaveServer", Map.of()));
+    }
+
+    @Override
     public void joinGame() {
         send(new Message("joinGame", Map.of()));
     }

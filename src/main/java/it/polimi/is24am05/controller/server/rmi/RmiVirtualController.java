@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
  */
 public interface RmiVirtualController extends Remote {
     public void joinServerRMI(String nickname) throws RemoteException;
+    public void leaveServerRMI() throws RemoteException;
     public void joinGameRMI() throws RemoteException;
     public void setNumberOfPlayersRMI(int numberOfPlayers) throws RemoteException;
     public void placeStarterSideRMI(boolean isFront) throws RemoteException;

@@ -87,6 +87,11 @@ public class RmiClientHandler extends ClientHandler {
         }
 
         @Override
+        public void leaveServerRMI() throws RemoteException {
+            leaveServer();
+        }
+
+        @Override
         public void joinGameRMI() throws RemoteException {
             joinGame();
         }

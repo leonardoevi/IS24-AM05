@@ -85,6 +85,15 @@ public class RmiServerHandler extends ServerHandler {
     }
 
     @Override
+    public void leaveServer() {
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.leaveServerRMI();
+            } catch (RemoteException ignored) {}
+        });
+    }
+
+    @Override
     public void joinGame() {
         rmiExecutor.submit(() -> {
             try {
