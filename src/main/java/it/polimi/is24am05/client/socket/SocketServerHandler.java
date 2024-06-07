@@ -134,7 +134,7 @@ public class SocketServerHandler extends ServerHandler {
             this.socket = socket;
 
             // Start checking connection
-            connectionChecker.scheduleAtFixedRate(new ConnectionChecker(this.socket), 1, 2, TimeUnit.SECONDS);
+            connectionChecker.scheduleAtFixedRate(new ConnectionChecker(this.socket), 1, 4, TimeUnit.SECONDS);
         }
 
         @Override
@@ -202,7 +202,7 @@ public class SocketServerHandler extends ServerHandler {
 
             // Wait for 1 seconds
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (InterruptedException ignored) {}
 
             // If the string did not come back, close the socket
