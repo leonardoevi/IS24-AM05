@@ -113,6 +113,10 @@ public class GUIRoot extends View {
                         });
 
                     } else {
+                        if (isLoggedOut) {
+                            dealStarterCards();
+                            isLoggedOut = false;
+                        }
                         Platform.runLater(() -> {
                             dealStarterCardsSceneController.update(toDisplay);
 
@@ -125,6 +129,10 @@ public class GUIRoot extends View {
                             dealHandAndObjectivesSceneController.update(toDisplay);
                         });
                     } else {
+                        if (isLoggedOut) {
+                            dealHandsAndObjectives();
+                            isLoggedOut = false;
+                        }
                         Platform.runLater(() -> {
                             dealHandAndObjectivesSceneController.update(toDisplay);
                         });

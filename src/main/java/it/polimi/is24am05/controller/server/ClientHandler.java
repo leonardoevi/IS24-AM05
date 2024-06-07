@@ -64,13 +64,13 @@ public abstract class ClientHandler implements VirtualClient {
             }
 
             addLog("Bye " + nickname);
+            server.unsubscribe(this);
             try {
                 controller.disconnect(nickname);
             } catch (NoSuchPlayerException e) {
                 System.out.println("Controller was not able to disconnect " + nickname);
             }
 
-            server.unsubscribe(this);
             this.nickname = null;
         }
     }
