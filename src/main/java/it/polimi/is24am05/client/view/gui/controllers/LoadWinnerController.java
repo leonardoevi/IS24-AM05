@@ -91,7 +91,6 @@ public class LoadWinnerController implements Initializable {
 
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(-200, 0, 0, 0));
-        vBox.getChildren().add(winners);
         vBox.setSpacing(30);
 
         borderPane.setCenter(vBox);
