@@ -678,7 +678,8 @@ public class Game implements Serializable, Cloneable {
 
     @Override
     public synchronized String toString(){
-        StringBuilder stringBuilder = new StringBuilder("\n=============================");
+        StringBuilder stringBuilder = new StringBuilder("\n");
+        stringBuilder.append("∿".repeat(77)).append("\n");
         for(Player p : this.getPlayers()){
             stringBuilder.append("\nPlayer: ").append(p.getNickname()).append("\n");
             stringBuilder.append("\nState: ").append(p.getState()).append("\n");

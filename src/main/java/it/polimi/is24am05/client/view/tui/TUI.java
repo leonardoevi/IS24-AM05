@@ -3,6 +3,9 @@ package it.polimi.is24am05.client.view.tui;
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
 import it.polimi.is24am05.client.view.View;
+import it.polimi.is24am05.model.card.Card;
+import it.polimi.is24am05.model.card.goldCard.GoldCard;
+import it.polimi.is24am05.model.card.resourceCard.ResourceCard;
 import it.polimi.is24am05.model.game.Game;
 
 import java.util.NoSuchElementException;
@@ -98,7 +101,7 @@ public class TUI extends View {
                         break;
 
                     case "7":
-                        server.placeSide(scanner.next(), parseBoolean(scanner.next()), parseInt(scanner.next()), parseInt(scanner.next()));
+                        server.placeSide(getCardName(Card.getCard(parseInt(scanner.next()))), parseBoolean(scanner.next()), parseInt(scanner.next()), parseInt(scanner.next()));
                         break;
 
                     case "8":
@@ -106,7 +109,7 @@ public class TUI extends View {
                         break;
 
                     case "9":
-                        server.drawVisible(scanner.next());
+                        server.drawVisible(getCardName(Card.getCard(parseInt(scanner.next()))));
                         break;
 
                     case "11": // Quitting
@@ -127,5 +130,14 @@ public class TUI extends View {
                 System.out.println("Connection to server unavailable, exiting.");
             stdinClosed = true;
         }
+    }
+
+    private String getCardName(Card card) throws NoSuchElementException {
+        if(card instanceof ResourceCard)
+            return ((ResourceCard) card).name();
+        else if(card instanceof GoldCard)
+            return ((GoldCard) card).name();
+        else
+            throw new NoSuchElementException();
     }
 }
