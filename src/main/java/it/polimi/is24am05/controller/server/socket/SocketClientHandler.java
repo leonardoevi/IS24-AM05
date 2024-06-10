@@ -133,6 +133,12 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
             case "disconnect":
                 super.disconnect();
                 break;
+            case "message":
+                super.sendMessage((String) message.arguments().get("message"));
+                break;
+            case "directMessage":
+                super.sendMessage((String) message.arguments().get("message"), (String) message.arguments().get("recipient"));
+                break;
         }
     }
 

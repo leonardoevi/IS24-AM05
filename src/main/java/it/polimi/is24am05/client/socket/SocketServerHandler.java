@@ -96,6 +96,16 @@ public class SocketServerHandler extends ServerHandler {
         }
     }
 
+    @Override
+    public void sendMessage(String message) {
+        send(new Message("message", Map.of("message", message)));
+    }
+
+    @Override
+    public void sendDirectMessage(String message, String recipient) {
+        send(new Message("directMessage", Map.of("message", message, "recipient", recipient)));
+    }
+
     public synchronized void send(Message message) {
         try {
 

@@ -19,4 +19,7 @@ public interface RmiVirtualController extends Remote {
 
     public void pingRMI(String key) throws RemoteException;
     public void pongRMI(String key) throws RemoteException;
+
+    public void sendMessageRMI(String message) throws RemoteException;
+    public void sendMessageRMI(String message, String recipientNickname) throws RemoteException;
 }

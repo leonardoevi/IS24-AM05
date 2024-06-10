@@ -160,6 +160,24 @@ public class RmiServerHandler extends ServerHandler {
         notifyViewServerUnreachable();
     }
 
+    @Override
+    public void sendMessage(String message) {
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.sendMessageRMI(message);
+            } catch (RemoteException ignored) {}
+        });
+    }
+
+    @Override
+    public void sendDirectMessage(String message, String recipient) {
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.sendMessageRMI(message, recipient);
+            } catch (RemoteException ignored) {}
+        });
+    }
+
     class RmiFromServer extends UnicastRemoteObject implements RmiVirtualClient {
 
         protected RmiFromServer() throws RemoteException {}

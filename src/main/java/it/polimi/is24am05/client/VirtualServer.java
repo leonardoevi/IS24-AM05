@@ -27,4 +27,7 @@ public interface VirtualServer {
     public void drawVisible(String cardId);
     public void drawDeck(boolean isGold);
     public void disconnect();
+
+    public void sendMessage(String message);
+    public void sendDirectMessage(String message, String recipient);
 }

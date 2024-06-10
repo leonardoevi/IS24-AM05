@@ -136,6 +136,16 @@ public class RmiClientHandler extends ClientHandler {
             lastHeartBeat = key;
             //System.out.println("Received: " + key);
         }
+
+        @Override
+        public void sendMessageRMI(String message) throws RemoteException {
+            sendMessage(message);
+        }
+
+        @Override
+        public void sendMessageRMI(String message, String recipientNickname) throws RemoteException {
+            sendMessage(message, recipientNickname);
+        }
     }
 
 

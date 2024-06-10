@@ -117,6 +117,26 @@ public class TUI extends View {
                         stopInputReader();
                         break;
 
+                    case "12":
+                        String message = scanner.next();
+                        try {
+                            message += scanner.nextLine();
+                        } catch (NoSuchElementException ignored) {}
+
+                        server.sendMessage(message);
+                        break;
+
+                    case "13":
+                        String recipient = scanner.next();
+
+                        message = scanner.next();
+                        try {
+                            message += scanner.nextLine();
+                        } catch (NoSuchElementException ignored) {}
+
+                        server.sendDirectMessage(message, recipient);
+                        break;
+
                     default:
                         throw new NoSuchElementException();
                 }

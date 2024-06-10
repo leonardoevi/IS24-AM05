@@ -6,6 +6,9 @@ import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldCard;
 import it.polimi.is24am05.model.card.resourceCard.ResourceCard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class ClientHandler implements VirtualClient {
     private String nickname;
     private final Controller controller;
@@ -197,5 +200,45 @@ public abstract class ClientHandler implements VirtualClient {
         } catch (Exception e) {
             addLog(e.getMessage());
         }
+    }
+
+    protected void sendMessage(String message) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
+        if (controller.game == null) {
+            addLog("No game => no players to send the message to!");
+            return;
+        }
+
+        if(!controller.getUsers().contains(nickname)) {
+            addLog("You are not part of the game!");
+            return;
+        }
+
+        List<String> recipients = new ArrayList<>(controller.getUsers());
+        recipients.remove(this.nickname);
+        server.broadcastLog(recipients, "[" + this.nickname + "] " + message);
+    }
+
+    protected void sendMessage(String message, String recipientNickname) {
+        if(nickname == null) {
+            addLog("Identify yourself!");
+            return;
+        }
+
+        if(this.nickname.equals(recipientNickname)) {
+            addLog("Soliloquy non permitted!");
+            return;
+        }
+
+        if(!server.getNicknames().contains(recipientNickname)) {
+            addLog(recipientNickname + " is not connected");
+            return;
+        }
+
+        server.broadcastLog(List.of(recipientNickname), "{" + this.nickname + "} " + message);
     }
 }
