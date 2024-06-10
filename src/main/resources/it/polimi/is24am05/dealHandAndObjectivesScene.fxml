@@ -4,9 +4,16 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.text.Font?>
 <AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="148.0" prefWidth="241.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.DealHandAndObjectivesSceneController">
    <children>
-      <Label fx:id="logField" layoutX="91.0" layoutY="6.0" />
+      <Label fx:id="logField" textFill ="#e10d1c">
+      <font>
+         <Font name="System Bold" size="24.0" />
+      </font></Label>
       <ImageView fx:id="handCard1FS" />
       <ImageView fx:id="handCard1BS" />
       <ImageView fx:id="handCard2FS" />
@@ -15,5 +22,9 @@
       <ImageView fx:id="handCard3BS" />
       <ImageView fx:id="objectiveCard1" onMousePressed="#onTouch" />
       <ImageView fx:id="objectiveCard2" onMousePressed="#onTouch" />
+
+      <TextField fx:id="chatMessage"/>
+      <Button fx:id="confirmMessage" mnemonicParsing="false" onAction="#confirmMessage" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="Confirm" />
+      <ComboBox fx:id="sender"/>
    </children>
 </AnchorPane>

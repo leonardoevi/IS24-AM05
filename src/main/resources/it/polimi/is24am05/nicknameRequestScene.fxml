@@ -22,11 +22,15 @@
    <center>
       <VBox fx:id="vBox">
          <children>
+            <HBox fx:id="hBox">
+               <children>
+                  <Label fx:id="logField" text="Label" textAlignment="CENTER" />
+               </children>
+            </HBox>
             <HBox fx:id="hBox1">
                <children>
                   <Label fx:id="nickname" text="Nickname" alignment="BASELINE_LEFT"/>
                   <TextField fx:id="playerNickname"/>
-                  <Label fx:id="logField" prefHeight="59.0" prefWidth="381.0" text="Label" textAlignment="CENTER" />
                </children>
             </HBox>
 

@@ -5,14 +5,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.control.ComboBox?>
 <AnchorPane fx:id="mainBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="148.0" prefWidth="241.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.GameSceneController">
    <children>
       <StackPane fx:id="backgroundPlayArea">
@@ -22,9 +20,9 @@
          </children>
       </StackPane>
 
-      <Label fx:id="logField" textFill="#151ce1">
+      <Label fx:id="logField" textFill ="#e10d1c">
          <font>
-            <Font name="System Bold" size="22.0" />
+            <Font name="System Bold" size="24.0" />
          </font></Label>
       <ImageView fx:id="resourceDeckTop" onMousePressed="#drawResourceDeck" />
       <ImageView fx:id="resourceVisible1" onMousePressed="#drawVisible" />
@@ -68,6 +66,9 @@
       </Label>
       <TextField fx:id="rowPlacer" />
       <TextField fx:id="columnPlacer" />
+      <TextField fx:id="chatMessage"/>
+      <Button fx:id="confirmMessage" mnemonicParsing="false" onAction="#confirmMessage" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="Confirm" />
+      <ComboBox fx:id="sender"/>
 
    </children>
 

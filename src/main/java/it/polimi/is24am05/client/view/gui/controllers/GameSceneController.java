@@ -13,16 +13,14 @@ import it.polimi.is24am05.model.playArea.Tuple;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -57,7 +55,12 @@ public class GameSceneController implements Initializable {
     private double xshifht = 62;
     private double yshift = 30;
     private double fontSize = 14;
-
+    @FXML
+    private TextField chatMessage;
+    @FXML
+    private Button confirmMessage;
+    @FXML
+    private ComboBox<String> sender;
     @FXML
     private Pane playArea;
     @FXML
@@ -299,6 +302,16 @@ public class GameSceneController implements Initializable {
         AnchorPane.setBottomAnchor(handFrontSide3, 250.0);
         AnchorPane.setLeftAnchor(handFrontSide3, 150.0);
 
+        AnchorPane.setTopAnchor(sender, 5.0);
+        AnchorPane.setLeftAnchor(sender, 230.0);
+
+        AnchorPane.setTopAnchor(chatMessage, 5.0);
+        AnchorPane.setLeftAnchor(chatMessage, 30.0);
+        chatMessage.setPromptText("Chat with someone!");
+
+        AnchorPane.setTopAnchor(confirmMessage, 5.0);
+        AnchorPane.setLeftAnchor(confirmMessage, 370.0);
+
         AnchorPane.setTopAnchor(myPoints, 10.0);
         AnchorPane.setRightAnchor(myPoints, 60.0);
         myPoints.setPrefWidth(200);
@@ -373,7 +386,7 @@ public class GameSceneController implements Initializable {
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
-                Duration.seconds(3),
+                Duration.seconds(6),
                 event -> logField.setText("")
         ));
         timeline.setCycleCount(1);
@@ -401,13 +414,16 @@ public class GameSceneController implements Initializable {
         goldVisible2.setImage(null);
         playArea.getChildren().removeIf(node -> node instanceof StackPane || node instanceof Text);
 
+
         for (Player p : game.getPlayers()) {
             if (p.getNickname().equals(clientNickname)) {
 
                 myPoints.setText("POINTS: " + p.getPoints());
 
-            }
+            }else
+                sender.getItems().add(p.getNickname());
         }
+        sender.getItems().add("All the players");
 
         try {
             Resource resourceTop = FUNGI;
@@ -811,6 +827,12 @@ public class GameSceneController implements Initializable {
                 checkFields(source);
             }
         });
+    }
+    @FXML
+    public void confirmMessage(Event event){
+        String message = chatMessage.getText();
+        String toWhom = sender.getValue();
+        gui.sendMessage(message, toWhom);
     }
 
     /**

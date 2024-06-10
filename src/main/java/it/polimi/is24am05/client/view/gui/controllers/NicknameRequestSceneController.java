@@ -29,6 +29,8 @@ public class NicknameRequestSceneController implements Initializable {
     @FXML
     private HBox hBox1;
     @FXML
+    private HBox hBox;
+    @FXML
     private HBox hBox2;
     @FXML
     private HBox nickBox;
@@ -66,12 +68,18 @@ public class NicknameRequestSceneController implements Initializable {
     public void initialize(URL url, ResourceBundle resources) {
 
         logField.setText("");
+        logField.setPrefWidth(700);
         playerNickname.setPromptText("Enter your nickname");
 
         numPlays.setPrefWidth(200);
         numPlays.getItems().addAll(2, 3, 4);
 
         playerNickname.setPrefWidth(200);
+
+        hBox = new HBox(100);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(logField);
+
         hBox1 = new HBox(100);
         hBox1.setAlignment(Pos.CENTER);
         hBox1.getChildren().addAll(nickname, playerNickname);
@@ -91,7 +99,7 @@ public class NicknameRequestSceneController implements Initializable {
 
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(-200, 0, 0, 0));
-        vBox.getChildren().addAll(hBox1, nickBox, hBox2, numBox);
+        vBox.getChildren().addAll(hBox, hBox1, nickBox, hBox2, numBox);
         vBox.setSpacing(30);
 
         String imageBackPath = getClass().getResource("/assets/images/playAreaBackground.png").toExternalForm();

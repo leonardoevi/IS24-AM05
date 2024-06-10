@@ -473,4 +473,10 @@ public class GUIRoot extends View {
     public void placeCard(String cardId, boolean isFront, int i, int j) {
         server.placeSide(cardId, isFront, i, j);
     }
+    public void sendMessage(String message, String receiver){
+        if (!Objects.equals(receiver, "All the players"))
+            server.sendDirectMessage(message, receiver);
+        else
+            server.sendMessage(message);
+    }
 }

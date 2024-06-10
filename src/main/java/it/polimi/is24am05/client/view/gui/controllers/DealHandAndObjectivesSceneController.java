@@ -6,9 +6,13 @@ import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.game.Game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -31,6 +35,12 @@ public class DealHandAndObjectivesSceneController implements Initializable {
     @FXML
     private Label logField;
     private GUIRoot gui;
+    @FXML
+    private TextField chatMessage;
+    @FXML
+    private Button confirmMessage;
+    @FXML
+    private ComboBox<String> sender;
 
     @FXML
     ImageView handCard1FS;
@@ -125,6 +135,20 @@ public class DealHandAndObjectivesSceneController implements Initializable {
         handCard3BS.setFitWidth(120);
         handCard3BS.setFitHeight(90);
 
+        AnchorPane.setTopAnchor(sender, 5.0);
+        AnchorPane.setLeftAnchor(sender, 230.0);
+
+        AnchorPane.setTopAnchor(chatMessage, 5.0);
+        AnchorPane.setLeftAnchor(chatMessage, 30.0);
+        chatMessage.setPromptText("Chat with someone!");
+
+        AnchorPane.setTopAnchor(confirmMessage, 5.0);
+        AnchorPane.setLeftAnchor(confirmMessage, 370.0);
+        AnchorPane.setLeftAnchor(confirmMessage, 370.0);
+        AnchorPane.setTopAnchor(logField, 10.0);
+        AnchorPane.setLeftAnchor(logField, 600.0);
+        logField.setText("");
+
         objectiveCard1.setPreserveRatio(false);
         AnchorPane.setBottomAnchor(objectiveCard1, 220.0);
         AnchorPane.setLeftAnchor(objectiveCard1, 600.0);
@@ -156,7 +180,7 @@ public class DealHandAndObjectivesSceneController implements Initializable {
     public void showLog(String log) {
         logField.setText(log);
         Timeline timeline = new Timeline(new KeyFrame(
-                Duration.seconds(3),
+                Duration.seconds(6),
                 event -> logField.setText("")
         ));
         timeline.setCycleCount(1);
@@ -258,7 +282,15 @@ public class DealHandAndObjectivesSceneController implements Initializable {
                 objectivePathMap.put(objectiveCard2, card);
 
 
-            }
+            }else
+                    sender.getItems().add(p.getNickname());
         }
+        sender.getItems().add("All the players");
+    }
+    @FXML
+    public void confirmMessage(Event event){
+        String message = chatMessage.getText();
+        String toWhom = sender.getValue();
+        gui.sendMessage(message, toWhom);
     }
 }
