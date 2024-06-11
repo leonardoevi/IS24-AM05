@@ -43,6 +43,8 @@ public class GUIRoot extends View {
     private OtherPlayerSceneController otherPlayerSceneController;
     private LoadWinnerController loadWinnerController;
 
+    private boolean isLoggedOut;
+
     /**
      * Constructor
      * @param clientModel the client model
@@ -52,6 +54,7 @@ public class GUIRoot extends View {
         super(clientModel, server);
         guiThread = new Thread(() -> GUIMain.launchApp(this));
         guiThread.start();
+        isLoggedOut = false;
 
     }
 
@@ -110,6 +113,10 @@ public class GUIRoot extends View {
                         });
 
                     } else {
+                        if (isLoggedOut) {
+                            dealStarterCards();
+                            isLoggedOut = false;
+                        }
                         Platform.runLater(() -> {
                             dealStarterCardsSceneController.update(toDisplay);
 
@@ -122,6 +129,10 @@ public class GUIRoot extends View {
                             dealHandAndObjectivesSceneController.update(toDisplay);
                         });
                     } else {
+                        if (isLoggedOut) {
+                            dealHandsAndObjectives();
+                            isLoggedOut = false;
+                        }
                         Platform.runLater(() -> {
                             dealHandAndObjectivesSceneController.update(toDisplay);
                         });
@@ -135,7 +146,10 @@ public class GUIRoot extends View {
                         });
 
                     } else {
-
+                        if (isLoggedOut) {
+                            loadGame();
+                            isLoggedOut = false;
+                        }
                         Platform.runLater(() -> {
                             gameSceneController.update(toDisplay);
                         });
@@ -347,7 +361,6 @@ public class GUIRoot extends View {
     public void nicknameChosen(String nickname) {
         this.clientNickname = nickname;
         server.setNickname(nickname);
-        server.setNickname(nickname);
         server.joinServer();
         server.joinGame();
 
@@ -478,5 +491,11 @@ public class GUIRoot extends View {
             server.sendDirectMessage(message, receiver);
         else
             server.sendMessage(message);
+    }
+
+    public void logout() throws IOException {
+        isLoggedOut = true;
+        server.leaveServer();
+        goToFirstScene();
     }
 }

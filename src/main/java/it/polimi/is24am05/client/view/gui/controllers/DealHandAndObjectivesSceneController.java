@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -19,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +64,8 @@ public class DealHandAndObjectivesSceneController implements Initializable {
     ImageView objectiveCard1;
     @FXML
     ImageView objectiveCard2;
+    @FXML
+    private Button logout;
 
     Map<ImageView, String> objectivePathMap;
 
@@ -161,6 +165,8 @@ public class DealHandAndObjectivesSceneController implements Initializable {
         objectiveCard2.setFitWidth(120);
         objectiveCard2.setFitHeight(90);
 
+        AnchorPane.setTopAnchor(logout, 0.0);
+        AnchorPane.setRightAnchor(logout, 0.0);
 
     }
 
@@ -285,6 +291,13 @@ public class DealHandAndObjectivesSceneController implements Initializable {
             }else
                     sender.getItems().add(p.getNickname());
         }
+        logout.setOnAction(event -> {
+            try {
+                gui.logout();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         sender.getItems().add("All the players");
     }
     @FXML

@@ -54,7 +54,7 @@ public class RmiServerHandler extends ServerHandler {
 
             // Set up a demon thread to check if server is still up
             Thread demon = new Thread(new RmiServerChecker()); demon.setDaemon(true); demon.setName("Rmi connection checker");
-            serverChecker.scheduleAtFixedRate(demon, 1, 2, TimeUnit.SECONDS);
+            serverChecker.scheduleAtFixedRate(demon, 1, 4, TimeUnit.SECONDS);
 
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             notifyViewServerUnreachable();
@@ -82,6 +82,15 @@ public class RmiServerHandler extends ServerHandler {
             notifyViewServerUnreachable();
             killRmiReaper();
         }
+    }
+
+    @Override
+    public void leaveServer() {
+        rmiExecutor.submit(() -> {
+            try {
+                virtualController.leaveServerRMI();
+            } catch (RemoteException ignored) {}
+        });
     }
 
     @Override
@@ -229,7 +238,7 @@ public class RmiServerHandler extends ServerHandler {
             pinger.start();
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (InterruptedException ignored) {}
 
             // Check if client responded to the ping message

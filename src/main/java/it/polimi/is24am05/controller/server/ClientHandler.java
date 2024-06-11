@@ -5,6 +5,7 @@ import it.polimi.is24am05.controller.exceptions.AlreadyUsedNicknameException;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldCard;
 import it.polimi.is24am05.model.card.resourceCard.ResourceCard;
+import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,30 @@ public abstract class ClientHandler implements VirtualClient {
             }
             this.nickname = nickname;
             server.subscribe(this);
+        }
+    }
+
+    protected void leaveServer() {
+        if(nickname == null) {
+            addLog("At least join before leaving... UwU");
+            return;
+        }
+
+        synchronized (server) {
+            if (!server.getNicknames().contains(nickname)) {
+                addLog("At least join before leaving... T^T");
+                return;
+            }
+
+            addLog("Bye " + nickname);
+            server.unsubscribe(this);
+            try {
+                controller.disconnect(nickname);
+            } catch (NoSuchPlayerException e) {
+                System.out.println("Controller was not able to disconnect " + nickname);
+            }
+
+            this.nickname = null;
         }
     }
 

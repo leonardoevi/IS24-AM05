@@ -7,9 +7,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.control.cell.ChoiceBoxListCell?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.NicknameRequestSceneController">
    <top>
@@ -18,7 +15,7 @@
             <Insets top="40.0" />
          </BorderPane.margin>
       </Label>
-   </top>
+     </top>
    <center>
       <VBox fx:id="vBox">
          <children>
@@ -49,4 +46,8 @@
          </children>
       </VBox>
    </center>
+   <bottom>
+      <Button fx:id="logout" mnemonicParsing="false" onAction="#logout" styleClass="confirmButton" stylesheets="@NicknameRequestScene.css" text="LOGOUT"/>
+
+   </bottom>
 </BorderPane>

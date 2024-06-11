@@ -245,7 +245,7 @@ public enum ResourceFrontSide implements Side {
     ),
     RFS_032(
             Map.of(
-                    Corner.NW, Optional.empty(),
+                    Corner.NE, Optional.empty(),
                     Corner.SE, Optional.of(Resource.INSECT),
                     Corner.SW, Optional.of(Resource.INSECT)
             ), 0

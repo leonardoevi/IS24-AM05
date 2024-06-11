@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -44,6 +45,8 @@ public class NicknameRequestSceneController implements Initializable {
 
     @FXML
     private Button confirmNumOfPlayers;
+    @FXML
+    private Button logout;
     @FXML
     private Label logField;
     @FXML
@@ -99,7 +102,7 @@ public class NicknameRequestSceneController implements Initializable {
 
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(-200, 0, 0, 0));
-        vBox.getChildren().addAll(hBox, hBox1, nickBox, hBox2, numBox);
+        vBox.getChildren().addAll(hBox,hBox1, nickBox, hBox2, numBox, logout);
         vBox.setSpacing(30);
 
         String imageBackPath = getClass().getResource("/assets/images/playAreaBackground.png").toExternalForm();
@@ -112,6 +115,7 @@ public class NicknameRequestSceneController implements Initializable {
                 new BackgroundSize(1.0, 1.0, true, true, false, false))));
 
         borderPane.setCenter(vBox);
+        logout.setVisible(false);
 
 
     }
@@ -139,8 +143,12 @@ public class NicknameRequestSceneController implements Initializable {
      */
     @FXML
     public void onButtonClicked(javafx.event.ActionEvent event) {
+        logout.setVisible(true);
         String nickname = getPlayerNickname();
         gui.nicknameChosen(nickname);
+    }
+    public void logout (javafx.event.ActionEvent event) throws IOException {
+        gui.logout();
     }
     /**
      * Sets chosen number of players
