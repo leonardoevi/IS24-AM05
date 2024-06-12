@@ -238,12 +238,12 @@ public abstract class ClientHandler implements VirtualClient {
             return;
         }
 
-        if(!controller.getUsers().contains(nickname)) {
+        if(!controller.game.getNicknames().contains(nickname)) {
             addLog("You are not part of the game!");
             return;
         }
 
-        List<String> recipients = new ArrayList<>(controller.getUsers());
+        List<String> recipients = new ArrayList<>(controller.game.getNicknames());
         recipients.remove(this.nickname);
         server.broadcastLog(recipients, "[" + this.nickname + "] " + message);
     }
