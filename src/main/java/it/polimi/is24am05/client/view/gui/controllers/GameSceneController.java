@@ -841,6 +841,9 @@ public class GameSceneController implements Initializable {
     @FXML
     public void confirmMessage(Event event){
         String message = chatMessage.getText();
+        if (message.isBlank())
+            return;
+        chatMessage.setText("");
         String toWhom = sender.getValue();
         gui.sendMessage(message, toWhom);
     }
