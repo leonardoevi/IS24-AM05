@@ -22,11 +22,13 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
+      <classifier>mac-aarch64</classifier>
       <version>22</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
+      <classifier>mac-aarch64</classifier>
       <version>22</version>
     </dependency>
 <dependency>
@@ -67,7 +69,7 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>it.polimi.is24am05/it.polimi.is24am05.Main</mainClass>
+              <mainClass>it.polimi.is24am05.Main</mainClass>
               <launcher>app</launcher>
               <jlinkZipName>app</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>
