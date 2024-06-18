@@ -685,6 +685,12 @@ public class Game implements Serializable, Cloneable {
             stringBuilder.append("\nState: ").append(p.getState()).append("\n");
             stringBuilder.append("Points: ").append(p.getPoints()).append("\n");
 
+            if(this.gameState == GameState.END){
+                stringBuilder.append("Objectives satisfied: ")
+                        .append(p.getSatisfiedObjectiveCards())
+                        .append("\n");
+            }
+
             stringBuilder.append("Play area: ").append("\n");
             stringBuilder.append(new AreaDisplayer(p.getPlayArea())).append("\n");
 
@@ -723,6 +729,18 @@ public class Game implements Serializable, Cloneable {
         if(this.gameState == GameState.GAME || this.gameState == GameState.GAME_ENDING) {
             stringBuilder.append("Decks: ").append("\n");
             stringBuilder.append(deckToString(this.getResourceDeck(), false, this.getGoldDeck(), true)).append("\n");
+        }
+
+        if(this.gameState == GameState.END) {
+            if(this.getWinners().size() > 1){
+                stringBuilder.append("\n\n")
+                        .append("Winners: ")
+                        .append(this.getWinners().stream().map(Player::getNickname).toList()).append("\n\n");
+            }
+            else
+                stringBuilder.append("\n\n")
+                        .append("Winner: ")
+                        .append(this.getWinners().getFirst().getNickname()).append("\n\n");
         }
 
         stringBuilder.append("Game State: " + this.gameState+ "\n");
