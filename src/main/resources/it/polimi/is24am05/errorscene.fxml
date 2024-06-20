@@ -8,7 +8,7 @@
    <center>
       <VBox fx:id="vBox">
             <HBox fx:id="hBox">
-                  <Label fx:id="errorLabel" />
+                  <Label fx:id="errorLabel" prefHeight="60.0" prefWidth="604.0" styleClass="title" stylesheets="@NicknameRequestScene.css" />
                   </HBox>
       </VBox>
    </center>

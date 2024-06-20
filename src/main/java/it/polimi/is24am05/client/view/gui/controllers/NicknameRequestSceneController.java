@@ -15,6 +15,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -102,7 +103,7 @@ public class NicknameRequestSceneController implements Initializable {
 
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(-200, 0, 0, 0));
-        vBox.getChildren().addAll(hBox,hBox1, nickBox, hBox2, numBox, logout);
+        vBox.getChildren().addAll(hBox ,hBox1, nickBox, hBox2, numBox, logout);
         vBox.setSpacing(30);
 
         String imageBackPath = getClass().getResource("/assets/images/playAreaBackground.png").toExternalForm();
@@ -126,10 +127,18 @@ public class NicknameRequestSceneController implements Initializable {
 
 
     public void showLog(String log) {
-        logField.setText(log);
+        String text;
+        if (Objects.equals(log, "Identify yourself!")){
+            text = logField.getText();
+            text = "Those names have been already chosen:\n" + text + "\nPlease choose a different one";
+        }else{
+            text = log;
+        }
+
+        logField.setText(text);
 
         Timeline timeline = new Timeline(new KeyFrame(
-                Duration.seconds(3),
+                Duration.seconds(5),
                 event -> logField.setText("")
         ));
         timeline.setCycleCount(1);
@@ -157,11 +166,17 @@ public class NicknameRequestSceneController implements Initializable {
     @FXML
     public void numOfPlayersConfirmed(javafx.event.ActionEvent event) {
         int num = getNumPlayers();
-        gui.numberOfplayersChosen(num);
+        if (num==-1)
+            showLog("You have not selected any players!");
+        else
+            gui.numberOfplayersChosen(num);
     }
 
     public int getNumPlayers(){
-        return  numPlays.getValue();
+        if (numPlays.getValue() != null)
+            return numPlays.getValue();
+        else
+            return -1;
     }
 }
 

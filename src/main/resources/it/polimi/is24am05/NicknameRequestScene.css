@@ -1,33 +1,16 @@
-#title {
+.title {
     -fx-color-label-visible: #006400 ;
-    -fx-font-family: 'Georgia', serif; /* Font elegante */
-    -fx-font-size: 48px; /* Dimensione del testo grande */
-    -fx-font-weight: bold; /* Testo in grassetto */
-    -fx-text-fill: #006400 ; /* Colore del testo */
-    -fx-text-transform: uppercase; /* Testo in maiuscolo */
-    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
+    -fx-font-family: 'Georgia', serif;
+    -fx-font-size: 80px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #006400 ;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 2px;
     -fx-alignment: center;
-    -fx-text-align: center; /* Allineamento al centro */
-    -fx-margin: 20px 0; /* Margine sopra e sotto */
+    -fx-text-align: center;
+    -fx-margin: 20px 0;
 }
 
-
-#back{
-
-
-
-}
-#title2 {
-    -fx-font-family: 'Georgia', serif; /* Font elegante */
-    -fx-font-size: 24px; /* Dimensione del testo grande */
-    -fx-font-weight: bold; /* Testo in grassetto */
-    -fx-color: #2c3e50; /* Colore del testo */
-    -fx-text-transform: uppercase; /* Testo in maiuscolo */
-    -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
-
-    -fx-text-align: center; /* Allineamento al centro */
-    -fx-margin: 20px 0; /* Margine sopra e sotto */
-}
 .label{
     -fx-font-family: 'Georgia', serif; /* Font elegante */
     -fx-font-size: 20px; /* Dimensione del testo grande */
@@ -35,7 +18,6 @@
     -fx-color: #2c3e50; /* Colore del testo */
     -fx-text-transform: uppercase; /* Testo in maiuscolo */
     -fx-letter-spacing: 2px; /* Spaziatura tra le lettere */
-
     -fx-text-align: center; /* Allineamento al centro */
     -fx-margin: 20px 0; /* Margine sopra e sotto */
 
@@ -56,5 +38,4 @@
 
 .confirmButton:hover {
     -fx-background-color: #c0392b;
-
 }

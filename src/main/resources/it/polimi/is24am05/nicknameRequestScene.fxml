@@ -10,7 +10,7 @@
 <?import javafx.scene.control.ComboBox?>
 <BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.is24am05.client.view.gui.controllers.NicknameRequestSceneController">
    <top>
-      <Label id="title" prefHeight="60.0" prefWidth="604.0" text="CODEX NATURALIS" textAlignment="CENTER" BorderPane.alignment="CENTER">
+      <Label id="title" prefHeight="60.0" prefWidth="604.0" text="CODEX NATURALIS" textAlignment="CENTER" BorderPane.alignment="CENTER" styleClass="title" stylesheets="@NicknameRequestScene.css">
          <BorderPane.margin>
             <Insets top="40.0" />
          </BorderPane.margin>
@@ -21,12 +21,12 @@
          <children>
             <HBox fx:id="hBox">
                <children>
-                  <Label fx:id="logField" text="Label" textAlignment="CENTER" />
+                  <Label fx:id="logField" prefWidth="604.0" text="Label" textAlignment="CENTER" styleClass="label" stylesheets="@NicknameRequestScene.css" />
                </children>
             </HBox>
             <HBox fx:id="hBox1">
                <children>
-                  <Label fx:id="nickname" text="Nickname" alignment="BASELINE_LEFT"/>
+                  <Label fx:id="nickname" text="Nickname" alignment="BASELINE_LEFT" styleClass="label" stylesheets="@NicknameRequestScene.css"/>
                   <TextField fx:id="playerNickname"/>
                </children>
             </HBox>
@@ -37,7 +37,7 @@
 
             <HBox fx:id="hBox2">
                <children>
-                  <Label fx:id="numPlayers" text="Number of players" />
+                  <Label fx:id="numPlayers" text="Number of players" styleClass="label" stylesheets="@NicknameRequestScene.css"/>
                   </children></HBox>
             <HBox fx:id="numBox">
                <ComboBox fx:id="numPlays"/>

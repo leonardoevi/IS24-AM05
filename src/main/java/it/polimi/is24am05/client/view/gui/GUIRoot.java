@@ -83,7 +83,7 @@ public class GUIRoot extends View {
 
         scene.setUserData(errorScenecontroller);
         guiMain.sceneControllerMap.put(scene, errorScenecontroller);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
+        //scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
         changeScene(scene);
 
     }
@@ -330,7 +330,7 @@ public class GUIRoot extends View {
 
         scene.setUserData(nicknameRequestSceneController);
         guiMain.sceneControllerMap.put(scene, nicknameRequestSceneController);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
+        //scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/it/polimi/is24am05/NickNameRequestScene.css")).toExternalForm());
         changeScene(scene);
 
     }
