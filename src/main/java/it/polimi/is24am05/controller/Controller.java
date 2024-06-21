@@ -406,7 +406,7 @@ public class Controller {
 
         try {
             // Create FileOutputStream to write data to a file
-            System.out.print("⨕");
+            System.out.println(".");
             FileOutputStream fileOut = new FileOutputStream(path);
             // Create ObjectOutputStream to serialize object
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
