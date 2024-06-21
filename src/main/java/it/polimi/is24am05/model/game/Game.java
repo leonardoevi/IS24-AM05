@@ -427,7 +427,7 @@ public class Game implements Serializable, Cloneable {
 
         // Check if it is time for the player to draw
         if(player.getState() != PlayerState.DRAW)
-            throw new MoveNotAllowedException("It is time to draw a Card");
+            throw new MoveNotAllowedException("It is not time to draw a Card");
 
         // Select the deck
         Deck toDrawFrom;
@@ -471,7 +471,7 @@ public class Game implements Serializable, Cloneable {
 
         // Check if it is time for the player to draw
         if(player.getState() != PlayerState.DRAW)
-            throw new MoveNotAllowedException("It is time to draw a Card");
+            throw new MoveNotAllowedException("It is not time to draw a Card");
 
         // Select the correct Deck to draw from
         Deck toDrawFrom;
