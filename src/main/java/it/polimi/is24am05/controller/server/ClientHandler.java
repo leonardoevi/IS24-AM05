@@ -46,7 +46,7 @@ public abstract class ClientHandler implements VirtualClient {
 
         synchronized (server) {
             if (server.getNicknames().contains(nickname)) {
-                addLog(new AlreadyUsedNicknameException(server.getNicknames()).getMessage());
+                addLog("Already connected users: " + new AlreadyUsedNicknameException(server.getNicknames()).getMessage());
                 return;
             }
             this.nickname = nickname;

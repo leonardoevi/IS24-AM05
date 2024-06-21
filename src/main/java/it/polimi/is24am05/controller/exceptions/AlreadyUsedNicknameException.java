@@ -11,6 +11,6 @@ public class AlreadyUsedNicknameException extends Exception {
 
     @Override
     public String getMessage() {
-        return String.join(",", nicknames);
+        return String.join(", ", nicknames);
     }
 }

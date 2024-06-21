@@ -406,12 +406,12 @@ public class Controller {
 
         try {
             // Create FileOutputStream to write data to a file
-            System.out.print("⨕");
             FileOutputStream fileOut = new FileOutputStream(path);
             // Create ObjectOutputStream to serialize object
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             // Write object to file
             objectOut.writeObject(game);
+            System.out.println(".");
             // Close streams
             objectOut.close();
             fileOut.close();
