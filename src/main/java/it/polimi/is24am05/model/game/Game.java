@@ -382,7 +382,7 @@ public class Game implements Serializable, Cloneable {
 
         // Check if it's time for the player to place a Card
         if(player.getState() != PlayerState.PLACE)
-            throw new MoveNotAllowedException("It is time to place a card");
+            throw new MoveNotAllowedException("It is not time to place a card");
 
 
         // Place the card
