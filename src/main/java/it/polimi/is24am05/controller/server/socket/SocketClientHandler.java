@@ -32,6 +32,13 @@ public class SocketClientHandler extends ClientHandler implements Runnable {
      */
     private final ScheduledExecutorService connectionChecker = Executors.newSingleThreadScheduledExecutor();
 
+    /**
+     * Construct a ClientHandler that connects to the client via socket
+     * @param controller of the game
+     * @param server to subscribe to
+     * @param socket to handle communication through
+     * @throws IOException if something goes wrong when connecting to the server
+     */
     public SocketClientHandler(Controller controller, Server server, Socket socket) throws IOException {
         super(controller, server);
         this.socket = socket;

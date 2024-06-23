@@ -23,6 +23,13 @@ public class RmiClientHandler extends ClientHandler {
     protected volatile String lastHeartBeat = "Manuel";
     private final ScheduledExecutorService connectionDemon = Executors.newSingleThreadScheduledExecutor();
 
+    /**
+     * Construct a ClientHandler that connects to the client via socket
+     * @param controller of the game
+     * @param server to subscribe to
+     * @param virtualClient reference to the client, used to call RMI methods on
+     * @throws RemoteException if something goes wrong during connection
+     */
     public RmiClientHandler(Controller controller, Server server, RmiVirtualClient virtualClient) throws RemoteException {
         super(controller, server);
         this.virtualClient = virtualClient;

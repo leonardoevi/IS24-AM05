@@ -10,6 +10,9 @@ import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class handles communication with a client
+ */
 public abstract class ClientHandler implements VirtualClient {
     private String nickname;
     private final Controller controller;

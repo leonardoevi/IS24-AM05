@@ -5,7 +5,6 @@ import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiHandlersProviderImp;
 import it.polimi.is24am05.controller.server.socket.SocketClientHandler;
 import it.polimi.is24am05.model.exceptions.game.NoSuchPlayerException;
-import it.polimi.is24am05.model.game.Game;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,6 +18,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Multiplexer to all connected clients
+ */
 public class Server {
     private final List<ClientHandler> clientHandlers;
     private final Controller controller;
@@ -28,6 +30,10 @@ public class Server {
         this.controller = controller;
     }
 
+    /**
+     * Start the server and start accepting Socket and RMI connections
+     * @throws RemoteException if something goes wrong during any of the startup operations
+     */
     public void start() throws RemoteException {
         new Thread(this::startSocket).start();
         startRMI();
@@ -76,24 +82,44 @@ public class Server {
         }
     }
 
+    /**
+     * @return the nicknames of the connected clients
+     */
     public synchronized List<String> getNicknames(){
         return clientHandlers.stream().map(ClientHandler::getNickname).toList();
     }
 
+    /**
+     * Add a client to the list of connected clients
+     * @param clientHandler to add
+     */
     public synchronized void subscribe(ClientHandler clientHandler) {
         System.out.println(clientHandler.getNickname() + " subscribed");
         clientHandlers.add(clientHandler);
     }
 
+    /**
+     * Removes a client from the list of connected clients
+     * @param clientHandler to remove
+     */
     public synchronized void unsubscribe(ClientHandler clientHandler) {
         System.out.println(clientHandler.getNickname() + " unsubscribed");
         clientHandlers.remove(clientHandler);
     }
 
+    /**
+     * @param clientHandler to check
+     * @return true if the specified client is in the list of connected clients
+     */
     public synchronized boolean isSubscribed(ClientHandler clientHandler) {
         return clientHandlers.contains(clientHandler);
     }
 
+    /**
+     * @param nickname to find
+     * @return the client with the specified nickname
+     * @throws NoSuchPlayerException if no client with the specified nickname is in the list
+     */
     private synchronized ClientHandler getClientHandler(String nickname) throws NoSuchPlayerException {
         return clientHandlers.stream().filter(h -> h.getNickname().equals(nickname)).findFirst()
                 .orElseThrow(NoSuchPlayerException::new);
@@ -113,6 +139,10 @@ public class Server {
         }
     }
 
+    /**
+     * Update the game model of the client with the specified nickname
+     * @param nickname to update
+     */
     public void gameUpdated(String nickname) {
         try{
             getClientHandler(nickname).setGame(controller.game.getPov(nickname));

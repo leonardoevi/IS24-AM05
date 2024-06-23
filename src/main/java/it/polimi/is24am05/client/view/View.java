@@ -2,8 +2,10 @@ package it.polimi.is24am05.client.view;
 
 import it.polimi.is24am05.client.ServerHandler;
 import it.polimi.is24am05.client.model.ClientModel;
-import it.polimi.is24am05.model.game.Game;
 
+/**
+ * Class that allows the visualization of the game state
+ */
 public abstract class View implements Observer{
     protected final ClientModel clientModel;
     protected final ServerHandler server;
@@ -14,5 +16,8 @@ public abstract class View implements Observer{
         clientModel.addObserver(this);
     }
 
+    /**
+     * Kills all the processes when the connection to the server is no longer available
+     */
     public abstract void serverUnreachable();
 }

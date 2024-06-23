@@ -6,6 +6,7 @@ import it.polimi.is24am05.controller.server.rmi.RmiHandlersProvider;
 import it.polimi.is24am05.controller.server.rmi.RmiVirtualController;
 import it.polimi.is24am05.model.game.Game;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -38,6 +39,13 @@ public class RmiServerHandler extends ServerHandler {
 
     }
 
+    /**
+     * Constructs a class that connect to the server via RMI
+     * @param serverIP ip of the server
+     * @param serverPort port of the server
+     * @param viewType GUI or TUI
+     * @throws RemoteException if something goes wrong during connection to the server
+     */
     public RmiServerHandler(String serverIP, String serverPort, String viewType) throws RemoteException {
         super(serverIP, serverPort, viewType);
         rmiFromServer = new RmiFromServer();
@@ -45,7 +53,10 @@ public class RmiServerHandler extends ServerHandler {
         startConnection();
     }
 
-
+    /**
+     * Try to connect to the server
+     * @throws RemoteException if something goes wrong during the connection
+     */
     public void startConnection() throws RemoteException {
         // Try connecting to the server
         try {
@@ -221,6 +232,9 @@ public class RmiServerHandler extends ServerHandler {
         }
     }
 
+    /**
+     * Check connection with the client sending heartbeat
+     */
     class RmiServerChecker implements Runnable {
         @Override
         public void run() {

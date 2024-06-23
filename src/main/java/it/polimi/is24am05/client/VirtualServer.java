@@ -9,6 +9,9 @@ public interface VirtualServer {
      */
     public void joinServer();
 
+    /**
+     * Allows the client to leave the server, usually to change nickname and join again
+     */
     public void leaveServer();
 
     /**

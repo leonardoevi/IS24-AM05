@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 
+/**
+ * Handles communication via socket
+ */
 public class SocketServerHandler extends ServerHandler {
     private final Socket socket;
     private final ObjectOutputStream outputStream;
@@ -27,6 +30,13 @@ public class SocketServerHandler extends ServerHandler {
         }
     }
 
+    /**
+     * Constructs a class that connect to the server via socket
+     * @param serverIP ip of the server
+     * @param serverPort port of the server
+     * @param viewType GUI or TUI
+     * @throws IOException if something goes wrong during connection to the server
+     */
     public SocketServerHandler(String serverIP, String serverPort, String viewType) throws IOException {
         super(serverIP, serverPort, viewType);
 
@@ -111,6 +121,10 @@ public class SocketServerHandler extends ServerHandler {
         send(new Message("directMessage", Map.of("message", message, "recipient", recipient)));
     }
 
+    /**
+     * Send a message to the server via the socket
+     * @param message
+     */
     public synchronized void send(Message message) {
         try {
 
@@ -122,6 +136,9 @@ public class SocketServerHandler extends ServerHandler {
         }
     }
 
+    /**
+     * Reads and interprets the messages sent from the serve via the socket
+     */
     public class SocketServerReader implements Runnable {
 
         private final SocketServerHandler socketServerHandler;

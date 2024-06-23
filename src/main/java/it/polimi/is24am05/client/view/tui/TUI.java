@@ -17,6 +17,11 @@ import static java.lang.Integer.parseInt;
 public class TUI extends View {
     private final InputReader inputReader;
 
+    /**
+     * Construct a TUI for the provided model
+     * @param clientModel model to display
+     * @param server connection to the server
+     */
     public TUI(ClientModel clientModel, ServerHandler server) {
         super(clientModel, server);
 
@@ -48,6 +53,9 @@ public class TUI extends View {
         inputReader.stopInputReader();
     }
 
+    /**
+     * Thread that reads and processes the input from stdin
+     */
     class InputReader implements Runnable{
         private final Scanner stdin = new Scanner(System.in);
         private boolean stdinClosed = false;

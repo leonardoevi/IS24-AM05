@@ -6,6 +6,9 @@ import it.polimi.is24am05.client.view.tui.TUI;
 import it.polimi.is24am05.client.view.View;
 import it.polimi.is24am05.model.game.Game;
 
+/**
+ * Handles communication with the server
+ */
 public abstract class ServerHandler implements VirtualServer{
     private String nickname;
     private final ClientModel clientModel;
