@@ -101,7 +101,17 @@ public class TUI extends View {
                         break;
 
                     case "5":
-                        server.placeStarterSide(parseBoolean(scanner.next()));
+                        boolean isFront;
+                        String choice = scanner.next();
+
+                        if (choice.equals("front"))
+                            isFront = true;
+                        else if (choice.equals("back"))
+                            isFront = false;
+                        else
+                            throw new Exception();
+
+                        server.placeStarterSide(isFront);
                         break;
 
                     case "6":
@@ -109,11 +119,31 @@ public class TUI extends View {
                         break;
 
                     case "7":
-                        server.placeSide(getCardName(Card.getCard(parseInt(scanner.next()))), parseBoolean(scanner.next()), parseInt(scanner.next()), parseInt(scanner.next()));
+                        String cardId = getCardName(Card.getCard(parseInt(scanner.next())));
+                        choice = scanner.next();
+
+                        if (choice.equals("front"))
+                            isFront = true;
+                        else if (choice.equals("back"))
+                            isFront = false;
+                        else
+                            throw new Exception();
+
+                        server.placeSide(cardId, isFront, parseInt(scanner.next()), parseInt(scanner.next()));
                         break;
 
                     case "8":
-                        server.drawDeck(parseBoolean(scanner.next()));
+                        boolean isGold;
+                        choice = scanner.next();
+
+                        if (choice.equals("gold"))
+                            isGold = true;
+                        else if (choice.equals("resource"))
+                            isGold = false;
+                        else
+                            throw new Exception();
+
+                        server.drawDeck(isGold);
                         break;
 
                     case "9":
