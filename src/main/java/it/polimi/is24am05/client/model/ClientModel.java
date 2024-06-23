@@ -7,12 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Model of the game, client side
+ */
 public class ClientModel implements Observable {
     private Game game;
     private final List<String> log = new ArrayList<>();
 
     private final List<Observer> observers = new ArrayList<>();
 
+    /**
+     * Update the model of the game with a new one
+     * @param game new game state
+     */
     public void setGame(Game game) {
         this.game = game;
         notifyObserversGame();
@@ -29,6 +36,10 @@ public class ClientModel implements Observable {
         return new ArrayList<>(log);
     }
 
+    /**
+     * Add a log
+     * @param log to add
+     */
     public void addLog(String log) {
         this.log.add(log);
         notifyObserversLogs();
