@@ -351,8 +351,7 @@ public class Controller {
      * @param nickname of the player disconnected
      */
     public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
-        if(users.remove(nickname))
-            System.out.println("Disconnecting " + nickname);
+        boolean alreadyDisconnected = users.remove(nickname);
 
         if(this.game == null)
             return;
@@ -374,7 +373,8 @@ public class Controller {
             server.broadcastLog(messageRecipents, nickname + "'s objective automatically chosen");
         }
 
-        server.broadcastLog(messageRecipents, nickname + " disconnected!");
+        if(!alreadyDisconnected)
+            server.broadcastLog(messageRecipents.stream().filter(x -> !game.getDisconnected().contains(x)).toList(), nickname + " disconnected!");
 
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){

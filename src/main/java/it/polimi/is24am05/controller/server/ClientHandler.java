@@ -223,11 +223,11 @@ public abstract class ClientHandler implements VirtualClient {
         try {
             if(nickname != null)
                 controller.disconnect(nickname);
-
-            server.unsubscribe(this);
         } catch (Exception e) {
             addLog(e.getMessage());
         }
+
+        server.unsubscribe(this);
     }
 
     protected void sendMessage(String message) {

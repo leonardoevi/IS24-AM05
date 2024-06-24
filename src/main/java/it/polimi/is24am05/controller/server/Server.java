@@ -103,8 +103,8 @@ public class Server {
      * @param clientHandler to remove
      */
     public synchronized void unsubscribe(ClientHandler clientHandler) {
-        System.out.println(clientHandler.getNickname() + " unsubscribed");
-        clientHandlers.remove(clientHandler);
+        if(clientHandlers.remove(clientHandler))
+            System.out.println(clientHandler.getNickname() + " unsubscribed");
     }
 
     /**

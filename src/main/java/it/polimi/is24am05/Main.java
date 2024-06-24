@@ -31,6 +31,7 @@ public class Main {
                 try {
                     Game oldGame = loadGame(args[1]);
                     System.out.println("Old game loaded");
+                    System.out.println("Players: " + String.join(" ", oldGame.getNicknames()));
                     new Controller(oldGame);
                 } catch (IOException | ClassNotFoundException | ArrayIndexOutOfBoundsException e) {
                     // Create a lobby for a new game if the file provided is not found or no file is provided
