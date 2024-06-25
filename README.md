@@ -10,7 +10,15 @@
      java -jar <path to the .jar file> server <path to a save file>
    ```
      to load a game from a save file
-3. Execute the .jar file with the following command to start the client:
+
+   If RMI connections don't work add the following parameter
+   ```
+   -Djava.rmi.server.hostname=<server ip>
+   ```
+   ```
+   java -Djava.rmi.server.hostname=172.20.10.3 -jar IS24-AM05.jar server
+   ```
+4. Execute the .jar file with the following command to start the client:
    ```
      client <rmi/socket> <server ip> <server port> <TUI/GUI>
    ```
