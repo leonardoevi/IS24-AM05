@@ -417,7 +417,7 @@ public class GameSceneController implements Initializable {
         goldVisible2.setImage(null);
         playArea.getChildren().removeIf(node -> node instanceof StackPane || node instanceof Text);
 
-
+        sender.getItems().clear();
         for (Player p : game.getPlayers()) {
             if (p.getNickname().equals(clientNickname)) {
 

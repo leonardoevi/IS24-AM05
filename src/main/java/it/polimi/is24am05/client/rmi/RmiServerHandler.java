@@ -51,6 +51,8 @@ public class RmiServerHandler extends ServerHandler {
         rmiFromServer = new RmiFromServer();
 
         startConnection();
+
+        System.out.println("Connection to server established");
     }
 
     /**

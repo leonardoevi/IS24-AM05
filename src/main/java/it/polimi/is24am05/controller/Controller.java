@@ -92,10 +92,12 @@ public class Controller {
             // If the user is already connected
             if(this.users.contains(playerNickname))
                 throw new ConnectionRefusedException("User already connected");
+
+            // Broadcast update
+            server.broadcastLog(users, playerNickname + " rejoined!");
+
             // Add the user to the list of reconnected users
             users.add(playerNickname);
-            // Broadcast update
-            server.broadcastLog(messageRecipents, playerNickname + " rejoined!");
             // If all have reconnected resume the game
             if(this.users.size() == this.numUsers) {
                 // Reconnect users starting from the user that was expected to play, in the same order of playing
@@ -162,16 +164,18 @@ public class Controller {
                 this.game.reconnect(playerNickname);
                 GameState stateAfterReconnection = game.getGameState();
 
+                users.add(playerNickname);
+
                 server.gameUpdated(playerNickname);
-                server.broadcastLog(messageRecipents.stream()
+                server.broadcastLog(users.stream()
                         .filter(s -> !s.equals(playerNickname))
                         .toList(), playerNickname + " reconnected!");
 
                 if(stateBeforeReconnection != stateAfterReconnection) {
-                    server.broadcastGameUpdated(messageRecipents.stream()
+                    server.broadcastGameUpdated(users.stream()
                             .filter(s -> !s.equals(playerNickname))
                             .toList());
-                    server.broadcastLog(messageRecipents, "Game resumed!");
+                    server.broadcastLog(users, "Game resumed!");
                 }
 
             } catch (NoSuchPlayerException ignored) {}
@@ -351,7 +355,7 @@ public class Controller {
      * @param nickname of the player disconnected
      */
     public synchronized void disconnect(String nickname) throws NoSuchPlayerException {
-        boolean alreadyDisconnected = users.remove(nickname);
+        boolean firstDisconnection = users.remove(nickname);
 
         if(this.game == null)
             return;
@@ -373,7 +377,7 @@ public class Controller {
             server.broadcastLog(messageRecipents, nickname + "'s objective automatically chosen");
         }
 
-        if(!alreadyDisconnected)
+        if(firstDisconnection)
             server.broadcastLog(messageRecipents.stream().filter(x -> !game.getDisconnected().contains(x)).toList(), nickname + " disconnected!");
 
         // If the game is stopped after this disconnection
@@ -388,6 +392,14 @@ public class Controller {
      */
     public synchronized List<String> getUsers() {
         return new LinkedList<>(users);
+    }
+
+    public LobbyState getLobbyState() {
+        return lobbyState;
+    }
+
+    public int getNumUsers() {
+        return numUsers;
     }
 
     /**

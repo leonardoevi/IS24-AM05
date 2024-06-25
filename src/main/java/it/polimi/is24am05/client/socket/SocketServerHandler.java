@@ -49,6 +49,8 @@ public class SocketServerHandler extends ServerHandler {
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
 
         new Thread(new SocketServerReader(this, socket)).start();
+
+        System.out.println("Connection to server established");
     }
 
     @Override

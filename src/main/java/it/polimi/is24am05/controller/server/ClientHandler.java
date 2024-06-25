@@ -1,6 +1,7 @@
 package it.polimi.is24am05.controller.server;
 
 import it.polimi.is24am05.controller.Controller;
+import it.polimi.is24am05.controller.LobbyState;
 import it.polimi.is24am05.controller.exceptions.AlreadyUsedNicknameException;
 import it.polimi.is24am05.model.card.Card;
 import it.polimi.is24am05.model.card.goldCard.GoldCard;
@@ -55,6 +56,7 @@ public abstract class ClientHandler implements VirtualClient {
             this.nickname = nickname;
             server.subscribe(this);
         }
+        addLog( "Welcome " + this.getNickname());
     }
 
     protected void leaveServer() {
@@ -69,16 +71,16 @@ public abstract class ClientHandler implements VirtualClient {
                 return;
             }
 
-            addLog("Bye " + nickname);
             server.unsubscribe(this);
             try {
                 controller.disconnect(nickname);
             } catch (NoSuchPlayerException e) {
                 System.out.println("Controller was not able to disconnect " + nickname);
             }
-
-            this.nickname = null;
         }
+
+        addLog("Bye " + nickname);
+        this.nickname = null;
     }
 
     protected void joinGame() {
@@ -94,6 +96,13 @@ public abstract class ClientHandler implements VirtualClient {
 
         try {
             controller.newConnection(nickname);
+            if(controller.getLobbyState().equals(LobbyState.NEW) || controller.getLobbyState().equals(LobbyState.OLD)) {
+                int missingPlayers = controller.getNumUsers() - controller.getUsers().size();
+                if(missingPlayers > 1)
+                    addLog("Waiting for " + missingPlayers + " more players to connect");
+                if(missingPlayers == 1)
+                    addLog("Waiting for one more player to connect");
+            }
         } catch (Exception e) {
             addLog(e.getMessage());
         }
@@ -112,6 +121,7 @@ public abstract class ClientHandler implements VirtualClient {
 
         try {
             controller.newConnection(nickname, numberOfPlayers);
+            addLog("Game created and joined for " + numberOfPlayers + " players");
         } catch (Exception e) {
             addLog(e.getMessage());
         }
