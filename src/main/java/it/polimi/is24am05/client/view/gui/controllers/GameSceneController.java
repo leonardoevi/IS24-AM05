@@ -461,6 +461,9 @@ public class GameSceneController implements Initializable {
             resourceDeckTop.setImage(new Image(sidePath));
         } catch (EmptyDeckException e) {
             // logField.setText("resource deck empty");
+            String sidePath = "/assets/images/emptydeck.png";
+            sidePath = getClass().getResource(sidePath).toExternalForm();
+            resourceDeckTop.setImage(new Image(sidePath));
         }
 
         try {
@@ -496,6 +499,9 @@ public class GameSceneController implements Initializable {
             goldDeckTop.setImage(new Image(sidePath));
         } catch (EmptyDeckException e) {
             // logField.setText("resource deck empty");
+            String sidePath = "/assets/images/emptydeck.png";
+            sidePath = getClass().getResource(sidePath).toExternalForm();
+            goldDeckTop.setImage(new Image(sidePath));
         }
 
         int idCard;
@@ -508,7 +514,7 @@ public class GameSceneController implements Initializable {
             if (idCard >= 10) {
                 path += "0";
 
-            } else if (idCard < 10) {
+            } else {
                 path += "00";
 
             }
@@ -518,22 +524,23 @@ public class GameSceneController implements Initializable {
             path = getClass().getResource(path).toExternalForm();
             resourceVisible1.setImage(new Image(path));
 
+            if (resourceVisible.size()==2) {
+                idCard = resourceVisible.get(1).getId();
 
-            idCard = resourceVisible.get(1).getId();
+                path = "/assets/images/front/";
+                if (idCard >= 10) {
+                    path += "0";
 
-            path = "/assets/images/front/";
-            if (idCard >= 10) {
-                path += "0";
+                } else {
+                    path += "00";
 
-            } else if (idCard < 10) {
-                path += "00";
-
+                }
+                path += idCard;
+                path += ".png";
+                visibleViewMap.put(resourceVisible2, path);
+                path = getClass().getResource(path).toExternalForm();
+                resourceVisible2.setImage(new Image(path));
             }
-            path += idCard;
-            path += ".png";
-            visibleViewMap.put(resourceVisible2, path);
-            path = getClass().getResource(path).toExternalForm();
-            resourceVisible2.setImage(new Image(path));
         }
         if (game.getGoldDeck() != null && game.getGoldDeck().getVisible() != null && !game.getGoldDeck().getVisible().isEmpty()) {
             List<Card> goldVisible = new HashSet<>(game.getGoldDeck().getVisible()).stream().toList();
@@ -548,17 +555,18 @@ public class GameSceneController implements Initializable {
             path = getClass().getResource(path).toExternalForm();
             goldVisible1.setImage(new Image(path));
 
+            if (goldVisible.size()==2) {
+                idCard = goldVisible.get(1).getId();
 
-            idCard = goldVisible.get(1).getId();
+                path = "/assets/images/front/";
 
-            path = "/assets/images/front/";
-
-            path += "0";
-            path += idCard;
-            path += ".png";
-            visibleViewMap.put(goldVisible2, path);
-            path = getClass().getResource(path).toExternalForm();
-            goldVisible2.setImage(new Image(path));
+                path += "0";
+                path += idCard;
+                path += ".png";
+                visibleViewMap.put(goldVisible2, path);
+                path = getClass().getResource(path).toExternalForm();
+                goldVisible2.setImage(new Image(path));
+            }
         }
         if (game.getSharedObjectives() != null) {
             if (game.getSharedObjectives()[0] != null) {
