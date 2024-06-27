@@ -362,7 +362,9 @@ public class Controller {
 
         GameState stateBeforeDisconnection = game.getGameState();
         PlayerState playerStateBeforeDisconnection = game.getPlayerState(nickname);
+        int turnBeforeDisconnection = game.getTurn();
         game.disconnect(nickname);
+        int turnAfterDisconnection = game.getTurn();
         GameState stateAfterDisconnection = game.getGameState();
 
         // If the disconnection happened during PLACE_STARTER_CARD game state, broadcast the new game state
@@ -377,8 +379,12 @@ public class Controller {
             server.broadcastLog(messageRecipents, nickname + "'s objective automatically chosen");
         }
 
+        String newTurnMessage = "";
+        if(turnBeforeDisconnection != turnAfterDisconnection)
+            newTurnMessage = " It is now " + game.getPlayers().get(turnAfterDisconnection).getNickname() + "'s turn";
+
         if(firstDisconnection)
-            server.broadcastLog(messageRecipents.stream().filter(x -> !game.getDisconnected().contains(x)).toList(), nickname + " disconnected!");
+            server.broadcastLog(messageRecipents.stream().filter(x -> !game.getDisconnected().contains(x)).toList(), nickname + " disconnected!" + newTurnMessage);
 
         // If the game is stopped after this disconnection
         if( (stateBeforeDisconnection == GameState.GAME || stateBeforeDisconnection == GameState.GAME_ENDING) && stateAfterDisconnection == GameState.PAUSE){
